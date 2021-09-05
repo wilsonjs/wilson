@@ -5704,10 +5704,10 @@ postcss@^8.3.6:
     nanoid "^3.1.23"
     source-map-js "^0.6.2"
 
-preact-iso@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/preact-iso/-/preact-iso-2.0.3.tgz#79343d9e539261c3369800c5623c213c528a0541"
-  integrity sha512-YQ+HTVDDFVuTvxL8xUMy+1QlrEuIFSXC5Np4WO1UEVDWXy51n56H2jd05bjMFeTEiKLxQmr86SqhSmgo5PzCLw==
+preact-iso@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/preact-iso/-/preact-iso-2.1.0.tgz#8ea254aeed8c50b746782cadcdb995ca96345834"
+  integrity sha512-Pr301RPZ/yML7KfSB1C1t8rrLhHCVDxFL6K8BMravCnQ9FNfXchXdvNRZRYFZUqA+MpC/r6RoNBJNwL2QOTkRw==
 
 preact-render-to-string@^5.1.19:
   version "5.1.19"
