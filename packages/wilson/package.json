@@ -110,7 +110,7 @@
   "devDependencies": {
     "@types/compression": "^1.7.2",
     "@types/estree": "^0.0.50",
-    "@types/fs-extra": "^9.0.12",
+    "@types/fs-extra": "^9.0.13",
     "@types/html-minifier-terser": "^5.1.2",
     "@types/jest": "^27.0.1",
     "@types/mime-types": "^2.1.1",
