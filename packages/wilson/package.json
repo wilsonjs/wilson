@@ -63,7 +63,7 @@
     "@svgr/core": "^5.5.0",
     "acorn": "^8.5.0",
     "astring": "^1.7.4",
-    "boxen": "^5.1.0",
+    "boxen": "^6.2.0",
     "brotli-size": "^4.0.0",
     "chalk": "^4.1.2",
     "compression": "^1.7.4",
