@@ -83,7 +83,7 @@
     "node-cache": "^5.1.2",
     "ora": "^6.0.1",
     "plist": "^3.0.4",
-    "preact": "^10.5.14",
+    "preact": "^10.7.0",
     "preact-render-to-string": "^5.1.19",
     "pretty-error": "^3.0.3",
     "readdirp": "^3.6.0",
