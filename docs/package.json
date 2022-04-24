@@ -28,7 +28,7 @@
     "vscode-styled-components": "styled-components/vscode-styled-components"
   },
   "devDependencies": {
-    "@types/node": "^16.9.1",
+    "@types/node": "^17.0.25",
     "sass": "^1.41.0"
   }
 }
