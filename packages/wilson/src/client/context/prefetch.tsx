@@ -152,7 +152,7 @@ const prefetch = (url: string) => {
  * @returns A boolean indicating whether or not data saving should be performed
  */
 const performDataSaving = (): boolean => {
-  const conn = (navigator as Navigator).connection
+  const conn = (navigator as unknown as Navigator).connection
   return conn !== undefined && (conn.saveData || /2g/.test(conn.effectiveType))
 }
 

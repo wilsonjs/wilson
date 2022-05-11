@@ -44,7 +44,7 @@ export async function renderToString(url: string): Promise<PrerenderResult> {
     try {
       return preactRenderToString(vnode)
     } catch (e) {
-      if (e && e.then) {
+      if (e && (e as Promise<unknown>).then) {
         await e
         return await render()
       }

@@ -17,6 +17,6 @@ export async function startDevServer(
     await devServer.listen()
   } catch (e) {
     const pe = new PrettyError()
-    console.error(pe.render(e))
+    console.error(pe.render(e as Error))
   }
 }
