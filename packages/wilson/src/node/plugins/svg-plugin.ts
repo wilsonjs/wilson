@@ -1,9 +1,7 @@
 import { Plugin } from 'vite'
 import { LoadResult } from 'rollup'
 import { readFile } from 'fs/promises'
-// eslint-disable-next-line
-// @ts-ignore
-import svgr from '@svgr/core'
+import { transform as transformSVG } from '@svgr/core'
 import { transformJsx } from '../util.js'
 
 const cache = new Map()
@@ -20,8 +18,8 @@ const svgPlugin = async (): Promise<Plugin> => {
       let result = cache.get(id)
 
       if (!result) {
-        const code = await readFile(id)
-        const jsx = await svgr.default(code)
+        const buffer = await readFile(id)
+        const jsx = await transformSVG(buffer.toString())
         result = `import { h } from 'preact';\n${transformJsx(jsx)}`
         cache.set(id, result)
       }
