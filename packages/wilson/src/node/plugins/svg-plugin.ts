@@ -16,7 +16,6 @@ const svgPlugin = async (): Promise<Plugin> => {
 
       id = id.replace(/\?component$/, '')
       let result = cache.get(id)
-
       if (!result) {
         const buffer = await readFile(id)
         const jsx = await transformSVG(buffer.toString())
