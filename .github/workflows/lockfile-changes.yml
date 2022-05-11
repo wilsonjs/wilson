@@ -1,4 +1,4 @@
-name: Human-readable summary of lock file changes
+name: NPM Lockfile Changes
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  yarn_lock_changes:
+  lockfile_changes:
     runs-on: ubuntu-latest
 
     # Permission overwrite is required for Dependabot PRs
@@ -20,7 +20,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Yarn Lock Changes
-        uses: codepunkt/yarn-lock-changes@main
+      - name: NPM Lockfile Changes
+        uses: codepunkt/npm-lockfile-changes@main
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
