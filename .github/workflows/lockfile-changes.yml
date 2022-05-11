@@ -1,0 +1,26 @@
+name: Human-readable summary of lock file changes
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'package-lock.json'
+  workflow_dispatch:
+
+jobs:
+  yarn_lock_changes:
+    runs-on: ubuntu-latest
+
+    # Permission overwrite is required for Dependabot PRs
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Yarn Lock Changes
+        uses: codepunkt/yarn-lock-changes@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
