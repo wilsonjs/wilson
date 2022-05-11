@@ -85,7 +85,7 @@
     "plist": "^3.0.4",
     "preact": "^10.5.14",
     "preact-render-to-string": "^5.1.19",
-    "pretty-error": "^3.0.3",
+    "pretty-error": "^4.0.0",
     "readdirp": "^3.6.0",
     "rehype-autolink-headings": "^6.1.0",
     "rehype-parse": "^8.0.3",
