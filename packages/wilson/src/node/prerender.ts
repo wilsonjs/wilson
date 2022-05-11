@@ -163,7 +163,7 @@ export async function prerenderStaticPages(feeds: Feed[]): Promise<void> {
             `};</script>`
         )
 
-        const minifiedSource = minify(source, {
+        const minifiedSource = await minify(source, {
           collapseBooleanAttributes: true,
           collapseWhitespace: true,
           minifyCSS: true,

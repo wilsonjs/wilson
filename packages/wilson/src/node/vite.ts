@@ -38,11 +38,7 @@ export const getViteConfig = async ({
       await markdownPlugin(),
       await pagesPlugin(),
       await virtualPlugin(),
-      // eslint-disable-next-line
-      // @ts-ignore
-      preact.default({
-        devtoolsInProd: true,
-      }),
+      preact({ devtoolsInProd: true }),
       await svgPlugin(),
     ],
     build: {

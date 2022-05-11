@@ -2,44 +2,31 @@ import { copy, ensureDir, readdir, writeFile } from 'fs-extra'
 import { basename, join } from 'path'
 import minimist from 'minimist'
 import chalk from 'chalk'
-import { execSync } from 'child_process'
 import install from './install'
 
 const argv = minimist(process.argv.slice(2))
 
-const shouldUseYarn = (): boolean => {
-  try {
-    execSync('yarnpkg --version', { stdio: 'ignore' })
-    return true
-  } catch (e) {
-    return false
-  }
-}
-
-const verifyNodeVersion = () => {
+const verifyNodeVersion = async () => {
   const currentNodeVersion = process.versions.node
   const semver = currentNodeVersion.split('.')
+  const installedMajor = parseInt(semver[0], 10)
+  const packageJson = await import(join(__dirname, '../package.json'))
   const requiredVersion = parseInt(
-    require(join(__dirname, '../package.json'))
-      .engines.node.split('.')[0]
-      .replace(/^(~|\^)/, ''),
+    packageJson.engines.node.split('.')[0].replace(/^(~|\^)/, ''),
     10
   )
-  const installedMajor = parseInt(semver[0], 10)
 
   if (installedMajor < requiredVersion) {
     throw new Error(
-      'You are running Node ' +
-        currentNodeVersion +
-        '.\n' +
-        `Wilson requires Node ${requiredVersion} or higher. \n` +
-        'Please update your version of Node.'
+      `You are running Node ${currentNodeVersion}.
+Wilson requires Node ${requiredVersion} or higher.
+Please update your version of Node.`
     )
   }
 }
 
 async function cli() {
-  verifyNodeVersion()
+  await verifyNodeVersion()
 
   const targetDir = argv._[0] || '.'
   const cwd = process.cwd()
@@ -75,37 +62,34 @@ async function cli() {
   }
 
   // write package.json with adjusted `name` property
-  const pkg = require(join(templateDir, `package.json`))
+  const pkg = await import(join(templateDir, `package.json`))
   pkg.name = basename(root)
   await write('package.json', JSON.stringify(pkg, null, 2))
 
-  const useYarn = shouldUseYarn()
-
   console.info(``)
-  console.info(`Installing dependencies using ${useYarn ? 'yarn' : 'npm'}...`)
+  console.info(`Installing dependencies...`)
   console.info(``)
 
-  await install(root, useYarn)
-  const runCommand = useYarn ? 'yarn' : 'npm run'
+  await install()
 
   console.info(``)
   console.info(`Success!`)
   console.info(`Created a new Wilson site at ${chalk.green(root)}.`)
   console.info(`Inside that directory, you can run several commands`)
   console.info(``)
-  console.info(`  ${chalk.cyan(`${runCommand} start`)}`)
+  console.info(`  ${chalk.cyan(`npm run start`)}`)
   console.info(`    Starts the development server.`)
   console.info(``)
-  console.info(`  ${chalk.cyan(`${runCommand} build`)}`)
+  console.info(`  ${chalk.cyan(`npm run build`)}`)
   console.info(`    Bundles the site into static files for production.`)
   console.info(``)
-  console.info(`  ${chalk.cyan(`${runCommand} serve`)}`)
+  console.info(`  ${chalk.cyan(`npm run serve`)}`)
   console.info(`    Serves the production-ready site on localhost.`)
   console.info(``)
   console.info(`We suggest that you begin by typing:`)
   console.info(``)
   console.info(`    ${chalk.cyan('cd')} ${targetDir}`)
-  console.info(`    ${chalk.cyan(`${runCommand} start`)}`)
+  console.info(`    ${chalk.cyan(`npm run start`)}`)
 }
 
 cli().catch((e) => {

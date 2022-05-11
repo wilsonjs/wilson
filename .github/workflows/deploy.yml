@@ -8,13 +8,13 @@ on:
       - 'docs/**'
       - 'packages/wilson/**'
       - 'netlify.toml'
-      - 'yarn.lock'
+      - 'package-lock.json'
   workflow_dispatch:
 
 jobs:
   # Netlify will deploy a preview every time there is a PR to the main branch
   # opened, synchronized or reopened.
-  # 
+  #
   # The audit job will wait for the netlify deployment, run a lighthouse check
   # against the preview deployment URL and update the PR with the result.
   audit:
@@ -67,6 +67,6 @@ jobs:
             github.issues.createComment({
               issue_number,
               owner,
-              repo, 
+              repo,
               body: `[Preview Deployment](${netlifyUrl}) has these [Lighthouse Audit](${lighthouseUrl}) scores:\n\n![](https://img.shields.io/badge/Performance-${perf}-${perfColor}?style=flat-square) ![](https://img.shields.io/badge/Best-Practices-${best}-${bestColor}?style=flat-square) ![](https://img.shields.io/badge/Accessibility-${a11y}-${a11yColor}?style=flat-square) ![](https://img.shields.io/badge/Best%20Practices-${best}-${bestColor}?style=flat-square) ![](https://img.shields.io/badge/SEO-${seo}-${seoColor}?style=flat-square) ![](https://img.shields.io/badge/Progressive%20Web%20App-${pwa}-${pwaColor}?style=flat-square)`
             });

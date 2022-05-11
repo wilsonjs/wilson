@@ -1,7 +1,6 @@
 [build]
   publish = "docs/dist/"
-  command = "yarn run wilson:build && yarn run docs:build"
+  command = "npm run wilson:build && npm run docs:build"
 
 [build.environment]
-  NODE_VERSION = "14"
-  YARN_VERSION = "1.22.10"
+  NODE_VERSION = "16"

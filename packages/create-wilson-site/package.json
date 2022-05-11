@@ -1,14 +1,18 @@
 {
-  "name": "@wilson/create-wilson-site",
+  "name": "create-wilson-site",
   "version": "1.0.0-beta.2",
   "license": "MIT",
   "author": "Christoph Werner <christoph@codepunkt.de>",
   "description": "Blazing-fast, opinionated static site generator for Preact",
   "bin": {
-    "wilson": "bin/create-wilson-site.js"
+    "create-wilson-site": "bin/create-wilson-site.js"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">= 16.15.0",
+    "npm": ">= 8.5.5"
+  },
   "files": [
     "dist/**",
     "template/**"
@@ -26,10 +30,10 @@
     ]
   },
   "scripts": {
-    "build": "yarn run clean && tsc",
-    "dev": "yarn run clean && tsc -w",
+    "build": "npm run clean && tsc",
+    "dev": "npm run clean && tsc -w",
     "clean": "node -e \"fs.rmSync('dist', { force: true, recursive: true })\"",
-    "prepack": "yarn run build"
+    "prepack": "npm run build"
   },
   "dependencies": {
     "chalk": "^4.1.2",
