@@ -59,6 +59,12 @@ export const getViteConfig = async ({
               '../client/ssr/serverRender.js'
             )
           : 'index.html',
+        output: ssr
+          ? {
+              format: 'es',
+              entryFileNames: '[name].mjs',
+            }
+          : {},
       },
       manifest: !ssr,
       minify: ssr ? false : !process.env.DEBUG,
