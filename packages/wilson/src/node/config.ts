@@ -4,7 +4,7 @@ import {
   SiteConfigWithDefaults,
 } from '../types'
 import { resolve } from 'path'
-import fs, { truncate } from 'fs-extra'
+import fs from 'fs-extra'
 import { createRequire } from 'module'
 
 const require = createRequire(import.meta.url)

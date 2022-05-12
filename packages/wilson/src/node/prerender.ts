@@ -63,9 +63,9 @@ export async function prerenderStaticPages(feeds: Feed[]): Promise<void> {
     const manifest = await readJson<Manifest>('./dist/manifest.json')
     const template = await readFile('./dist/index.html')
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { renderToString }: { renderToString: PrerenderFn } = require(toRoot(
-      './.wilson/ssr/serverRender.js'
-    ))
+    const { renderToString }: { renderToString: PrerenderFn } = await import(
+      toRoot('./.wilson/ssr/serverRender.mjs')
+    )
 
     let longestPath = 0
     const sources: Record<string, string> = {}

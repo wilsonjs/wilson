@@ -30,7 +30,7 @@ const virtualPlugin = async (): Promise<Plugin> => {
      */
     async load(id: string): Promise<LoadResult> {
       if (id === clientEntryPath) {
-        return `import "wilson/dist/client/main.js";`
+        return `import("wilson/dist/client/main.js");`
       }
 
       if (id === virtualExportsPath) {
@@ -75,7 +75,7 @@ const virtualPlugin = async (): Promise<Plugin> => {
           ${layoutImport}
 
           ${lazyPageImports}
-          
+
           const routes = [${routes}];
           const siteData = ${JSON.stringify(siteData)};
 

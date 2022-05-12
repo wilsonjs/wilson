@@ -21,7 +21,7 @@ export async function build(root: string = process.cwd()): Promise<void> {
    * This is usually done via bundler configuration, but node_modules are not bundled
    * for server side rendering, so we need to do it manually.
    */
-  const path = './.wilson/ssr/serverRender.js'
+  const path = './.wilson/ssr/serverRender.mjs'
   const content = await readFile(path)
   writeFile(
     toRoot(path),
