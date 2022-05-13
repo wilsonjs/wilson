@@ -1,0 +1,416 @@
+diff --git a/node_modules/preact-iso/dist/index.js b/node_modules/preact-iso/dist/index.js
+new file mode 100644
+index 0000000..869be65
+--- /dev/null
++++ b/node_modules/preact-iso/dist/index.js
+@@ -0,0 +1,282 @@
++'use strict';
++
++Object.defineProperty(exports, '__esModule', { value: true });
++
++var preact = require('preact');
++var hooks = require('preact/hooks');
++
++let push;
++const UPDATE = (state, url) => {
++	push = undefined;
++	if (url && url.type === 'click') {
++		// ignore events the browser takes care of already:
++		if (url.ctrlKey || url.metaKey || url.altKey || url.shiftKey || url.button !== 0) {
++			return state;
++		}
++
++		const link = url.target.closest('a[href]');
++		if (
++			!link ||
++			link.origin != location.origin ||
++			/^#/.test(link.getAttribute('href')) ||
++			!/^(_?self)?$/i.test(link.target)
++		) {
++			return state;
++		}
++
++		push = true;
++		url.preventDefault();
++		url = link.href.replace(location.origin, '');
++	} else if (typeof url === 'string') {
++		push = true;
++	} else {
++		url = location.pathname + location.search;
++	}
++
++	if (push === true) history.pushState(null, '', url);
++	else if (push === false) history.replaceState(null, '', url);
++	return url;
++};
++
++const exec = (url, route, matches) => {
++	url = url.split('/').filter(Boolean);
++	route = (route || '').split('/').filter(Boolean);
++	for (let i = 0, val, rest; i < Math.max(url.length, route.length); i++) {
++		let [, m, param, flag] = (route[i] || '').match(/^(:?)(.*?)([+*?]?)$/);
++		val = url[i];
++		// segment match:
++		if (!m && param == val) continue;
++		// /foo/* match
++		if (!m && val && flag == '*') {
++			matches.rest = '/' + url.slice(i).map(decodeURIComponent).join('/');
++			break;
++		}
++		// segment mismatch / missing required field:
++		if (!m || (!val && flag != '?' && flag != '*')) return;
++		rest = flag == '+' || flag == '*';
++		// rest (+/*) match:
++		if (rest) val = url.slice(i).map(decodeURIComponent).join('/');
++		// normal/optional field:
++		else if (val) val = decodeURIComponent(val);
++		matches.params[param] = val;
++		if (!(param in matches)) matches[param] = val;
++		if (rest) break;
++	}
++	return matches;
++};
++
++function LocationProvider(props) {
++	const [url, route] = hooks.useReducer(UPDATE, props.url || location.pathname + location.search);
++	const wasPush = push === true;
++
++	const value = hooks.useMemo(() => {
++		const u = new URL(url, location.origin);
++		const path = u.pathname.replace(/(.)\/$/g, '$1');
++		// @ts-ignore-next
++		return { url, path, query: Object.fromEntries(u.searchParams), route, wasPush };
++	}, [url]);
++
++	hooks.useLayoutEffect(() => {
++		addEventListener('click', route);
++		addEventListener('popstate', route);
++
++		return () => {
++			removeEventListener('click', route);
++			removeEventListener('popstate', route);
++		};
++	}, []);
++
++	// @ts-ignore
++	return preact.h(LocationProvider.ctx.Provider, { value }, props.children);
++}
++
++const RESOLVED = Promise.resolve();
++function Router(props) {
++	const [c, update] = hooks.useReducer(c => c + 1, 0);
++
++	const { url, query, wasPush, path } = useLocation();
++	const { rest = path, params = {} } = hooks.useContext(RouteContext);
++
++	const isLoading = hooks.useRef(false);
++	const prevRoute = hooks.useRef(path);
++	// Monotonic counter used to check if an un-suspending route is still the current route:
++	const count = hooks.useRef(0);
++	// The current route:
++	const cur = hooks.useRef();
++	// Previous route (if current route is suspended):
++	const prev = hooks.useRef();
++	// A not-yet-hydrated DOM root to remove once we commit:
++	const pendingBase = hooks.useRef();
++	// has this component ever successfully rendered without suspending:
++	const hasEverCommitted = hooks.useRef(false);
++	// was the most recent render successful (did not suspend):
++	const didSuspend = hooks.useRef();
++	didSuspend.current = false;
++
++	cur.current = hooks.useMemo(() => {
++		// This hack prevents Preact from diffing when we swap `cur` to `prev`:
++		if (this.__v && this.__v.__k) this.__v.__k.reverse();
++
++		count.current++;
++
++		prev.current = cur.current;
++
++		let p, d, m;
++		preact.toChildArray(props.children).some(vnode => {
++			const matches = exec(rest, vnode.props.path, (m = { path: rest, query, params, rest: '' }));
++			if (matches) return (p = preact.cloneElement(vnode, m));
++			if (vnode.props.default) d = preact.cloneElement(vnode, m);
++		});
++
++		return preact.h(RouteContext.Provider, { value: m }, p || d);
++	}, [url]);
++
++	// Reset previous children - if rendering succeeds synchronously, we shouldn't render the previous children.
++	const p = prev.current;
++	prev.current = null;
++
++	// This borrows the _childDidSuspend() solution from compat.
++	this.__c = e => {
++		// Mark the current render as having suspended:
++		didSuspend.current = true;
++
++		// The new route suspended, so keep the previous route around while it loads:
++		prev.current = p;
++
++		// Fire an event saying we're waiting for the route:
++		if (props.onLoadStart) props.onLoadStart(url);
++		isLoading.current = true;
++
++		// Re-render on unsuspend:
++		let c = count.current;
++		e.then(() => {
++			// Ignore this update if it isn't the most recently suspended update:
++			if (c !== count.current) return;
++
++			// Successful route transition: un-suspend after a tick and stop rendering the old route:
++			prev.current = null;
++			RESOLVED.then(update);
++		});
++	};
++
++	hooks.useLayoutEffect(() => {
++		const currentDom = this.__v && this.__v.__e;
++
++		// Ignore suspended renders (failed commits):
++		if (didSuspend.current) {
++			// If we've never committed, mark any hydration DOM for removal on the next commit:
++			if (!hasEverCommitted.current && !pendingBase.current) {
++				pendingBase.current = currentDom;
++			}
++			return;
++		}
++
++		// If this is the first ever successful commit and we didn't use the hydration DOM, remove it:
++		if (!hasEverCommitted.current && pendingBase.current) {
++			if (pendingBase.current !== currentDom) pendingBase.current.remove();
++			pendingBase.current = null;
++		}
++
++		// Mark the component has having committed:
++		hasEverCommitted.current = true;
++
++		// The route is loaded and rendered.
++		if (prevRoute.current !== path) {
++			if (wasPush) scrollTo(0, 0);
++			if (props.onLoadEnd && isLoading.current) props.onLoadEnd(url);
++			if (props.onRouteChange) props.onRouteChange(url);
++
++			isLoading.current = false;
++			prevRoute.current = path;
++		}
++	}, [path, wasPush, c]);
++
++	// Note: curChildren MUST render first in order to set didSuspend & prev.
++	return [preact.h(RenderRef, { r: cur }), preact.h(RenderRef, { r: prev })];
++}
++
++// Lazily render a ref's current value:
++const RenderRef = ({ r }) => r.current;
++
++Router.Provider = LocationProvider;
++
++/** @typedef {{ url: string, path: string, query: object, route, wasPush: boolean }} RouteInfo */
++
++LocationProvider.ctx = preact.createContext(/** @type {RouteInfo} */ ({}));
++const RouteContext = preact.createContext({});
++
++const Route = props => preact.h(props.component, props);
++
++const useLocation = () => hooks.useContext(LocationProvider.ctx);
++const useRoute = () => hooks.useContext(RouteContext);
++
++function lazy(load) {
++	let p, c;
++	return props => {
++		const [, update] = hooks.useState(0);
++		const r = hooks.useRef(c);
++		if (!p) p = load().then(m => (c = (m && m.default) || m));
++		if (c !== undefined) return preact.h(c, props);
++		if (!r.current) r.current = p.then(() => update(1));
++		throw p;
++	};
++}
++
++// See https://github.com/preactjs/preact/blob/88680e91ec0d5fc29d38554a3e122b10824636b6/compat/src/suspense.js#L5
++const oldCatchError = preact.options.__e;
++preact.options.__e = (err, newVNode, oldVNode) => {
++	if (err && err.then) {
++		let v = newVNode;
++		while ((v = v.__)) {
++			if (v.__c && v.__c.__c) {
++				if (newVNode.__e == null) {
++					newVNode.__e = oldVNode.__e; // ._dom
++					newVNode.__k = oldVNode.__k; // ._children
++				}
++				if (!newVNode.__k) newVNode.__k = [];
++				return v.__c.__c(err, newVNode);
++			}
++		}
++	}
++	if (oldCatchError) oldCatchError(err, newVNode, oldVNode);
++};
++
++function ErrorBoundary(props) {
++	this.__c = childDidSuspend;
++	this.componentDidCatch = props.onError;
++	return props.children;
++}
++
++function childDidSuspend(err) {
++	err.then(() => this.forceUpdate());
++}
++
++let initialized;
++
++/** @type {typeof render} */
++function hydrate(jsx, parent) {
++	if (typeof window === 'undefined') return;
++	let isodata = document.querySelector('script[type=isodata]');
++	// @ts-ignore-next
++	parent = parent || (isodata && isodata.parentNode) || document.body;
++	if (!initialized && isodata) {
++		preact.hydrate(jsx, parent);
++	} else {
++		preact.render(jsx, parent);
++	}
++	initialized = true;
++}
++
++function prerender(vnode, options) {
++	return Promise.resolve().then(function () { return require('./prerender-9d608315.js'); }).then(m => m.default(vnode, options));
++}
++
++exports.ErrorBoundary = ErrorBoundary;
++exports.LocationProvider = LocationProvider;
++exports.Route = Route;
++exports.Router = Router;
++exports.hydrate = hydrate;
++exports.lazy = lazy;
++exports.prerender = prerender;
++exports.useLocation = useLocation;
++exports.useRoute = useRoute;
+diff --git a/node_modules/preact-iso/dist/package.json b/node_modules/preact-iso/dist/package.json
+new file mode 100644
+index 0000000..0292b99
+--- /dev/null
++++ b/node_modules/preact-iso/dist/package.json
+@@ -0,0 +1 @@
++{"type":"commonjs"}
+\ No newline at end of file
+diff --git a/node_modules/preact-iso/dist/prerender-9d608315.js b/node_modules/preact-iso/dist/prerender-9d608315.js
+new file mode 100644
+index 0000000..57de7bb
+--- /dev/null
++++ b/node_modules/preact-iso/dist/prerender-9d608315.js
+@@ -0,0 +1,62 @@
++'use strict';
++
++var preact = require('preact');
++var renderToString = require('preact-render-to-string');
++
++function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
++
++var renderToString__default = /*#__PURE__*/_interopDefaultLegacy(renderToString);
++
++let vnodeHook;
++
++const old = preact.options.vnode;
++preact.options.vnode = vnode => {
++	if (old) old(vnode);
++	if (vnodeHook) vnodeHook(vnode);
++};
++
++/**
++ * @param {ReturnType<h>} vnode The root JSX element to render (eg: `<App />`)
++ * @param {object} [options]
++ * @param {number} [options.maxDepth = 10] The maximum number of nested asynchronous operations to wait for before flushing
++ * @param {object} [options.props] Additional props to merge into the root JSX element
++ */
++async function prerender(vnode, options) {
++	options = options || {};
++
++	const maxDepth = options.maxDepth || 10;
++	const props = options.props;
++	let tries = 0;
++
++	if (typeof vnode === 'function') {
++		vnode = preact.h(vnode, props);
++	} else if (props) {
++		vnode = preact.cloneElement(vnode, props);
++	}
++
++	const render = () => {
++		if (++tries > maxDepth) return;
++		try {
++			return renderToString__default["default"](vnode);
++		} catch (e) {
++			if (e && e.then) return e.then(render);
++			throw e;
++		}
++	};
++
++	let links = new Set();
++	vnodeHook = ({ type, props }) => {
++		if (type === 'a' && props && props.href && (!props.target || props.target === '_self')) {
++			links.add(props.href);
++		}
++	};
++
++	try {
++		const html = await render();
++		return { html, links };
++	} finally {
++		vnodeHook = null;
++	}
++}
++
++exports["default"] = prerender;
+diff --git a/node_modules/preact-iso/package.json b/node_modules/preact-iso/package.json
+index d88cc21..45aa94d 100644
+--- a/node_modules/preact-iso/package.json
++++ b/node_modules/preact-iso/package.json
+@@ -2,16 +2,19 @@
+ 	"name": "preact-iso",
+ 	"version": "2.3.0",
+ 	"description": "Isomorphic utilities for Preact",
+-	"main": "./index.js",
++	"main": "./dist/index.js",
+ 	"module": "./index.js",
+ 	"types": "./index.d.ts",
+-	"type": "module",
++  "type": "module",
+ 	"scripts": {
+ 		"test-build": "node --experimental-modules test/bundle-using-wmr.js",
+ 		"test": "node --experimental-vm-modules node_modules/.bin/jest"
+ 	},
+ 	"exports": {
+-		".": "./index.js",
++    ".": {
++      "import": "./index.js",
++      "require": "./dist/index.js"
++    },
+ 		"./router": "./router.js",
+ 		"./lazy": "./lazy.js",
+ 		"./prerender": "./prerender.js",
+diff --git a/node_modules/preact-iso/rollup.config.js b/node_modules/preact-iso/rollup.config.js
+new file mode 100644
+index 0000000..9f52e27
+--- /dev/null
++++ b/node_modules/preact-iso/rollup.config.js
+@@ -0,0 +1,19 @@
++export default {
++  input: 'index.js',
++  output: {
++    dir: 'dist',
++    format: 'cjs'
++  },
++  plugins: [
++    {
++      name: 'create-commonjs-packagejson',
++      async generateBundle() {
++        this.emitFile({
++          type: 'asset',
++          fileName: 'package.json',
++          source: '{"type":"commonjs"}'
++        });
++      }
++    }
++  ]
++};
