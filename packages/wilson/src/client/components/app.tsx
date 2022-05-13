@@ -3,6 +3,13 @@ import { ErrorBoundary, LocationProvider, Router } from 'preact-iso'
 import { FunctionalComponent } from 'preact'
 import { useTitleTemplate } from 'hoofd/preact'
 import { AutoPrefetchProvider } from '../context/prefetch'
+import { getLCP, getFID, getCLS } from 'web-vitals'
+
+if (!import.meta.env.SSR) {
+  getCLS(console.log)
+  getFID(console.log)
+  getLCP(console.log)
+}
 
 const NotFound: FunctionalComponent = () => <>Not Found</>
 
