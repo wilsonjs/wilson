@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 /**
  * No imports here, just type definitions.
  *
@@ -5,7 +7,7 @@
  * folder structure gets screwed up.
  */
 
-import { Node } from 'unist'
+import type { Node } from 'unist'
 
 /**
  *
