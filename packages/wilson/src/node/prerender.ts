@@ -64,7 +64,7 @@ export async function prerenderStaticPages(feeds: Feed[]): Promise<void> {
     const template = await readFile('./dist/index.html')
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { renderToString }: { renderToString: PrerenderFn } = await import(
-      toRoot('./.wilson/ssr/serverRender.mjs')
+      toRoot('./.wilson/ssr/serverRender.js')
     )
 
     let longestPath = 0
