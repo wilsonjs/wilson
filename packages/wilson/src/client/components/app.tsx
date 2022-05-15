@@ -20,13 +20,9 @@ const App: FunctionalComponent = () => {
     <LocationProvider>
       <Layout>
         <AutoPrefetchProvider>
-          <div>
-            <ErrorBoundary>
-              <Router>
-                {[...routes, <NotFound key="notFound" default />]}
-              </Router>
-            </ErrorBoundary>
-          </div>
+          <ErrorBoundary>
+            <Router>{[...routes, <NotFound key="notFound" default />]}</Router>
+          </ErrorBoundary>
         </AutoPrefetchProvider>
       </Layout>
     </LocationProvider>
