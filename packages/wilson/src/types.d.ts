@@ -169,13 +169,6 @@ interface FeedOptions {
 }
 
 /**
- * Required site configuration.
- */
-interface SiteConfigRequired {
-  siteData: SiteData
-}
-
-/**
  * Syntax highlighting options, reflects options of gatsby-remark-vscode
  */
 interface ThemeSettings {
@@ -222,8 +215,17 @@ export interface LayoutOptions {
 }
 
 /**
- * Optional site configuration.
+ * Site configuration.
  */
+export type SiteConfig = SiteConfigRequired & SiteConfigOptional
+export type SiteConfigWithDefaults = SiteConfig & SiteConfigDefaults
+export type SiteConfigRequired = { siteData: SiteData }
+
+export type ImportMode =
+  | 'sync'
+  | 'async'
+  | ((pagePath: string, currentPage: number) => 'sync' | 'async')
+
 export interface SiteConfigOptional {
   opengraphImage?: { background: string; texts: OpengraphImageText[] }
   layouts?: LayoutOptions
@@ -232,6 +234,7 @@ export interface SiteConfigOptional {
   feeds?: FeedOptions[]
   syntaxHighlighting?: SyntaxHighlightingOptions
   performance?: PerformanceOptions
+  importMode?: ImportMode
   injectHead?: () => string | Promise<string>
 }
 
@@ -241,23 +244,18 @@ export interface SiteConfigOptional {
 export type SiteConfigDefaults = Required<
   Pick<
     SiteConfigOptional,
-    'taxonomies' | 'feeds' | 'syntaxHighlighting' | 'performance' | 'injectHead'
+    | 'taxonomies'
+    | 'feeds'
+    | 'syntaxHighlighting'
+    | 'performance'
+    | 'injectHead'
+    | 'importMode'
   >
 > & {
   layouts: Required<LayoutOptions>
   pagination: Required<PaginationOptions>
   performance: Required<PerformanceOptions>
 }
-
-/**
- * Site configuration.
- */
-export type SiteConfig = SiteConfigRequired & SiteConfigOptional
-
-/**
- * Site configuration combined with default values.
- */
-export type SiteConfigWithDefaults = SiteConfig & SiteConfigDefaults
 
 export interface Page {
   route: string

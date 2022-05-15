@@ -3,7 +3,7 @@ import { LoadResult, ResolveIdResult } from 'rollup'
 import { toRoot, transformJsx } from '../util.js'
 import { getConfig } from '../config.js'
 import { getPageSources } from '../state.js'
-import { PageType } from '../page.js'
+import { PageType, SelectPage, TaxonomyPage } from '../page.js'
 import { dirname, relative } from 'path'
 
 const virtualExportsPath = 'wilson/virtual'
@@ -30,7 +30,7 @@ const virtualPlugin = async (): Promise<Plugin> => {
      */
     async load(id: string): Promise<LoadResult> {
       if (id === clientEntryPath) {
-        return `import("wilson/dist/client/main.js");`
+        return `import "wilson/dist/client/main.js";`
       }
 
       if (id === virtualExportsPath) {
@@ -38,6 +38,7 @@ const virtualPlugin = async (): Promise<Plugin> => {
         const {
           siteData,
           layouts: { pageLayout },
+          importMode,
         } = getConfig()
 
         const layoutImport = pageLayout
@@ -50,10 +51,20 @@ const virtualPlugin = async (): Promise<Plugin> => {
         const lazyPageImports = pageSources
           .map((pageSource, i) =>
             pageSource.pages.map((page: PageType, j: number) => {
-              return `const PageSource${i}Page${j} = lazy(() => import('${pageEntryPath(
-                i,
-                j
-              )}'));`
+              const path = pageEntryPath(i, j)
+              const mode =
+                typeof importMode === 'function'
+                  ? importMode(
+                      pageSource.relativePath,
+                      page instanceof SelectPage || page instanceof TaxonomyPage
+                        ? page.pagination.currentPage
+                        : 1
+                    )
+                  : importMode
+              if (mode === 'sync') {
+                return `import PageSource${i}Page${j} from '${path}';`
+              }
+              return `const PageSource${i}Page${j} = lazy(() => import('${path}'));`
             })
           )
           .flat()

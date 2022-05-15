@@ -36,6 +36,7 @@ const configDefaults: SiteConfigDefaults = {
     extensions: [],
     theme: 'Default Dark+',
   },
+  importMode: 'async',
   injectHead: () => '',
 }
 
