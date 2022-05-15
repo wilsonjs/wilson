@@ -8,16 +8,19 @@ export const wrapManifest = (
 } => {
   const getJsDependencies = (paths: string[]): string[] => {
     return paths
-      .map((path) => [manifest[path].file, ...(manifest[path].imports ?? [])])
+      .map((path) => [
+        ...(manifest[path]?.file ?? []),
+        ...(manifest[path]?.imports ?? []),
+      ])
       .flat()
   }
 
   const getCssDependencies = (paths: string[]): string[] => {
-    return paths.map((path) => manifest[path].css ?? []).flat()
+    return paths.map((path) => manifest[path]?.css ?? []).flat()
   }
 
   const getAssetDependencies = (paths: string[]): string[] => {
-    return paths.map((path) => manifest[path].assets ?? []).flat()
+    return paths.map((path) => manifest[path]?.assets ?? []).flat()
   }
 
   const getPageDependencies = (
