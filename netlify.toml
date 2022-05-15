@@ -1,6 +1,6 @@
 [build]
   publish = "docs/dist/"
-  command = "npm run wilson:build && npm run docs:build"
+  command = "npx patch-package && npm run wilson:build && npm run docs:build"
 
 [build.environment]
   NODE_VERSION = "16"
