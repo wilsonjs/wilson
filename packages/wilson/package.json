@@ -96,7 +96,7 @@
     "remark-rehype": "^10.1.0",
     "remark-stringify": "^10.0.0",
     "rss": "^1.2.2",
-    "sass": "^1.41.0",
+    "sass": "^1.52.1",
     "slugify": "^1.6.0",
     "sucrase": "^3.20.1",
     "throttles": "^1.0.1",
