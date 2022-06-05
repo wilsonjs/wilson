@@ -113,7 +113,7 @@
     "@types/estree": "^0.0.51",
     "@types/fs-extra": "^9.0.12",
     "@types/html-minifier-terser": "^6.1.0",
-    "@types/jest": "^27.0.1",
+    "@types/jest": "^28.1.1",
     "@types/mime-types": "^2.1.1",
     "@types/minimatch": "^3.0.5",
     "@types/minimist": "^1.2.2",
