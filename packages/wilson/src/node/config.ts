@@ -18,6 +18,7 @@ const configDefaults: SiteConfigDefaults = {
       timeout: 2000,
     },
   },
+  languages: [],
   layouts: {
     pageLayout: 'page',
     nestedLayouts: [{ pattern: '**/*.md', layout: 'markdown' }],

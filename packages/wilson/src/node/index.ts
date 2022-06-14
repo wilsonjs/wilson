@@ -11,4 +11,5 @@ export {
   SelectFrontmatter,
   TaxonomyFrontmatter,
   TermsFrontmatter,
+  PageProps,
 } from '../types'

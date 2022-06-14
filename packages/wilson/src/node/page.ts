@@ -3,6 +3,7 @@ import { statSync } from 'fs'
 import { extname, join, relative } from 'path'
 import {
   BasePagination,
+  FrontmatterWithDefaults,
   Page as PageInterface,
   PaginationRoutes,
   TaxonomyData,
@@ -53,10 +54,12 @@ abstract class Page implements PageInterface {
   public abstract title: string
   public date: Date
   public sourcePath: string
+  public frontmatter: FrontmatterWithDefaults
 
   constructor(source: PageSourceType) {
     this.date = this.getDate(source)
     this.sourcePath = source.path
+    this.frontmatter = source.frontmatter
   }
 
   private getDate(source: PageSourceType): Date {

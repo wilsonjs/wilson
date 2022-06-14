@@ -9,6 +9,11 @@
 
 import type { Node } from 'unist'
 
+export interface Language {
+  label: string
+  lang: string
+}
+
 /**
  *
  */
@@ -29,6 +34,8 @@ interface FrontmatterOptional {
   permalink?: string
   layout?: string
   opengraphType?: string
+  lang?: string
+  langRef?: string
 }
 
 interface FrontmatterRequired {
@@ -235,6 +242,7 @@ export interface SiteConfigOptional {
   syntaxHighlighting?: SyntaxHighlightingOptions
   performance?: PerformanceOptions
   importMode?: ImportMode
+  languages?: Language[]
   injectHead?: () => string | Promise<string>
 }
 
@@ -250,6 +258,7 @@ export type SiteConfigDefaults = Required<
     | 'performance'
     | 'injectHead'
     | 'importMode'
+    | 'languages'
   >
 > & {
   layouts: Required<LayoutOptions>
@@ -264,9 +273,16 @@ export interface Page {
   date: Date
 }
 
+interface Link {
+  title: string
+  url: string
+  isActive: boolean
+}
+
 interface PageProps {
   title: string
   date: number // timestamp
+  translations: Link[]
 }
 
 export interface BasePagination {

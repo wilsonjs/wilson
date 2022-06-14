@@ -27,7 +27,7 @@ export async function build(root: string = process.cwd()): Promise<void> {
     toRoot(path),
     content.replace(
       /^("use strict";)/,
-      `$1\nvar ma=require('module-alias');\nvar compat='preact/compat/dist/compat.js';\nma.addAliases({react:compat,'react-dom':compat});`
+      `$1\nvar ma=require('module-alias');\nvar compat='preact/compat';\nma.addAliases({react:compat,'react-dom':compat});`
     )
   )
 

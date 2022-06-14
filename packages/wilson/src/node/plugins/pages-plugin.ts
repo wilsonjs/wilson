@@ -4,7 +4,13 @@ import { dirname, relative } from 'path'
 import { toRoot, transformJsx } from '../util.js'
 import minimatch from 'minimatch'
 import { getConfig } from '../config.js'
-import { ContentPage, SelectPage, TaxonomyPage, TermsPage } from '../page.js'
+import {
+  ContentPage,
+  PageType,
+  SelectPage,
+  TaxonomyPage,
+  TermsPage,
+} from '../page.js'
 import { getPageSources } from '../state.js'
 import { MarkdownPageSource } from '../page-source.js'
 
@@ -37,22 +43,53 @@ const pagesPlugin = async (): Promise<Plugin> => {
       const match = id.match(virtualPageRegex)
       if (match === null) return
 
+      const pageSources = getPageSources()
       const pageSourceIndex = parseInt(match[1], 10)
-      const pageSource = getPageSources()[pageSourceIndex]
+      const pageSource = pageSources[pageSourceIndex]
       const pageIndex = parseInt(match[2], 10)
       const page = pageSource.pages[pageIndex]
 
+      const translationPageSources = pageSource.frontmatter.langRef
+        ? pageSources.filter(
+            (s) =>
+              typeof pageSource.frontmatter.langRef === 'string' &&
+              s.frontmatter.langRef === pageSource.frontmatter.langRef
+          )
+        : []
+
       const {
         performance: { autoPrefetch },
+        layouts: { nestedLayouts },
+        siteData: { lang },
+        languages,
       } = getConfig()
+
+      const pageLang = page.frontmatter.lang ?? lang
+      const translationPages = translationPageSources
+        .map((s) => (s.pages.length === 1 ? s.pages[0] : s.pages[pageIndex]))
+        .sort(
+          (a, b) =>
+            languages.findIndex((l) => l.lang === a.frontmatter.lang ?? lang) -
+            languages.findIndex((l) => l.lang === b.frontmatter.lang ?? lang)
+        )
+      const translations = translationPages
+        .map((p) => {
+          const siteConfigLanguage = (languages ?? []).find(
+            (l) => l.lang === p.frontmatter.lang
+          )
+          if (!siteConfigLanguage) return null
+          return {
+            title: siteConfigLanguage.label,
+            url: p.route,
+            isActive: p.frontmatter.lang === pageLang,
+          }
+        })
+        .filter(Boolean)
 
       if (page === undefined) {
         throw new Error('kaput!')
       }
 
-      const {
-        layouts: { nestedLayouts },
-      } = getConfig()
       const nestedLayout =
         pageSource.frontmatter.layout ?? typeof nestedLayouts === 'undefined'
           ? undefined
@@ -60,16 +97,17 @@ const pagesPlugin = async (): Promise<Plugin> => {
               return minimatch(pageSource.relativePath, pattern)
             })?.layout
 
-      const layoutImport = nestedLayout
-        ? `import Layout from '${relative(
+      const nestedLayoutImport = nestedLayout
+        ? `import NestedLayoutOrFragment from '${relative(
             dirname(id),
             toRoot(`./src/layouts/${nestedLayout}`)
           ).replace(/\\/g, '/')}';`
-        : `import { Fragment as Layout } from 'preact';`
+        : `import { Fragment as NestedLayoutOrFragment } from 'preact';`
 
       const componentProps = `
         title="${page.title}"
         date={${+page.date}}
+        translations={${JSON.stringify(translations)}}
         ${
           page instanceof ContentPage
             ? `taxonomies={${JSON.stringify(page.taxonomies)}}`
@@ -80,7 +118,7 @@ const pagesPlugin = async (): Promise<Plugin> => {
             ? `headings={${JSON.stringify(pageSource.headings)}}`
             : ''
         }
-      `
+        `
 
       const autoPrefetchUse = autoPrefetch.enabled ? '<AutoPretetch />' : ''
       const autoPrefetchDefinition = autoPrefetch.enabled
@@ -98,9 +136,9 @@ const pagesPlugin = async (): Promise<Plugin> => {
         import 'preact/compat';
         import { h } from 'preact';
         import { useMeta, useTitle } from 'hoofd/preact';
-        import { siteData } from 'wilson/virtual';
+        import { Layout, siteData } from 'wilson/virtual';
         import { Page } from '${pageSource.path}';
-        ${layoutImport}
+        ${nestedLayoutImport}
         ${autoPrefetchDefinition}
 
         export default function PageWrapper() {
@@ -116,31 +154,33 @@ const pagesPlugin = async (): Promise<Plugin> => {
           }' });
           useMeta({ property: 'twitter:title', content: title });
           useTitle(title);
-          
+
           return <Layout ${componentProps}>
-            ${autoPrefetchUse}
-            <Page
-              ${componentProps}
-              ${
-                page instanceof TaxonomyPage || page instanceof SelectPage
-                  ? `contentPages={${JSON.stringify(page.contentPages)}}
-                     pagination={${JSON.stringify({
-                       ...page.pagination,
-                       ...page.paginationRoutes,
-                     })}}`
-                  : ''
-              }
-              ${
-                page instanceof TaxonomyPage
-                  ? `selectedTerm="${page.selectedTerm}"`
-                  : ''
-              }
-              ${
-                page instanceof TermsPage
-                  ? `taxonomyTerms={${JSON.stringify(page.taxonomyTerms)}}`
-                  : ''
-              }
-            />
+            <NestedLayoutOrFragment ${componentProps}>
+              ${autoPrefetchUse}
+              <Page
+                ${componentProps}
+                ${
+                  page instanceof TaxonomyPage || page instanceof SelectPage
+                    ? `contentPages={${JSON.stringify(page.contentPages)}}
+                      pagination={${JSON.stringify({
+                        ...page.pagination,
+                        ...page.paginationRoutes,
+                      })}}`
+                    : ''
+                }
+                ${
+                  page instanceof TaxonomyPage
+                    ? `selectedTerm="${page.selectedTerm}"`
+                    : ''
+                }
+                ${
+                  page instanceof TermsPage
+                    ? `taxonomyTerms={${JSON.stringify(page.taxonomyTerms)}}`
+                    : ''
+                }
+              />
+            </NestedLayoutOrFragment>
           </Layout>;
         }
       `

@@ -1,4 +1,4 @@
-import { routes, siteData, Layout } from 'wilson/virtual'
+import { routes, siteData } from 'wilson/virtual'
 import { ErrorBoundary, LocationProvider, Router } from 'preact-iso'
 import { FunctionalComponent } from 'preact'
 import { useTitleTemplate } from 'hoofd/preact'
@@ -18,13 +18,11 @@ const App: FunctionalComponent = () => {
 
   return (
     <LocationProvider>
-      <Layout>
-        <AutoPrefetchProvider>
-          <ErrorBoundary>
-            <Router>{[...routes, <NotFound key="notFound" default />]}</Router>
-          </ErrorBoundary>
-        </AutoPrefetchProvider>
-      </Layout>
+      <AutoPrefetchProvider>
+        <ErrorBoundary>
+          <Router>{[...routes, <NotFound key="notFound" default />]}</Router>
+        </ErrorBoundary>
+      </AutoPrefetchProvider>
     </LocationProvider>
   )
 }
