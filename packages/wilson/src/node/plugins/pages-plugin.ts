@@ -4,15 +4,10 @@ import { dirname, relative } from 'path'
 import { toRoot, transformJsx } from '../util.js'
 import minimatch from 'minimatch'
 import { getConfig } from '../config.js'
-import {
-  ContentPage,
-  PageType,
-  SelectPage,
-  TaxonomyPage,
-  TermsPage,
-} from '../page.js'
+import { ContentPage, SelectPage, TaxonomyPage, TermsPage } from '../page.js'
 import { getPageSources } from '../state.js'
 import { MarkdownPageSource } from '../page-source.js'
+import { TranslatedPagRef } from '../../types.js'
 
 const virtualPageRegex = /^@wilson\/page-source\/(\d+)\/page\/(\d+)/
 
@@ -49,13 +44,15 @@ const pagesPlugin = async (): Promise<Plugin> => {
       const pageIndex = parseInt(match[2], 10)
       const page = pageSource.pages[pageIndex]
 
-      const translationPageSources = pageSource.frontmatter.langRef
-        ? pageSources.filter(
-            (s) =>
-              typeof pageSource.frontmatter.langRef === 'string' &&
-              s.frontmatter.langRef === pageSource.frontmatter.langRef
+      const translationPageSources = pageSources.filter((s) => {
+        return (
+          s.relativePath.replace(new RegExp(`^${s.language}\\/`), '') ===
+          pageSource.relativePath.replace(
+            new RegExp(`^${pageSource.language}\\/`),
+            ''
           )
-        : []
+        )
+      })
 
       const {
         performance: { autoPrefetch },
@@ -64,31 +61,28 @@ const pagesPlugin = async (): Promise<Plugin> => {
         languages,
       } = getConfig()
 
-      const pageLang = page.frontmatter.lang ?? lang
-      const translationPages = translationPageSources
-        .map((s) => (s.pages.length === 1 ? s.pages[0] : s.pages[pageIndex]))
+      const translations = translationPageSources
         .sort(
           (a, b) =>
-            languages.findIndex((l) => l.lang === a.frontmatter.lang ?? lang) -
-            languages.findIndex((l) => l.lang === b.frontmatter.lang ?? lang)
+            languages.findIndex((l) => l.code === a.language ?? lang) -
+            languages.findIndex((l) => l.code === b.language ?? lang)
         )
-      const translations = translationPages
-        .map((p) => {
-          const siteConfigLanguage = (languages ?? []).find(
-            (l) => l.lang === p.frontmatter.lang
+        .map((pageSource) => {
+          const languageConfig = (languages ?? []).find(
+            (language) => language.code === pageSource.language
           )
-          if (!siteConfigLanguage) return null
+          if (typeof pageSource.language === 'undefined' || !languageConfig)
+            return null
+          const page =
+            pageSource.pages.length === 1
+              ? pageSource.pages[0]
+              : pageSource.pages[pageIndex]
           return {
-            title: siteConfigLanguage.label,
-            url: p.route,
-            isActive: p.frontmatter.lang === pageLang,
+            url: page.route,
+            languageCode: pageSource.language,
           }
         })
-        .filter(Boolean)
-
-      if (page === undefined) {
-        throw new Error('kaput!')
-      }
+        .filter(Boolean) as TranslatedPagRef[]
 
       const nestedLayout =
         pageSource.frontmatter.layout ?? typeof nestedLayouts === 'undefined'

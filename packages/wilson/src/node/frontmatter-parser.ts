@@ -76,19 +76,7 @@ class FrontmatterParser {
       this.throw('page has no or empty frontmatter')
     if (frontmatter.title === undefined) this.throw('frontmatter has no title')
 
-    const { taxonomies, languages } = getConfig()
-
-    if (languages.length > 0 && typeof frontmatter.lang !== 'string') {
-      this.throw('frontmatter has no lang')
-    }
-    if (
-      typeof frontmatter.lang === 'string' &&
-      languages.find((l) => l.lang === frontmatter.lang) === undefined
-    ) {
-      this.throw(
-        `language ${frontmatter.lang} not defined in site configuration`
-      )
-    }
+    const { taxonomies } = getConfig()
 
     if (frontmatter.type === 'content') {
       const fm = frontmatter as ContentFrontmatter

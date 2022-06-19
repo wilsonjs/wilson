@@ -1,15 +1,22 @@
 export {
+  ContentFrontmatter,
+  ContentPageProps,
   Frontmatter,
+  FrontmatterWithDefaults,
   Page,
+  PageProps,
+  SelectFrontmatter,
+  SelectPageProps,
   SiteData,
   SiteConfig,
-  ContentPageProps,
-  SelectPageProps,
-  TaxonomyPageProps,
-  TermPageProps,
-  ContentFrontmatter,
-  SelectFrontmatter,
   TaxonomyFrontmatter,
+  TaxonomyPageProps,
   TermsFrontmatter,
-  PageProps,
+  TermPageProps,
 } from '../types'
+
+export {
+  useAllLanguages,
+  useCurrentLanguageCode,
+  useTranslation,
+} from 'wilson/virtual'

@@ -1,7 +1,6 @@
 import App from './components/app'
 import { hydrate } from 'preact-iso'
 import { options, VNode } from 'preact'
-
 const app = <App />
 
 // @TODO: whats SSRContextProvider in react-plugin-pages?

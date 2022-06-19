@@ -74,6 +74,24 @@ export function getConfig(
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const config: SiteConfig = require(configPath)
 
+  // If languages are defined
+  if (typeof config.languages !== 'undefined') {
+    // more than one language should be defined
+    if (config.languages.length === 1) {
+      throw new Error(`if you define languages, define more than one!`)
+    }
+    // the site's default language should be defined included
+    if (
+      typeof config.languages.find(
+        (language) => language.code === config.siteData.lang
+      ) === 'undefined'
+    ) {
+      throw new Error(
+        'if you define languages, include the language defined in siteData'
+      )
+    }
+  }
+
   const isDevServer =
     process.argv.length === 2 || ['start', 'dev'].includes(process.argv[2])
 
@@ -94,4 +112,8 @@ export function getConfig(
   }
 
   return cachedConfig
+}
+
+export function getAllLanguageCodes(): string[] {
+  return getConfig().languages.map((language) => language.code)
 }

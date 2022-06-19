@@ -10,15 +10,18 @@
 import type { Node } from 'unist'
 
 export interface Language {
-  label: string
-  lang: string
+  code: string
+  name: string
+  translations: {
+    [identifier: string]: string
+  }
 }
 
 /**
  *
  */
 export interface SiteData {
-  lang?: string
+  lang: string
   titleTemplate: string
   description: string
   siteName: string
@@ -273,16 +276,15 @@ export interface Page {
   date: Date
 }
 
-interface Link {
-  title: string
+interface TranslatedPagRef {
+  languageCode: string
   url: string
-  isActive: boolean
 }
 
 interface PageProps {
   title: string
   date: number // timestamp
-  translations: Link[]
+  translations: TranslatedPagRef[]
 }
 
 export interface BasePagination {

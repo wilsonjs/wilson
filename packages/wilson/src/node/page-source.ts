@@ -11,7 +11,7 @@ import { readFileSync } from 'fs'
 import { ContentPage, SelectPage, TaxonomyPage, TermsPage } from './page.js'
 import { getContentPages, getTaxonomyTerms } from './state.js'
 import { hasCommonElements, transformJsx } from './util.js'
-import { extname, join, relative } from 'path'
+import { extname } from 'path'
 import { getConfig } from './config.js'
 import { transformMarkdown } from './markdown.js'
 import { assetUrlPrefix } from './constants.js'
@@ -22,15 +22,22 @@ import FrontmatterParser from './frontmatter-parser.js'
  */
 abstract class PageSource {
   public path: string
+  public language: string | undefined
   public relativePath: string
   public transformedCode: string | null = null
   abstract pages: unknown[]
   public headings?: Heading[]
   public frontmatter: Frontmatter = {} as Frontmatter
 
-  constructor(path: string) {
+  constructor(path: string, relativePath: string) {
     this.path = path
-    this.relativePath = relative(join(process.cwd(), 'src', 'pages'), path)
+    this.relativePath = relativePath
+    const { languages } = getConfig()
+    const startWithLanguageCode = new RegExp(
+      `^(${languages.map((language) => language.code).join('|')})\\/`
+    )
+    const languageMatch = this.relativePath.match(startWithLanguageCode)
+    this.language = languageMatch !== null ? languageMatch[1] : undefined
   }
 
   public async initialize(): Promise<void> {
@@ -49,8 +56,12 @@ export class ContentPageSource extends PageSource {
   public pages: ContentPage[] = []
   public frontmatter: ContentFrontmatterWithDefaults
 
-  constructor(path: string, frontmatter: FrontmatterWithDefaults) {
-    super(path)
+  constructor(
+    fullPath: string,
+    relativePath: string,
+    frontmatter: FrontmatterWithDefaults
+  ) {
+    super(fullPath, relativePath)
     this.frontmatter = frontmatter as ContentFrontmatterWithDefaults
   }
 
@@ -104,8 +115,12 @@ export class MarkdownPageSource extends ContentPageSource {
 export class TaxonomyPageSource extends PageSource {
   public pages: TaxonomyPage[] = []
   public frontmatter: TaxonomyFrontmatterWithDefaults
-  constructor(path: string, frontmatter: FrontmatterWithDefaults) {
-    super(path)
+  constructor(
+    fullPath: string,
+    relativePath: string,
+    frontmatter: FrontmatterWithDefaults
+  ) {
+    super(fullPath, relativePath)
     this.frontmatter = frontmatter as TaxonomyFrontmatterWithDefaults
   }
   public createPages(): void {
@@ -142,8 +157,12 @@ export class TaxonomyPageSource extends PageSource {
 export class TermsPageSource extends PageSource {
   public pages: TermsPage[] = []
   public frontmatter: TermsFrontmatterWithDefaults
-  constructor(path: string, frontmatter: FrontmatterWithDefaults) {
-    super(path)
+  constructor(
+    fullPath: string,
+    relativePath: string,
+    frontmatter: FrontmatterWithDefaults
+  ) {
+    super(fullPath, relativePath)
     this.frontmatter = frontmatter as TermsFrontmatterWithDefaults
   }
   public createPages(): void {
@@ -155,8 +174,12 @@ export class TermsPageSource extends PageSource {
 export class SelectPageSource extends PageSource {
   public pages: SelectPage[] = []
   public frontmatter: SelectFrontmatterWithDefaults
-  constructor(path: string, frontmatter: FrontmatterWithDefaults) {
-    super(path)
+  constructor(
+    fullPath: string,
+    relativePath: string,
+    frontmatter: FrontmatterWithDefaults
+  ) {
+    super(fullPath, relativePath)
     this.frontmatter = frontmatter as SelectFrontmatterWithDefaults
   }
   public createPages(): void {
@@ -172,6 +195,7 @@ export class SelectPageSource extends PageSource {
       )
       // sort by page date, descending
       .sort((a, b) => +b.date - +a.date)
+
     const pageSize = config.pagination.pageSize ?? 2
     let currentPage = 1
     this.pages = []
@@ -189,12 +213,14 @@ export class SelectPageSource extends PageSource {
 }
 
 export const createPageSource = async (
-  path: string,
+  fullPath: string,
+  relativePath: string,
   frontmatter: FrontmatterWithDefaults
 ): Promise<PageSourceType> => {
   let pageSource: PageSourceType
   const constructorArgs: Parameters<typeof createPageSource> = [
-    path,
+    fullPath,
+    relativePath,
     frontmatter,
   ]
 
@@ -211,7 +237,7 @@ export const createPageSource = async (
     case 'content':
     default:
       pageSource =
-        extname(path) === '.md'
+        extname(fullPath) === '.md'
           ? new MarkdownPageSource(...constructorArgs)
           : new ContentPageSource(...constructorArgs)
       break
