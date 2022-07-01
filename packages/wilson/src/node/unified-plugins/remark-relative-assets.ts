@@ -1,12 +1,49 @@
 import { visit, CONTINUE } from 'unist-util-visit'
-import { Element } from 'hast'
+import { Element, Properties } from 'hast'
 import { Transformer } from 'unified'
-
-const isRelativeUrl = (url: string): boolean => /^\./.test(url)
 
 interface Options {
   assetUrlPrefix: string
   assetUrlTagConfig: Record<string, string[]>
+}
+
+const replaceSimpleAttribute = (
+  attribute: string,
+  assetUrls: string[],
+  assetUrlPrefix: string,
+  properties: Properties
+): void => {
+  const attributeValue = properties[attribute] as string
+  const index = assetUrls.findIndex((url) => url === attributeValue)
+  if (index === -1) {
+    properties[attribute] = `${assetUrlPrefix}${assetUrls.length}`
+    assetUrls.push(attributeValue)
+  } else {
+    properties[attribute] = `${assetUrlPrefix}${index}`
+  }
+}
+
+const replaceSrcSet = (
+  assetUrls: string[],
+  assetUrlPrefix: string,
+  properties: Properties
+) => {
+  const srcSet = (properties.srcSet as string)
+    .split(',')
+    .map((s) => s.trim().split(' ')) as Array<
+    [url: string, width?: string, density?: string]
+  >
+  for (const src of srcSet) {
+    const srcSetUrl = src[0]
+    const index = assetUrls.findIndex((url) => url === srcSetUrl)
+    if (index === -1) {
+      src[0] = `${assetUrlPrefix}${assetUrls.length}`
+      assetUrls.push(srcSetUrl)
+    } else {
+      src[0] = `${assetUrlPrefix}${index}`
+    }
+  }
+  properties.srcSet = srcSet.map((s) => s.join(' ')).join(', ')
 }
 
 /**
@@ -30,14 +67,15 @@ const remarkRelativeAssets: (options: Options) => Transformer = ({
 
       attributes.forEach((attribute) => {
         if (typeof properties[attribute] !== 'string') return
-        const assetUrl = properties[attribute] as string
-        if (!isRelativeUrl(assetUrl)) return
-        const index = assetUrls.findIndex((url) => url === assetUrl)
-        if (index === -1) {
-          properties[attribute] = `${assetUrlPrefix}${assetUrls.length}`
-          assetUrls.push(assetUrl)
+        if (attribute === 'srcSet') {
+          replaceSrcSet(assetUrls, assetUrlPrefix, properties)
         } else {
-          properties[attribute] = `${assetUrlPrefix}${index}`
+          replaceSimpleAttribute(
+            attribute,
+            assetUrls,
+            assetUrlPrefix,
+            properties
+          )
         }
       })
 

@@ -41,7 +41,7 @@ const App: FunctionalComponent<AppProps> = ({ serverRenderUrl }) => {
 
   return (
     <LocationProvider>
-      <div id="wilson">
+      <div id="__wilson">
         <LanguageProvider value={language}>
           <AutoPrefetchProvider>
             <ErrorBoundary>

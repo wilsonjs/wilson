@@ -32,14 +32,14 @@ export interface SiteData {
   keywords?: string[]
 }
 
-interface FrontmatterOptional {
+type FrontmatterOptional = {
   date?: string | Date
   permalink?: string
   layout?: string
   opengraphType?: string
   lang?: string
   langRef?: string
-}
+} & Record<string, unknown>
 
 interface FrontmatterRequired {
   title: string
@@ -285,6 +285,9 @@ interface PageProps {
   title: string
   date: number // timestamp
   translations: TranslatedPagRef[]
+  taxonomies?: TaxonomyData
+  frontmatter: Record<string, unknown>
+  relativePath: string
 }
 
 export interface BasePagination {

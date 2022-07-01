@@ -9,6 +9,10 @@ import rehypeRaw from 'rehype-raw'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import remarkRelativeAssets from './unified-plugins/remark-relative-assets.js'
 import rehypeExtractToc from './unified-plugins/rehype-extract-toc.js'
+// eslint-disable-next-line
+// @ts-ignore
+import remarkImages from '@fec/remark-images'
+
 import { assetUrlPrefix, assetUrlTagConfig } from './constants.js'
 import { Heading } from '../types'
 import { unified, Processor } from 'unified'
@@ -19,6 +23,7 @@ import toJsx from '@mapbox/hast-util-to-jsx'
 // eslint-disable-next-line
 // @ts-ignore
 import syntaxHighlighting from 'gatsby-remark-vscode'
+import { join } from 'path'
 
 const frontmatterCache = new NodeCache()
 
@@ -92,7 +97,9 @@ type MarkdownTransformResult = {
  * @returns The MarkdownTransformResult object
  */
 export const transformMarkdown = async (
-  markdownCode: string
+  markdownCode: string,
+  /** relative path that starts with src/pages, as required by remark images with default srcDir of '.' */
+  relativePath: string
 ): Promise<MarkdownTransformResult> => {
   const cachedResult = transformCache.get<MarkdownTransformResult>(markdownCode)
 
@@ -106,6 +113,20 @@ export const transformMarkdown = async (
     .use(remarkParse)
     // apply plugins that change MDAST
     .use(remarkStringify)
+    .use(remarkImages, {
+      loadingPolicy: 'lazy',
+      figureClassName: null,
+      pictureClassName: null,
+      imgClassName: null,
+      figCaptionClassName: null,
+      mapMarkdownImageNode: (image: {
+        node: { url: string }
+        inLink: boolean
+      }) => {
+        image.node.url = join(relativePath, image.node.url)
+        return image
+      },
+    })
     .use(syntaxHighlighting.remarkPlugin, syntaxHighlightingOptions)
     .use(remarkToRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
@@ -126,7 +147,8 @@ export const transformMarkdown = async (
     html: (vfile.value as string)
       .replace(/^<div>/, '<>')
       .replace(/<\/div>$/, '</>'),
-    assetUrls: (vfile.data as MarkdownTransformResult).assetUrls as string[],
+    assetUrls: ((vfile.data as MarkdownTransformResult).assetUrls ??
+      []) as string[],
     headings: (vfile.data as MarkdownTransformResult).headings as Heading[],
   }
 

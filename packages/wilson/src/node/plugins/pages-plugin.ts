@@ -85,11 +85,12 @@ const pagesPlugin = async (): Promise<Plugin> => {
         .filter(Boolean) as TranslatedPagRef[]
 
       const nestedLayout =
-        pageSource.frontmatter.layout ?? typeof nestedLayouts === 'undefined'
+        pageSource.frontmatter.layout ??
+        (typeof nestedLayouts === 'undefined'
           ? undefined
           : nestedLayouts.find(({ pattern = '**' }) => {
               return minimatch(pageSource.relativePath, pattern)
-            })?.layout
+            })?.layout)
 
       const nestedLayoutImport = nestedLayout
         ? `import NestedLayoutOrFragment from '${relative(
@@ -102,6 +103,8 @@ const pagesPlugin = async (): Promise<Plugin> => {
         title="${page.title}"
         date={${+page.date}}
         translations={${JSON.stringify(translations)}}
+        frontmatter={${JSON.stringify(pageSource.frontmatter)}}
+        relativePath={${JSON.stringify(pageSource.relativePath)}}
         ${
           page instanceof ContentPage
             ? `taxonomies={${JSON.stringify(page.taxonomies)}}`
