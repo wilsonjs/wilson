@@ -67,7 +67,7 @@ const metaPlugin = async (): Promise<Plugin> => {
 
       const processor = unified()
         .use(parse)
-        .use(setLang, { lang: lang ?? 'en' })
+        .use(setLang, { lang })
         .use(stringify)
       const vfile = processor.processSync(html)
       const result = vfile.value

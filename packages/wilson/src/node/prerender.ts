@@ -116,10 +116,12 @@ export async function prerenderStaticPages(feeds: Feed[]): Promise<void> {
 
         const head = `
           <title>${prerenderResult.head.title}</title>
-          ${feeds.map(
-            ({ href, title }) =>
-              `<link rel="alternate" type="application/rss+xml" title="${title}" href="${href}" />`
-          )}
+          ${feeds
+            .map(
+              ({ href, title }) =>
+                `<link rel="alternate" type="application/rss+xml" title="${title}" href="${href}" />`
+            )
+            .join('')}
           ${prerenderResult.head.metas
             .map(
               ({ name, property, content }) =>

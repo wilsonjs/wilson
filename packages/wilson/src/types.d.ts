@@ -9,11 +9,19 @@
 
 import type { Node } from 'unist'
 
+export interface Language {
+  code: string
+  name: string
+  translations: {
+    [identifier: string]: string
+  }
+}
+
 /**
  *
  */
 export interface SiteData {
-  lang?: string
+  lang: string
   titleTemplate: string
   description: string
   siteName: string
@@ -24,12 +32,14 @@ export interface SiteData {
   keywords?: string[]
 }
 
-interface FrontmatterOptional {
+type FrontmatterOptional = {
   date?: string | Date
   permalink?: string
   layout?: string
   opengraphType?: string
-}
+  lang?: string
+  langRef?: string
+} & Record<string, unknown>
 
 interface FrontmatterRequired {
   title: string
@@ -235,6 +245,7 @@ export interface SiteConfigOptional {
   syntaxHighlighting?: SyntaxHighlightingOptions
   performance?: PerformanceOptions
   importMode?: ImportMode
+  languages?: Language[]
   injectHead?: () => string | Promise<string>
 }
 
@@ -250,6 +261,7 @@ export type SiteConfigDefaults = Required<
     | 'performance'
     | 'injectHead'
     | 'importMode'
+    | 'languages'
   >
 > & {
   layouts: Required<LayoutOptions>
@@ -264,9 +276,18 @@ export interface Page {
   date: Date
 }
 
+interface TranslatedPagRef {
+  languageCode: string
+  url: string
+}
+
 interface PageProps {
   title: string
   date: number // timestamp
+  translations: TranslatedPagRef[]
+  taxonomies?: TaxonomyData
+  frontmatter: Record<string, unknown>
+  relativePath: string
 }
 
 export interface BasePagination {

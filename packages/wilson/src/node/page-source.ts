@@ -11,7 +11,7 @@ import { readFileSync } from 'fs'
 import { ContentPage, SelectPage, TaxonomyPage, TermsPage } from './page.js'
 import { getContentPages, getTaxonomyTerms } from './state.js'
 import { hasCommonElements, transformJsx } from './util.js'
-import { extname, join, relative } from 'path'
+import { dirname, extname, relative } from 'path'
 import { getConfig } from './config.js'
 import { transformMarkdown } from './markdown.js'
 import { assetUrlPrefix } from './constants.js'
@@ -22,15 +22,22 @@ import FrontmatterParser from './frontmatter-parser.js'
  */
 abstract class PageSource {
   public path: string
+  public language: string | undefined
   public relativePath: string
   public transformedCode: string | null = null
   abstract pages: unknown[]
   public headings?: Heading[]
   public frontmatter: Frontmatter = {} as Frontmatter
 
-  constructor(path: string) {
+  constructor(path: string, relativePath: string) {
     this.path = path
-    this.relativePath = relative(join(process.cwd(), 'src', 'pages'), path)
+    this.relativePath = relativePath
+    const { languages } = getConfig()
+    const startWithLanguageCode = new RegExp(
+      `^(${languages.map((language) => language.code).join('|')})\\/`
+    )
+    const languageMatch = this.relativePath.match(startWithLanguageCode)
+    this.language = languageMatch !== null ? languageMatch[1] : undefined
   }
 
   public async initialize(): Promise<void> {
@@ -49,8 +56,12 @@ export class ContentPageSource extends PageSource {
   public pages: ContentPage[] = []
   public frontmatter: ContentFrontmatterWithDefaults
 
-  constructor(path: string, frontmatter: FrontmatterWithDefaults) {
-    super(path)
+  constructor(
+    fullPath: string,
+    relativePath: string,
+    frontmatter: FrontmatterWithDefaults
+  ) {
+    super(fullPath, relativePath)
     this.frontmatter = frontmatter as ContentFrontmatterWithDefaults
   }
 
@@ -64,7 +75,9 @@ export class MarkdownPageSource extends ContentPageSource {
   public headings: Heading[] = []
 
   protected async transformCode(markdownCode: string): Promise<string> {
-    const { html, headings, assetUrls } = await transformMarkdown(markdownCode)
+    const relativePath = dirname(`src/pages/${this.relativePath}`)
+    const result = await transformMarkdown(markdownCode, relativePath)
+    const { html, headings } = result
 
     // store headings for further use
     this.headings = headings
@@ -72,21 +85,39 @@ export class MarkdownPageSource extends ContentPageSource {
     // replace relative asset URL string attributes with react-style variable
     // interpolations
     let htmlCode = html
-    assetUrls.forEach((_, i) => {
+    result.assetUrls.forEach((_, i) => {
       htmlCode = htmlCode.replace(
         new RegExp(`"${assetUrlPrefix}${i}"`, 'g'),
         `{${assetUrlPrefix}${i}}`
       )
     })
+    htmlCode = htmlCode.replace(
+      /srcSet="((?:[^"\s,]+\s*(?:\s+(?:\d+w|[\d\.]+x))?(?:,\s*)?)+)"/g,
+      (_, value) => {
+        result.assetUrls.forEach((_, i) => {
+          value = value.replace(
+            new RegExp(`${assetUrlPrefix}${i}`, 'g'),
+            `$\{${assetUrlPrefix}${i}}`
+          )
+        })
+        return `srcSet={\`${value}\`}`
+      }
+    )
 
-    const relativeAssetImports = assetUrls.map(
+    // change assetUrls to URLs that work for relative javascript imports
+    result.assetUrls = result.assetUrls.map((assetUrl) => {
+      return assetUrl.startsWith('./')
+        ? assetUrl
+        : `./${relative(relativePath, assetUrl)}`
+    })
+    const relativeAssetImports = result.assetUrls.map(
       (url, i) => `import ${assetUrlPrefix}${i} from '${url}';`
     )
 
     const preactCode = `
-      import { h, Fragment } from "preact";
-      ${relativeAssetImports.join('\n')}
-      export const Page = () => ${htmlCode};
+    import { h, Fragment } from "preact";
+    ${relativeAssetImports.join('\n')}
+    export const Page = () => <div id="__wilson-markdown">${htmlCode}</div>;
     `
 
     const jsCode = transformJsx(preactCode)
@@ -104,8 +135,12 @@ export class MarkdownPageSource extends ContentPageSource {
 export class TaxonomyPageSource extends PageSource {
   public pages: TaxonomyPage[] = []
   public frontmatter: TaxonomyFrontmatterWithDefaults
-  constructor(path: string, frontmatter: FrontmatterWithDefaults) {
-    super(path)
+  constructor(
+    fullPath: string,
+    relativePath: string,
+    frontmatter: FrontmatterWithDefaults
+  ) {
+    super(fullPath, relativePath)
     this.frontmatter = frontmatter as TaxonomyFrontmatterWithDefaults
   }
   public createPages(): void {
@@ -142,8 +177,12 @@ export class TaxonomyPageSource extends PageSource {
 export class TermsPageSource extends PageSource {
   public pages: TermsPage[] = []
   public frontmatter: TermsFrontmatterWithDefaults
-  constructor(path: string, frontmatter: FrontmatterWithDefaults) {
-    super(path)
+  constructor(
+    fullPath: string,
+    relativePath: string,
+    frontmatter: FrontmatterWithDefaults
+  ) {
+    super(fullPath, relativePath)
     this.frontmatter = frontmatter as TermsFrontmatterWithDefaults
   }
   public createPages(): void {
@@ -155,8 +194,12 @@ export class TermsPageSource extends PageSource {
 export class SelectPageSource extends PageSource {
   public pages: SelectPage[] = []
   public frontmatter: SelectFrontmatterWithDefaults
-  constructor(path: string, frontmatter: FrontmatterWithDefaults) {
-    super(path)
+  constructor(
+    fullPath: string,
+    relativePath: string,
+    frontmatter: FrontmatterWithDefaults
+  ) {
+    super(fullPath, relativePath)
     this.frontmatter = frontmatter as SelectFrontmatterWithDefaults
   }
   public createPages(): void {
@@ -172,6 +215,7 @@ export class SelectPageSource extends PageSource {
       )
       // sort by page date, descending
       .sort((a, b) => +b.date - +a.date)
+
     const pageSize = config.pagination.pageSize ?? 2
     let currentPage = 1
     this.pages = []
@@ -189,12 +233,14 @@ export class SelectPageSource extends PageSource {
 }
 
 export const createPageSource = async (
-  path: string,
+  fullPath: string,
+  relativePath: string,
   frontmatter: FrontmatterWithDefaults
 ): Promise<PageSourceType> => {
   let pageSource: PageSourceType
   const constructorArgs: Parameters<typeof createPageSource> = [
-    path,
+    fullPath,
+    relativePath,
     frontmatter,
   ]
 
@@ -211,7 +257,7 @@ export const createPageSource = async (
     case 'content':
     default:
       pageSource =
-        extname(path) === '.md'
+        extname(fullPath) === '.md'
           ? new MarkdownPageSource(...constructorArgs)
           : new ContentPageSource(...constructorArgs)
       break

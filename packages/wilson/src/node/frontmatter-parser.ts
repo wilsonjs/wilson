@@ -76,6 +76,8 @@ class FrontmatterParser {
       this.throw('page has no or empty frontmatter')
     if (frontmatter.title === undefined) this.throw('frontmatter has no title')
 
+    const { taxonomies } = getConfig()
+
     if (frontmatter.type === 'content') {
       const fm = frontmatter as ContentFrontmatter
       if (fm.draft !== undefined && typeof fm.draft !== 'boolean') {
@@ -85,7 +87,6 @@ class FrontmatterParser {
         if (Object.getPrototypeOf(fm.taxonomies) !== Object.prototype) {
           this.throw('frontmatter.taxonomies is not an object literal')
         }
-        const { taxonomies } = getConfig()
         for (const taxonomyName in fm.taxonomies) {
           if (!taxonomies[taxonomyName]) {
             this.throw(`taxonomy "${taxonomyName}" is not defined in config`)

@@ -1,6 +1,6 @@
-import { extname } from 'path'
+import { extname, join, relative } from 'path'
 import readdirp from 'readdirp'
-import { getConfig } from './config.js'
+import { getAllLanguageCodes, getConfig } from './config.js'
 import { pageFileTypes } from './constants.js'
 import FrontmatterParser from './frontmatter-parser.js'
 import Page, { ContentPage } from './page.js'
@@ -9,6 +9,7 @@ import {
   createPageSource,
   PageSourceType,
 } from './page-source.js'
+import { CONTINUE } from 'unist-util-visit'
 
 interface InternalState {
   pageSources: PageSourceType[]
@@ -27,6 +28,8 @@ const state: InternalState = {
  * directory.
  */
 const initializePageSources = async (pageDir: string): Promise<void> => {
+  const allLanguageCodes = getAllLanguageCodes()
+
   for await (let { fullPath } of readdirp(pageDir)) {
     // replace \\ with / for paths on windows
     fullPath = fullPath.replace(/\\/g, '/')
@@ -36,9 +39,24 @@ const initializePageSources = async (pageDir: string): Promise<void> => {
       continue
     }
 
+    const relativePath = relative(join(process.cwd(), 'src', 'pages'), fullPath)
+
+    if (allLanguageCodes.length > 0) {
+      const startsWithLanguageCode = relativePath.match(
+        new RegExp(`^(${allLanguageCodes.join('|')})/`)
+      )
+      if (!startsWithLanguageCode) {
+        throw new Error(`found non-localized page: ${relativePath}`)
+      }
+    }
+
     const frontmatterParser = new FrontmatterParser(fullPath)
     const frontmatter = frontmatterParser.parseFrontmatter()
-    const pageSource = await createPageSource(fullPath, frontmatter)
+    const pageSource = await createPageSource(
+      fullPath,
+      relativePath,
+      frontmatter
+    )
     state.pageSources.push(pageSource)
   }
 

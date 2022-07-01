@@ -18,8 +18,8 @@ export const assetUrlPrefix = '_assetUrl_'
  */
 export const assetUrlTagConfig: Record<string, string[]> = {
   video: ['src', 'poster'],
-  source: ['src'],
-  img: ['src'],
+  source: ['src', 'srcSet'],
+  img: ['src', 'srcSet'],
   image: ['xlink:href', 'href'],
   use: ['xlink:href', 'href'],
 }

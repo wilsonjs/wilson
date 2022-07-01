@@ -5,6 +5,7 @@ import { getConfig } from '../config.js'
 import { getPageSources } from '../state.js'
 import { PageType, SelectPage, TaxonomyPage } from '../page.js'
 import { dirname, relative } from 'path'
+import { Language } from '../../types.js'
 
 const virtualExportsPath = 'wilson/virtual'
 const clientEntryPath = '/@wilson/client.js'
@@ -37,6 +38,7 @@ const virtualPlugin = async (): Promise<Plugin> => {
         const pageSources = getPageSources()
         const {
           siteData,
+          languages,
           layouts: { pageLayout },
           importMode,
         } = getConfig()
@@ -80,8 +82,18 @@ const virtualPlugin = async (): Promise<Plugin> => {
           .flat()
           .join(',')
 
+        const pageData = pageSources
+          .map((pageSource) =>
+            pageSource.pages.map((page) => ({
+              route: page.route,
+              language: pageSource.language,
+            }))
+          )
+          .flat()
+
         const code = `
-          import { h } from 'preact';
+          import { h, createContext } from 'preact';
+          import { useContext } from 'preact/hooks';
           import { lazy } from 'preact-iso';
           ${layoutImport}
 
@@ -89,8 +101,24 @@ const virtualPlugin = async (): Promise<Plugin> => {
 
           const routes = [${routes}];
           const siteData = ${JSON.stringify(siteData)};
+          const pageData = ${JSON.stringify(pageData)};
+          const languages = ${JSON.stringify(languages)};
+          const LanguageContext = createContext(null);
+          const LanguageProvider = LanguageContext.Provider
+          const useCurrentLanguageCode = () => useContext(LanguageContext);
+          const useAllLanguages = () => ${JSON.stringify(
+            languages.map((language) => ({
+              code: language.code,
+              name: language.name,
+            }))
+          )};
+          const useTranslation = (identifier) => {
+            const currentLanguageCode = useCurrentLanguageCode();
+            const currentLanguage = languages.find((language) => language.code === (currentLanguageCode ?? siteData.lang));
+            return currentLanguage.translations[identifier];
+          };
 
-          export { routes, siteData, Layout };
+          export { routes, siteData, Layout, LanguageProvider, useCurrentLanguageCode, useAllLanguages, useTranslation, pageData };
         `
 
         return transformJsx(code)
