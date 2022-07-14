@@ -1,0 +1,33 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "author": "Christoph Werner <christoph@codepunkt.de>",
+  "type": "module",
+  "scripts": {
+    "dev": "wilson --open",
+    "build": "wilson build",
+    "preview": "wilson preview --open --port 3050",
+    "now": "npm run build && npm run preview",
+    "lint": "eslint . --ext .ts,.js,.vue,.html",
+    "check": "vue-tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codepunkt/wilson",
+    "directory": "docs"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "2.0.0-beta.0",
+    "@wilson/config": "workspace:^1.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "vite": "3.0.0",
+    "wilson": "workspace:^1.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.14",
+    "@types/react-dom": "^18.0.6"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "root",
+  "private": true,
+  "packageManager": "pnpm@7.5.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codepunkt/wilson"
+  },
+  "scripts": {
+    "build": "FORCE_COLOR=1 turbo run build",
+    "preview": "FORCE_COLOR=1 turbo run preview",
+    "dev": "DEBUG=wilson:* FORCE_COLOR=1 turbo run dev --continue",
+    "docs": "pnpm run build && pnpm run dev --filter docs",
+    "lint:all": "pnpm nx run-many --target=lint --all",
+    "docs:build": "npm -C docs run build",
+    "docs:now": "npm -C docs run now",
+    "docs:check": "npm -C docs run check",
+    "blog": "npm run -C playground/the-vue-point dev",
+    "blog:build": "npm run -C playground/the-vue-point build",
+    "blog:now": "npm run -C playground/the-vue-point now",
+    "blog:check": "npm -C playground/the-vue-point run check",
+    "release": "node scripts/release",
+    "changelog": "node scripts/changelog",
+    "test": "packages/iles/bin/iles.js test"
+  },
+  "devDependencies": {
+    "turbo": "^1.3.1",
+    "typescript": "^4.7.4"
+  }
+}

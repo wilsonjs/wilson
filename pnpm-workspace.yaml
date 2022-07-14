@@ -1,0 +1,6 @@
+packages:
+  - packages/config
+  - packages/pages
+  - packages/utils
+  - packages/wilson
+  - docs

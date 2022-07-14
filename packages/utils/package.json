@@ -1,0 +1,33 @@
+{
+  "name": "@wilson/utils",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Christoph Werner <christoph@codepunkt.de>",
+  "type": "module",
+  "scripts": {
+    "dev": "npm run build -- --watch",
+    "build": "tsup src/utils.ts",
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codepunkt/wilson",
+    "directory": "packages/utils"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "types": "dist/utils.d.ts",
+  "main": "dist/utils.js",
+  "exports": {
+    ".": {
+      "import": "./dist/utils.js",
+      "require": "./src/utils.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "devDependencies": {
+    "tsup": "^6.1.3"
+  }
+}
