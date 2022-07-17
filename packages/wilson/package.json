@@ -123,7 +123,7 @@
     "@types/rss": "^0.0.29",
     "@types/serve-handler": "^6.1.1",
     "jest": "^28.1.0",
-    "serve": "^13.0.2",
+    "serve": "^14.0.1",
     "ts-jest": "^27.0.5",
     "tslib": "^2.3.1"
   }
