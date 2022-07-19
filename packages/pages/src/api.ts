@@ -235,8 +235,16 @@ export function createApi({
       return (await extendRoutes?.(routes)) || routes
     },
 
+    /**
+     * Returns an array of all pages, sorted by path segments and dynamic params.
+     * @returns Array of pages.
+     */
+    getSortedPages(): Page[] {
+      return Array.from(pageByPath.values()).sort(byPathSegmentsAndDynamicParams)
+    },
+
     async generateDataModule(id: string): Promise<string> {
-      const pages = Array.from(pageByPath.values())
+      const pages = this.getSortedPages()
       const routes = await this.getExtendedRoutes(pages)
       const code = `export default ${JSON.stringify(routes, null, 2)}`
       debug.virtual(
@@ -247,9 +255,9 @@ export function createApi({
       )
       return code
     },
+
     /**
      * Returns the page for the given importPath.
-     *
      * @param importPath page importPath, e.g. `src/pages/blog/[page].tsx`
      */
     getPageByImportPath(importPath: string): Page | undefined {
@@ -259,7 +267,6 @@ export function createApi({
     /**
      * Returns an object that maps dynamic route paths to props for specific
      * parameter matches.
-     *
      * @param routes An array of routes
      */
     getSpecificRouteProps(routes: Route[]): {
@@ -305,11 +312,10 @@ export function createApi({
     },
 
     async generateRoutesModule(id: string): Promise<string> {
-      const pages = Array.from(pageByPath.values())
+      const pages = this.getSortedPages()
       const routes = await this.getExtendedRoutes(pages)
       const specificMatchProps = this.getSpecificRouteProps(routes)
 
-      // TODO sort byDynamicParams
       const code = `import { h } from 'preact';
 import { shallowEqual } from 'fast-equals';
 ${routes.map(this.getRouteImportCode).join('\n')}\n
@@ -362,15 +368,25 @@ export default [
   }
 }
 
-export function countSlash(value: string) {
-  return (value.match(/\//g) || []).length
+/**
+ * Counts how often a string occurs in a string.
+ * @param value String to be searched in
+ * @param char String to be searched for
+ * @returns Number of occurrences
+ */
+export function countOccurence(search: string, char: string) {
+  return (search.match(new RegExp(char, 'g')) || []).length
 }
 
-// TODO: Ensure that paths with less dynamic params are added before.
-function byDynamicParams({ route: a }: Page, { route: b }: Page) {
-  const diff = countSlash(a) - countSlash(b)
-  if (diff) return diff
-  const aDynamic = a.includes(':')
-  const bDynamic = b.includes(':')
-  return aDynamic === bDynamic ? a.localeCompare(b) : aDynamic ? 1 : -1
+/**
+ * Compares two pages by their number of path segments and dynamic params.
+ */
+function byPathSegmentsAndDynamicParams({ route: a }: Page, { route: b }: Page) {
+  if (a === '/') return -1
+  if (b === '/') return 1
+  const slashDiff = countOccurence(a, '/') - countOccurence(b, '/')
+  if (slashDiff) return slashDiff
+  const paramDiff = countOccurence(a, ':') - countOccurence(b, ':')
+  if (paramDiff) return paramDiff
+  return a.localeCompare(b)
 }

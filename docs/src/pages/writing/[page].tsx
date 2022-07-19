@@ -1,12 +1,13 @@
 import type { DynamicPageProps, GetRenderedPathsResult } from 'wilson'
 
 type Props = { wat: number }
+type Params = 'page'
 
-export function getRenderedPaths(): GetRenderedPathsResult<'page', Props>[] {
+export function getRenderedPaths(): GetRenderedPathsResult<Params, Props>[] {
   return [{ params: { page: 'foo' } }, { params: { page: 'bar' }, props: { wat: 6 } }]
 }
 
-export default function Page(props: DynamicPageProps<'page', Props>) {
+export default function Page(props: DynamicPageProps<Params, Props>) {
   return (
     <>
       <h1>Paginated writing</h1>
