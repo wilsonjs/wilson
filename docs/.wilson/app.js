@@ -1,1895 +1,441 @@
-import * as jsxRuntime from "react/jsx-runtime";
-import * as React from "react";
-import React__default from "react";
-import ReactDOM from "react-dom/client";
-const Fragment = jsxRuntime.Fragment;
-const jsx = jsxRuntime.jsx;
-const jsxs = jsxRuntime.jsxs;
-function _extends$1() {
-  _extends$1 = Object.assign ? Object.assign.bind() : function(target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-    return target;
-  };
-  return _extends$1.apply(this, arguments);
-}
-var Action;
-(function(Action2) {
-  Action2["Pop"] = "POP";
-  Action2["Push"] = "PUSH";
-  Action2["Replace"] = "REPLACE";
-})(Action || (Action = {}));
-var readOnly = process.env.NODE_ENV !== "production" ? function(obj) {
-  return Object.freeze(obj);
-} : function(obj) {
-  return obj;
-};
-function warning$1(cond, message) {
-  if (!cond) {
-    if (typeof console !== "undefined")
-      console.warn(message);
-    try {
-      throw new Error(message);
-    } catch (e) {
-    }
-  }
-}
-var BeforeUnloadEventType = "beforeunload";
-var HashChangeEventType = "hashchange";
-var PopStateEventType = "popstate";
-function createBrowserHistory(options) {
-  if (options === void 0) {
-    options = {};
-  }
-  var _options = options, _options$window = _options.window, window2 = _options$window === void 0 ? document.defaultView : _options$window;
-  var globalHistory = window2.history;
-  function getIndexAndLocation() {
-    var _window$location = window2.location, pathname = _window$location.pathname, search = _window$location.search, hash = _window$location.hash;
-    var state = globalHistory.state || {};
-    return [state.idx, readOnly({
-      pathname,
-      search,
-      hash,
-      state: state.usr || null,
-      key: state.key || "default"
-    })];
-  }
-  var blockedPopTx = null;
-  function handlePop() {
-    if (blockedPopTx) {
-      blockers.call(blockedPopTx);
-      blockedPopTx = null;
-    } else {
-      var nextAction = Action.Pop;
-      var _getIndexAndLocation = getIndexAndLocation(), nextIndex = _getIndexAndLocation[0], nextLocation = _getIndexAndLocation[1];
-      if (blockers.length) {
-        if (nextIndex != null) {
-          var delta = index - nextIndex;
-          if (delta) {
-            blockedPopTx = {
-              action: nextAction,
-              location: nextLocation,
-              retry: function retry() {
-                go(delta * -1);
-              }
-            };
-            go(delta);
-          }
-        } else {
-          process.env.NODE_ENV !== "production" ? warning$1(false, "You are trying to block a POP navigation to a location that was not created by the history library. The block will fail silently in production, but in general you should do all navigation with the history library (instead of using window.history.pushState directly) to avoid this situation.") : void 0;
-        }
-      } else {
-        applyTx(nextAction);
-      }
-    }
-  }
-  window2.addEventListener(PopStateEventType, handlePop);
-  var action = Action.Pop;
-  var _getIndexAndLocation2 = getIndexAndLocation(), index = _getIndexAndLocation2[0], location = _getIndexAndLocation2[1];
-  var listeners = createEvents();
-  var blockers = createEvents();
-  if (index == null) {
-    index = 0;
-    globalHistory.replaceState(_extends$1({}, globalHistory.state, {
-      idx: index
-    }), "");
-  }
-  function createHref(to) {
-    return typeof to === "string" ? to : createPath(to);
-  }
-  function getNextLocation(to, state) {
-    if (state === void 0) {
-      state = null;
-    }
-    return readOnly(_extends$1({
-      pathname: location.pathname,
-      hash: "",
-      search: ""
-    }, typeof to === "string" ? parsePath(to) : to, {
-      state,
-      key: createKey()
-    }));
-  }
-  function getHistoryStateAndUrl(nextLocation, index2) {
-    return [{
-      usr: nextLocation.state,
-      key: nextLocation.key,
-      idx: index2
-    }, createHref(nextLocation)];
-  }
-  function allowTx(action2, location2, retry) {
-    return !blockers.length || (blockers.call({
-      action: action2,
-      location: location2,
-      retry
-    }), false);
-  }
-  function applyTx(nextAction) {
-    action = nextAction;
-    var _getIndexAndLocation3 = getIndexAndLocation();
-    index = _getIndexAndLocation3[0];
-    location = _getIndexAndLocation3[1];
-    listeners.call({
-      action,
-      location
-    });
-  }
-  function push(to, state) {
-    var nextAction = Action.Push;
-    var nextLocation = getNextLocation(to, state);
-    function retry() {
-      push(to, state);
-    }
-    if (allowTx(nextAction, nextLocation, retry)) {
-      var _getHistoryStateAndUr = getHistoryStateAndUrl(nextLocation, index + 1), historyState = _getHistoryStateAndUr[0], url = _getHistoryStateAndUr[1];
-      try {
-        globalHistory.pushState(historyState, "", url);
-      } catch (error) {
-        window2.location.assign(url);
-      }
-      applyTx(nextAction);
-    }
-  }
-  function replace(to, state) {
-    var nextAction = Action.Replace;
-    var nextLocation = getNextLocation(to, state);
-    function retry() {
-      replace(to, state);
-    }
-    if (allowTx(nextAction, nextLocation, retry)) {
-      var _getHistoryStateAndUr2 = getHistoryStateAndUrl(nextLocation, index), historyState = _getHistoryStateAndUr2[0], url = _getHistoryStateAndUr2[1];
-      globalHistory.replaceState(historyState, "", url);
-      applyTx(nextAction);
-    }
-  }
-  function go(delta) {
-    globalHistory.go(delta);
-  }
-  var history = {
-    get action() {
-      return action;
-    },
-    get location() {
-      return location;
-    },
-    createHref,
-    push,
-    replace,
-    go,
-    back: function back() {
-      go(-1);
-    },
-    forward: function forward() {
-      go(1);
-    },
-    listen: function listen(listener) {
-      return listeners.push(listener);
-    },
-    block: function block(blocker) {
-      var unblock = blockers.push(blocker);
-      if (blockers.length === 1) {
-        window2.addEventListener(BeforeUnloadEventType, promptBeforeUnload);
-      }
-      return function() {
-        unblock();
-        if (!blockers.length) {
-          window2.removeEventListener(BeforeUnloadEventType, promptBeforeUnload);
-        }
-      };
-    }
-  };
-  return history;
-}
-function createHashHistory(options) {
-  if (options === void 0) {
-    options = {};
-  }
-  var _options2 = options, _options2$window = _options2.window, window2 = _options2$window === void 0 ? document.defaultView : _options2$window;
-  var globalHistory = window2.history;
-  function getIndexAndLocation() {
-    var _parsePath = parsePath(window2.location.hash.substr(1)), _parsePath$pathname = _parsePath.pathname, pathname = _parsePath$pathname === void 0 ? "/" : _parsePath$pathname, _parsePath$search = _parsePath.search, search = _parsePath$search === void 0 ? "" : _parsePath$search, _parsePath$hash = _parsePath.hash, hash = _parsePath$hash === void 0 ? "" : _parsePath$hash;
-    var state = globalHistory.state || {};
-    return [state.idx, readOnly({
-      pathname,
-      search,
-      hash,
-      state: state.usr || null,
-      key: state.key || "default"
-    })];
-  }
-  var blockedPopTx = null;
-  function handlePop() {
-    if (blockedPopTx) {
-      blockers.call(blockedPopTx);
-      blockedPopTx = null;
-    } else {
-      var nextAction = Action.Pop;
-      var _getIndexAndLocation4 = getIndexAndLocation(), nextIndex = _getIndexAndLocation4[0], nextLocation = _getIndexAndLocation4[1];
-      if (blockers.length) {
-        if (nextIndex != null) {
-          var delta = index - nextIndex;
-          if (delta) {
-            blockedPopTx = {
-              action: nextAction,
-              location: nextLocation,
-              retry: function retry() {
-                go(delta * -1);
-              }
-            };
-            go(delta);
-          }
-        } else {
-          process.env.NODE_ENV !== "production" ? warning$1(false, "You are trying to block a POP navigation to a location that was not created by the history library. The block will fail silently in production, but in general you should do all navigation with the history library (instead of using window.history.pushState directly) to avoid this situation.") : void 0;
-        }
-      } else {
-        applyTx(nextAction);
-      }
-    }
-  }
-  window2.addEventListener(PopStateEventType, handlePop);
-  window2.addEventListener(HashChangeEventType, function() {
-    var _getIndexAndLocation5 = getIndexAndLocation(), nextLocation = _getIndexAndLocation5[1];
-    if (createPath(nextLocation) !== createPath(location)) {
-      handlePop();
-    }
-  });
-  var action = Action.Pop;
-  var _getIndexAndLocation6 = getIndexAndLocation(), index = _getIndexAndLocation6[0], location = _getIndexAndLocation6[1];
-  var listeners = createEvents();
-  var blockers = createEvents();
-  if (index == null) {
-    index = 0;
-    globalHistory.replaceState(_extends$1({}, globalHistory.state, {
-      idx: index
-    }), "");
-  }
-  function getBaseHref() {
-    var base = document.querySelector("base");
-    var href = "";
-    if (base && base.getAttribute("href")) {
-      var url = window2.location.href;
-      var hashIndex = url.indexOf("#");
-      href = hashIndex === -1 ? url : url.slice(0, hashIndex);
-    }
-    return href;
-  }
-  function createHref(to) {
-    return getBaseHref() + "#" + (typeof to === "string" ? to : createPath(to));
-  }
-  function getNextLocation(to, state) {
-    if (state === void 0) {
-      state = null;
-    }
-    return readOnly(_extends$1({
-      pathname: location.pathname,
-      hash: "",
-      search: ""
-    }, typeof to === "string" ? parsePath(to) : to, {
-      state,
-      key: createKey()
-    }));
-  }
-  function getHistoryStateAndUrl(nextLocation, index2) {
-    return [{
-      usr: nextLocation.state,
-      key: nextLocation.key,
-      idx: index2
-    }, createHref(nextLocation)];
-  }
-  function allowTx(action2, location2, retry) {
-    return !blockers.length || (blockers.call({
-      action: action2,
-      location: location2,
-      retry
-    }), false);
-  }
-  function applyTx(nextAction) {
-    action = nextAction;
-    var _getIndexAndLocation7 = getIndexAndLocation();
-    index = _getIndexAndLocation7[0];
-    location = _getIndexAndLocation7[1];
-    listeners.call({
-      action,
-      location
-    });
-  }
-  function push(to, state) {
-    var nextAction = Action.Push;
-    var nextLocation = getNextLocation(to, state);
-    function retry() {
-      push(to, state);
-    }
-    process.env.NODE_ENV !== "production" ? warning$1(nextLocation.pathname.charAt(0) === "/", "Relative pathnames are not supported in hash history.push(" + JSON.stringify(to) + ")") : void 0;
-    if (allowTx(nextAction, nextLocation, retry)) {
-      var _getHistoryStateAndUr3 = getHistoryStateAndUrl(nextLocation, index + 1), historyState = _getHistoryStateAndUr3[0], url = _getHistoryStateAndUr3[1];
-      try {
-        globalHistory.pushState(historyState, "", url);
-      } catch (error) {
-        window2.location.assign(url);
-      }
-      applyTx(nextAction);
-    }
-  }
-  function replace(to, state) {
-    var nextAction = Action.Replace;
-    var nextLocation = getNextLocation(to, state);
-    function retry() {
-      replace(to, state);
-    }
-    process.env.NODE_ENV !== "production" ? warning$1(nextLocation.pathname.charAt(0) === "/", "Relative pathnames are not supported in hash history.replace(" + JSON.stringify(to) + ")") : void 0;
-    if (allowTx(nextAction, nextLocation, retry)) {
-      var _getHistoryStateAndUr4 = getHistoryStateAndUrl(nextLocation, index), historyState = _getHistoryStateAndUr4[0], url = _getHistoryStateAndUr4[1];
-      globalHistory.replaceState(historyState, "", url);
-      applyTx(nextAction);
-    }
-  }
-  function go(delta) {
-    globalHistory.go(delta);
-  }
-  var history = {
-    get action() {
-      return action;
-    },
-    get location() {
-      return location;
-    },
-    createHref,
-    push,
-    replace,
-    go,
-    back: function back() {
-      go(-1);
-    },
-    forward: function forward() {
-      go(1);
-    },
-    listen: function listen(listener) {
-      return listeners.push(listener);
-    },
-    block: function block(blocker) {
-      var unblock = blockers.push(blocker);
-      if (blockers.length === 1) {
-        window2.addEventListener(BeforeUnloadEventType, promptBeforeUnload);
-      }
-      return function() {
-        unblock();
-        if (!blockers.length) {
-          window2.removeEventListener(BeforeUnloadEventType, promptBeforeUnload);
-        }
-      };
-    }
-  };
-  return history;
-}
-function createMemoryHistory(options) {
-  if (options === void 0) {
-    options = {};
-  }
-  var _options3 = options, _options3$initialEntr = _options3.initialEntries, initialEntries = _options3$initialEntr === void 0 ? ["/"] : _options3$initialEntr, initialIndex = _options3.initialIndex;
-  var entries = initialEntries.map(function(entry) {
-    var location2 = readOnly(_extends$1({
-      pathname: "/",
-      search: "",
-      hash: "",
-      state: null,
-      key: createKey()
-    }, typeof entry === "string" ? parsePath(entry) : entry));
-    process.env.NODE_ENV !== "production" ? warning$1(location2.pathname.charAt(0) === "/", "Relative pathnames are not supported in createMemoryHistory({ initialEntries }) (invalid entry: " + JSON.stringify(entry) + ")") : void 0;
-    return location2;
-  });
-  var index = clamp(initialIndex == null ? entries.length - 1 : initialIndex, 0, entries.length - 1);
-  var action = Action.Pop;
-  var location = entries[index];
-  var listeners = createEvents();
-  var blockers = createEvents();
-  function createHref(to) {
-    return typeof to === "string" ? to : createPath(to);
-  }
-  function getNextLocation(to, state) {
-    if (state === void 0) {
-      state = null;
-    }
-    return readOnly(_extends$1({
-      pathname: location.pathname,
-      search: "",
-      hash: ""
-    }, typeof to === "string" ? parsePath(to) : to, {
-      state,
-      key: createKey()
-    }));
-  }
-  function allowTx(action2, location2, retry) {
-    return !blockers.length || (blockers.call({
-      action: action2,
-      location: location2,
-      retry
-    }), false);
-  }
-  function applyTx(nextAction, nextLocation) {
-    action = nextAction;
-    location = nextLocation;
-    listeners.call({
-      action,
-      location
-    });
-  }
-  function push(to, state) {
-    var nextAction = Action.Push;
-    var nextLocation = getNextLocation(to, state);
-    function retry() {
-      push(to, state);
-    }
-    process.env.NODE_ENV !== "production" ? warning$1(location.pathname.charAt(0) === "/", "Relative pathnames are not supported in memory history.push(" + JSON.stringify(to) + ")") : void 0;
-    if (allowTx(nextAction, nextLocation, retry)) {
-      index += 1;
-      entries.splice(index, entries.length, nextLocation);
-      applyTx(nextAction, nextLocation);
-    }
-  }
-  function replace(to, state) {
-    var nextAction = Action.Replace;
-    var nextLocation = getNextLocation(to, state);
-    function retry() {
-      replace(to, state);
-    }
-    process.env.NODE_ENV !== "production" ? warning$1(location.pathname.charAt(0) === "/", "Relative pathnames are not supported in memory history.replace(" + JSON.stringify(to) + ")") : void 0;
-    if (allowTx(nextAction, nextLocation, retry)) {
-      entries[index] = nextLocation;
-      applyTx(nextAction, nextLocation);
-    }
-  }
-  function go(delta) {
-    var nextIndex = clamp(index + delta, 0, entries.length - 1);
-    var nextAction = Action.Pop;
-    var nextLocation = entries[nextIndex];
-    function retry() {
-      go(delta);
-    }
-    if (allowTx(nextAction, nextLocation, retry)) {
-      index = nextIndex;
-      applyTx(nextAction, nextLocation);
-    }
-  }
-  var history = {
-    get index() {
-      return index;
-    },
-    get action() {
-      return action;
-    },
-    get location() {
-      return location;
-    },
-    createHref,
-    push,
-    replace,
-    go,
-    back: function back() {
-      go(-1);
-    },
-    forward: function forward() {
-      go(1);
-    },
-    listen: function listen(listener) {
-      return listeners.push(listener);
-    },
-    block: function block(blocker) {
-      return blockers.push(blocker);
-    }
-  };
-  return history;
-}
-function clamp(n, lowerBound, upperBound) {
-  return Math.min(Math.max(n, lowerBound), upperBound);
-}
-function promptBeforeUnload(event) {
-  event.preventDefault();
-  event.returnValue = "";
-}
-function createEvents() {
-  var handlers = [];
-  return {
-    get length() {
-      return handlers.length;
-    },
-    push: function push(fn) {
-      handlers.push(fn);
-      return function() {
-        handlers = handlers.filter(function(handler) {
-          return handler !== fn;
-        });
-      };
-    },
-    call: function call(arg) {
-      handlers.forEach(function(fn) {
-        return fn && fn(arg);
-      });
-    }
-  };
-}
-function createKey() {
-  return Math.random().toString(36).substr(2, 8);
-}
-function createPath(_ref) {
-  var _ref$pathname = _ref.pathname, pathname = _ref$pathname === void 0 ? "/" : _ref$pathname, _ref$search = _ref.search, search = _ref$search === void 0 ? "" : _ref$search, _ref$hash = _ref.hash, hash = _ref$hash === void 0 ? "" : _ref$hash;
-  if (search && search !== "?")
-    pathname += search.charAt(0) === "?" ? search : "?" + search;
-  if (hash && hash !== "#")
-    pathname += hash.charAt(0) === "#" ? hash : "#" + hash;
-  return pathname;
-}
-function parsePath(path) {
-  var parsedPath = {};
-  if (path) {
-    var hashIndex = path.indexOf("#");
-    if (hashIndex >= 0) {
-      parsedPath.hash = path.substr(hashIndex);
-      path = path.substr(0, hashIndex);
-    }
-    var searchIndex = path.indexOf("?");
-    if (searchIndex >= 0) {
-      parsedPath.search = path.substr(searchIndex);
-      path = path.substr(0, searchIndex);
-    }
-    if (path) {
-      parsedPath.pathname = path;
-    }
-  }
-  return parsedPath;
-}
-/**
- * react-location
- *
- * Copyright (c) TanStack
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.md file in the root directory of this source tree.
- *
- * @license MIT
- */
-function _extends() {
-  _extends = Object.assign || function(target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-    return target;
-  };
-  return _extends.apply(this, arguments);
-}
-function _objectWithoutPropertiesLoose(source, excluded) {
-  if (source == null)
-    return {};
-  var target = {};
-  var sourceKeys = Object.keys(source);
-  var key, i;
-  for (i = 0; i < sourceKeys.length; i++) {
-    key = sourceKeys[i];
-    if (excluded.indexOf(key) >= 0)
-      continue;
-    target[key] = source[key];
-  }
-  return target;
-}
-function encode(obj, pfx) {
-  var k, i, tmp, str = "";
-  for (k in obj) {
-    if ((tmp = obj[k]) !== void 0) {
-      if (Array.isArray(tmp)) {
-        for (i = 0; i < tmp.length; i++) {
-          str && (str += "&");
-          str += encodeURIComponent(k) + "=" + encodeURIComponent(tmp[i]);
-        }
-      } else {
-        str && (str += "&");
-        str += encodeURIComponent(k) + "=" + encodeURIComponent(tmp);
-      }
-    }
-  }
-  return (pfx || "") + str;
-}
-function toValue(mix) {
-  if (!mix)
-    return "";
-  var str = decodeURIComponent(mix);
-  if (str === "false")
-    return false;
-  if (str === "true")
-    return true;
-  return +str * 0 === 0 ? +str : str;
-}
-function decode(str) {
-  var tmp, k, out = {}, arr = str.split("&");
-  while (tmp = arr.shift()) {
-    tmp = tmp.split("=");
-    k = tmp.shift();
-    if (out[k] !== void 0) {
-      out[k] = [].concat(out[k], toValue(tmp.shift()));
-    } else {
-      out[k] = toValue(tmp.shift());
-    }
-  }
-  return out;
-}
-const _excluded = ["children", "location", "__experimental__snapshot"], _excluded2 = ["location", "__experimental__snapshot"], _excluded3 = ["basepath", "routes"], _excluded4 = ["to", "search", "hash", "children", "target", "style", "replace", "onClick", "onMouseEnter", "className", "getActiveProps", "getInactiveProps", "activeOptions", "preload", "disabled", "_ref"], _excluded5 = ["style", "className"], _excluded6 = ["style", "className"], _excluded7 = ["pending"], _excluded8 = ["children"];
-const LocationContext = /* @__PURE__ */ React.createContext(null);
-const MatchesContext = /* @__PURE__ */ React.createContext(null);
-const routerContext = /* @__PURE__ */ React.createContext(null);
-const isDOM = Boolean(typeof window !== "undefined" && window.document && window.document.createElement);
-const useLayoutEffect = isDOM ? React.useLayoutEffect : React.useEffect;
-const createDefaultHistory = () => isDOM ? createBrowserHistory() : createMemoryHistory();
-class Subscribable {
-  constructor() {
-    this.listeners = [];
-  }
-  subscribe(listener) {
-    this.listeners.push(listener);
-    return () => {
-      this.listeners = this.listeners.filter((x) => x !== listener);
-    };
-  }
-  notify() {
-    this.listeners.forEach((listener) => listener());
-  }
-}
-class ReactLocation extends Subscribable {
-  constructor(options) {
-    var _options$stringifySea, _options$parseSearch;
-    super();
-    this.isTransitioning = false;
-    this.history = (options == null ? void 0 : options.history) || createDefaultHistory();
-    this.stringifySearch = (_options$stringifySea = options == null ? void 0 : options.stringifySearch) != null ? _options$stringifySea : defaultStringifySearch;
-    this.parseSearch = (_options$parseSearch = options == null ? void 0 : options.parseSearch) != null ? _options$parseSearch : defaultParseSearch;
-    this.current = this.parseLocation(this.history.location);
-    this.destroy = this.history.listen((event) => {
-      this.current = this.parseLocation(event.location, this.current);
-      this.notify();
-    });
-  }
-  buildNext(basepath, dest) {
-    var _dest$to, _dest$__searchFilters, _functionalUpdate, _dest$__searchFilters2;
-    if (basepath === void 0) {
-      basepath = "/";
-    }
-    if (dest === void 0) {
-      dest = {};
-    }
-    const from = _extends({}, this.current, dest.from);
-    const pathname = resolvePath(basepath, from.pathname, "" + ((_dest$to = dest.to) != null ? _dest$to : "."));
-    const filteredSearch = (_dest$__searchFilters = dest.__searchFilters) != null && _dest$__searchFilters.length ? dest.__searchFilters.reduce((prev, next) => next(prev), from.search) : from.search;
-    const updatedSearch = dest.search === true ? filteredSearch : dest.search ? (_functionalUpdate = functionalUpdate(dest.search, filteredSearch)) != null ? _functionalUpdate : {} : (_dest$__searchFilters2 = dest.__searchFilters) != null && _dest$__searchFilters2.length ? filteredSearch : {};
-    const search = replaceEqualDeep(from.search, updatedSearch);
-    const searchStr = this.stringifySearch(search);
-    let hash = dest.hash === true ? from.hash : functionalUpdate(dest.hash, from.hash);
-    hash = hash ? "#" + hash : "";
-    return {
-      pathname,
-      search,
-      searchStr,
-      hash,
-      href: "" + pathname + searchStr + hash,
-      key: dest.key
-    };
-  }
-  navigate(next, replace) {
-    this.current = next;
-    if (this.navigateTimeout)
-      clearTimeout(this.navigateTimeout);
-    let nextAction = "replace";
-    if (!replace) {
-      nextAction = "push";
-    }
-    const isSameUrl = this.parseLocation(this.history.location).href === this.current.href;
-    if (isSameUrl && !this.current.key) {
-      nextAction = "replace";
-    }
-    if (nextAction === "replace") {
-      return this.history.replace({
-        pathname: this.current.pathname,
-        hash: this.current.hash,
-        search: this.current.searchStr
-      });
-    }
-    return this.history.push({
-      pathname: this.current.pathname,
-      hash: this.current.hash,
-      search: this.current.searchStr
-    });
-  }
-  parseLocation(location, previousLocation) {
-    var _location$hash$split$;
-    const parsedSearch = this.parseSearch(location.search);
-    return {
-      pathname: location.pathname,
-      searchStr: location.search,
-      search: replaceEqualDeep(previousLocation == null ? void 0 : previousLocation.search, parsedSearch),
-      hash: (_location$hash$split$ = location.hash.split("#").reverse()[0]) != null ? _location$hash$split$ : "",
-      href: "" + location.pathname + location.search + location.hash,
-      key: location.key
-    };
-  }
-}
-function MatchesProvider(props) {
-  return /* @__PURE__ */ jsx(MatchesContext.Provider, {
-    ...props
-  });
-}
-function Router(_ref2) {
-  let {
-    children,
-    location,
-    __experimental__snapshot
-  } = _ref2, rest = _objectWithoutPropertiesLoose(_ref2, _excluded);
-  const routerRef = React.useRef(null);
-  if (!routerRef.current) {
-    routerRef.current = new RouterInstance({
-      location,
-      __experimental__snapshot,
-      routes: rest.routes
-    });
-  }
-  const router = routerRef.current;
-  const [nonce, rerender] = React.useReducer(() => ({}), {});
-  router.update(rest);
-  useLayoutEffect(() => {
-    return router.subscribe(() => {
-      rerender();
-    });
-  }, []);
-  useLayoutEffect(() => {
-    return router.updateLocation(location.current).unsubscribe;
-  }, [location.current.key]);
-  return /* @__PURE__ */ React.createElement(LocationContext.Provider, {
-    value: {
-      location
-    }
-  }, /* @__PURE__ */ React.createElement(routerContext.Provider, {
-    value: {
-      router
-    }
-  }, /* @__PURE__ */ jsx(InitialSideEffects, {}), /* @__PURE__ */ jsx(MatchesProvider, {
-    value: [router.rootMatch, ...router.state.matches],
-    children: children != null ? children : /* @__PURE__ */ jsx(Outlet, {})
-  })));
-}
-function InitialSideEffects() {
-  const location = useLocation();
-  const buildNext = useBuildNext();
-  const navigate = useNavigate();
-  useLayoutEffect(() => {
-    const next = buildNext({
-      to: ".",
-      search: true,
-      hash: true
-    });
-    if (next.href !== location.current.href) {
-      navigate({
-        to: ".",
-        search: true,
-        hash: true,
-        fromCurrent: true,
-        replace: true
-      });
-    }
-  }, []);
-  return null;
-}
-class RouterInstance extends Subscribable {
-  constructor(_ref3) {
-    var _experimental__snaps5;
-    let {
-      location,
-      __experimental__snapshot
-    } = _ref3, rest = _objectWithoutPropertiesLoose(_ref3, _excluded2);
-    super();
-    this.routesById = {};
-    this.update = (_ref4) => {
-      let {
-        basepath,
-        routes: routes2
-      } = _ref4, opts = _objectWithoutPropertiesLoose(_ref4, _excluded3);
-      Object.assign(this, opts);
-      this.basepath = cleanPath("/" + (basepath != null ? basepath : ""));
-      this.routesById = {};
-      const recurseRoutes = (routes3, parent) => {
-        return routes3.map((route) => {
-          var _route$path, _route$pendingMs, _route$pendingMinMs, _route$children;
-          const path = (_route$path = route.path) != null ? _route$path : "*";
-          const id = joinPaths([(parent == null ? void 0 : parent.id) === "root" ? "" : parent == null ? void 0 : parent.id, "" + (path == null ? void 0 : path.replace(/(.)\/$/, "$1")) + (route.id ? "-" + route.id : "")]);
-          route = _extends({}, route, {
-            pendingMs: (_route$pendingMs = route.pendingMs) != null ? _route$pendingMs : opts == null ? void 0 : opts.defaultPendingMs,
-            pendingMinMs: (_route$pendingMinMs = route.pendingMinMs) != null ? _route$pendingMinMs : opts == null ? void 0 : opts.defaultPendingMinMs,
-            id
-          });
-          if (this.routesById[id]) {
-            if (process.env.NODE_ENV !== "production") {
-              console.warn("Duplicate routes found with id: " + id, this.routesById, route);
-            }
-            throw new Error();
-          }
-          this.routesById[id] = route;
-          route.children = (_route$children = route.children) != null && _route$children.length ? recurseRoutes(route.children, route) : void 0;
-          return route;
-        });
-      };
-      this.routes = recurseRoutes(routes2);
-      this.rootMatch = {
-        id: "root",
-        params: {},
-        search: {},
-        pathname: this.basepath,
-        route: null,
-        ownData: {},
-        data: {},
-        isLoading: false,
-        status: "resolved"
-      };
-    };
-    this.setState = (updater) => {
-      const newState = updater({
-        state: this.state,
-        pending: this.pending
-      });
-      this.state = newState.state;
-      this.pending = newState.pending;
-      this.cleanMatchCache();
-      this.notify();
-    };
-    this.matchCache = {};
-    this.cleanMatchCache = () => {
-      var _this$state$matches, _this$pending$matches, _this$pending;
-      const activeMatchIds = [...(_this$state$matches = this == null ? void 0 : this.state.matches) != null ? _this$state$matches : [], ...(_this$pending$matches = this == null ? void 0 : (_this$pending = this.pending) == null ? void 0 : _this$pending.matches) != null ? _this$pending$matches : []].map((d) => d.id);
-      Object.values(this.matchCache).forEach((match) => {
-        var _match$updatedAt;
-        if (!match.updatedAt) {
-          return;
-        }
-        if (activeMatchIds.includes(match.id)) {
-          return;
-        }
-        const age = Date.now() - ((_match$updatedAt = match.updatedAt) != null ? _match$updatedAt : 0);
-        if (!match.maxAge || age > match.maxAge) {
-          if (match.route.unloader) {
-            match.route.unloader(match);
-          }
-          delete this.matchCache[match.id];
-        }
-      });
-    };
-    this.updateLocation = (next) => {
-      let unsubscribe;
-      const promise = new Promise((resolve) => {
-        const matchLoader = new MatchLoader(this, next);
-        this.setState((old) => {
-          return _extends({}, old, {
-            pending: {
-              location: matchLoader.location,
-              matches: matchLoader.matches
-            }
-          });
-        });
-        unsubscribe = matchLoader.subscribe(() => {
-          const currentMatches = this.state.matches;
-          currentMatches.filter((d) => {
-            return !matchLoader.matches.find((dd) => dd.id === d.id);
-          }).forEach((d) => {
-            d.onExit == null ? void 0 : d.onExit(d);
-          });
-          currentMatches.filter((d) => {
-            return matchLoader.matches.find((dd) => dd.id === d.id);
-          }).forEach((d) => {
-            d.route.onTransition == null ? void 0 : d.route.onTransition(d);
-          });
-          matchLoader.matches.filter((d) => {
-            return !currentMatches.find((dd) => dd.id === d.id);
-          }).forEach((d) => {
-            d.onExit = d.route.onMatch == null ? void 0 : d.route.onMatch(d);
-          });
-          this.setState((old) => {
-            return _extends({}, old, {
-              state: {
-                location: matchLoader.location,
-                matches: matchLoader.matches
-              },
-              pending: void 0
-            });
-          });
-          resolve();
-        });
-        matchLoader.loadData();
-        matchLoader.startPending();
-      });
-      return {
-        promise,
-        unsubscribe
-      };
-    };
-    this.__experimental__createSnapshot = () => {
-      return {
-        location: this.state.location,
-        matches: this.state.matches.map((_ref5) => {
-          let {
-            ownData,
-            id
-          } = _ref5;
-          return {
-            id,
-            ownData
-          };
-        })
-      };
-    };
-    this.update(rest);
-    let matches = [];
-    if (__experimental__snapshot) {
-      const matchLoader = new MatchLoader(this, location.current);
-      matchLoader.matches.forEach((match, index) => {
-        var _experimental__snaps, _experimental__snaps3, _experimental__snaps4;
-        if (match.id !== ((_experimental__snaps = __experimental__snapshot.matches[index]) == null ? void 0 : _experimental__snaps.id)) {
-          var _experimental__snaps2;
-          throw new Error("Router hydration mismatch: " + match.id + " !== " + ((_experimental__snaps2 = __experimental__snapshot.matches[index]) == null ? void 0 : _experimental__snaps2.id));
-        }
-        match.ownData = (_experimental__snaps3 = (_experimental__snaps4 = __experimental__snapshot.matches[index]) == null ? void 0 : _experimental__snaps4.ownData) != null ? _experimental__snaps3 : {};
-      });
-      cascadeMatchData(matchLoader.matches);
-      matches = matchLoader.matches;
-    }
-    this.state = {
-      location: (_experimental__snaps5 = __experimental__snapshot == null ? void 0 : __experimental__snapshot.location) != null ? _experimental__snaps5 : location.current,
-      matches
-    };
-    location.subscribe(() => this.notify());
-  }
-}
-function useLocation() {
-  const context = React.useContext(LocationContext);
-  warning(!!context, "useLocation must be used within a <ReactLocation />");
-  return context.location;
-}
-class RouteMatch {
-  constructor(unloadedMatch) {
-    this.status = "loading";
-    this.ownData = {};
-    this.data = {};
-    this.isLoading = false;
-    this.notify = (isSoft) => {
-      var _this$matchLoader;
-      (_this$matchLoader = this.matchLoader) == null ? void 0 : _this$matchLoader.preNotify(isSoft ? this : void 0);
-    };
-    this.assignMatchLoader = (matchLoader) => {
-      this.matchLoader = matchLoader;
-    };
-    this.startPending = () => {
-      if (this.pendingTimeout) {
-        clearTimeout(this.pendingTimeout);
-      }
-      if (this.route.pendingMs !== void 0) {
-        this.pendingTimeout = setTimeout(() => {
-          var _this$notify;
-          if (this.status === "loading") {
-            this.status = "pending";
-          }
-          (_this$notify = this.notify) == null ? void 0 : _this$notify.call(this);
-          if (typeof this.route.pendingMinMs !== "undefined") {
-            this.pendingMinPromise = new Promise((r) => setTimeout(r, this.route.pendingMinMs));
-          }
-        }, this.route.pendingMs);
-      }
-    };
-    this.load = (opts) => {
-      var _ref6, _opts$maxAge;
-      this.maxAge = (_ref6 = (_opts$maxAge = opts.maxAge) != null ? _opts$maxAge : this.route.loaderMaxAge) != null ? _ref6 : opts.router.defaultLoaderMaxAge;
-      if (this.loaderPromise) {
-        return;
-      }
-      const importer = this.route.import;
-      this.loaderPromise = (!importer ? Promise.resolve() : (() => {
-        this.isLoading = true;
-        return importer({
-          params: this.params,
-          search: this.search
-        }).then((imported) => {
-          this.route = _extends({}, this.route, imported);
-        });
-      })()).then(() => {
-        const elementPromises = [];
-        const elementTypes = ["element", "errorElement", "pendingElement"];
-        elementTypes.forEach((type) => {
-          const routeElement = this.route[type];
-          if (this[type]) {
-            return;
-          }
-          if (typeof routeElement === "function") {
-            this.isLoading = true;
-            elementPromises.push(routeElement(this).then((res) => {
-              this[type] = res;
-            }));
-          } else {
-            this[type] = this.route[type];
-          }
-        });
-        const loader = this.route.loader;
-        const dataPromise = !loader ? Promise.resolve() : new Promise(async (resolveLoader) => {
-          this.isLoading = true;
-          const loaderReady = (status) => {
-            this.updatedAt = Date.now();
-            resolveLoader(this.ownData);
-            this.status = status;
-          };
-          const resolve = (data) => {
-            this.ownData = data;
-            this.error = void 0;
-            loaderReady("resolved");
-          };
-          const reject = (err) => {
-            console.error(err);
-            this.error = err;
-            loaderReady("rejected");
-          };
-          try {
-            resolve(await loader(this, {
-              parentMatch: opts.parentMatch,
-              dispatch: async (event) => {
-                var _this$notify2;
-                if (event.type === "resolve") {
-                  resolve(event.data);
-                } else if (event.type === "reject") {
-                  reject(event.error);
-                } else if (event.type === "loading") {
-                  this.isLoading = true;
-                } else if (event.type === "maxAge") {
-                  this.maxAge = event.maxAge;
-                }
-                this.updatedAt = Date.now();
-                (_this$notify2 = this.notify) == null ? void 0 : _this$notify2.call(this, true);
-              }
-            }));
-          } catch (err) {
-            reject(err);
-          }
-        });
-        return Promise.all([...elementPromises, dataPromise]).then(() => {
-          this.status = "resolved";
-          this.isLoading = false;
-          this.startPending = void 0;
-        }).then(() => this.pendingMinPromise).then(() => {
-          var _this$notify3;
-          if (this.pendingTimeout) {
-            clearTimeout(this.pendingTimeout);
-          }
-          (_this$notify3 = this.notify) == null ? void 0 : _this$notify3.call(this, true);
-        });
-      }).then(() => {
-        return this.ownData;
-      });
-    };
-    Object.assign(this, unloadedMatch);
-  }
-}
-class MatchLoader extends Subscribable {
-  constructor(router, nextLocation) {
-    var _this;
-    super();
-    _this = this;
-    this.preNotifiedMatches = [];
-    this.status = "pending";
-    this.preNotify = (routeMatch) => {
-      if (routeMatch) {
-        if (!this.preNotifiedMatches.includes(routeMatch)) {
-          this.preNotifiedMatches.push(routeMatch);
-        }
-      }
-      if (!routeMatch || this.preNotifiedMatches.length === this.matches.length) {
-        this.status = "resolved";
-        cascadeMatchData(this.matches);
-        this.notify();
-      }
-    };
-    this.loadData = async function(_temp) {
-      var _this$matches;
-      let {
-        maxAge
-      } = _temp === void 0 ? {} : _temp;
-      _this.router.cleanMatchCache();
-      if (!((_this$matches = _this.matches) != null && _this$matches.length)) {
-        _this.preNotify();
-        return;
-      }
-      _this.firstRenderPromises = [];
-      _this.matches.forEach((match, index) => {
-        var _this$matches2, _this$firstRenderProm;
-        const parentMatch = (_this$matches2 = _this.matches) == null ? void 0 : _this$matches2[index - 1];
-        match.assignMatchLoader == null ? void 0 : match.assignMatchLoader(_this);
-        match.load == null ? void 0 : match.load({
-          maxAge,
-          parentMatch,
-          router: _this.router
-        });
-        (_this$firstRenderProm = _this.firstRenderPromises) == null ? void 0 : _this$firstRenderProm.push(match.loaderPromise);
-      });
-      return await Promise.all(_this.firstRenderPromises).then(() => {
-        _this.preNotify();
-        return _this.matches;
-      });
-    };
-    this.load = async function(_temp2) {
-      let {
-        maxAge
-      } = _temp2 === void 0 ? {} : _temp2;
-      return await _this.loadData({
-        maxAge
-      });
-    };
-    this.startPending = async () => {
-      this.matches.forEach((match) => match.startPending == null ? void 0 : match.startPending());
-    };
-    this.router = router;
-    this.location = nextLocation;
-    this.matches = [];
-    const unloadedMatches = matchRoutes(this.router, this.location);
-    this.matches = unloadedMatches == null ? void 0 : unloadedMatches.map((unloadedMatch) => {
-      if (!this.router.matchCache[unloadedMatch.id]) {
-        this.router.matchCache[unloadedMatch.id] = new RouteMatch(unloadedMatch);
-      }
-      return this.router.matchCache[unloadedMatch.id];
-    });
-  }
-}
-function cascadeMatchData(matches) {
-  matches == null ? void 0 : matches.forEach((match, index) => {
-    var _parentMatch$data;
-    const parentMatch = matches == null ? void 0 : matches[index - 1];
-    match.data = _extends({}, (_parentMatch$data = parentMatch == null ? void 0 : parentMatch.data) != null ? _parentMatch$data : {}, match.ownData);
-  });
-}
-function useRouter() {
-  const value = React.useContext(routerContext);
-  if (!value) {
-    warning(true, "You are trying to use useRouter() outside of ReactLocation!");
-    throw new Error();
-  }
-  return value.router;
-}
-function matchRoutes(router, currentLocation) {
-  if (!router.routes.length) {
-    return [];
-  }
-  const matches = [];
-  const recurse = async (routes2, parentMatch) => {
-    var _route$children3;
-    let {
-      pathname,
-      params
-    } = parentMatch;
-    const filteredRoutes = router != null && router.filterRoutes ? router == null ? void 0 : router.filterRoutes(routes2) : routes2;
-    const route = filteredRoutes.find((route2) => {
-      var _route$children2, _route$caseSensitive;
-      const fullRoutePathName = joinPaths([pathname, route2.path]);
-      const fuzzy = !!(route2.path !== "/" || (_route$children2 = route2.children) != null && _route$children2.length);
-      const matchParams = matchRoute(currentLocation, {
-        to: fullRoutePathName,
-        search: route2.search,
-        fuzzy,
-        caseSensitive: (_route$caseSensitive = route2.caseSensitive) != null ? _route$caseSensitive : router.caseSensitive
-      });
-      if (matchParams) {
-        params = _extends({}, params, matchParams);
-      }
-      return !!matchParams;
-    });
-    if (!route) {
-      return;
-    }
-    const interpolatedPath = interpolatePath(route.path, params);
-    pathname = joinPaths([pathname, interpolatedPath]);
-    const interpolatedId = interpolatePath(route.id, params, true);
-    const match = {
-      id: interpolatedId,
-      route,
-      params,
-      pathname,
-      search: currentLocation.search
-    };
-    matches.push(match);
-    if ((_route$children3 = route.children) != null && _route$children3.length) {
-      recurse(route.children, match);
-    }
-  };
-  recurse(router.routes, router.rootMatch);
-  return matches;
-}
-function interpolatePath(path, params, leaveWildcard) {
-  const interpolatedPathSegments = parsePathname(path);
-  return joinPaths(interpolatedPathSegments.map((segment) => {
-    if (segment.value === "*" && !leaveWildcard) {
-      return "";
-    }
-    if (segment.type === "param") {
-      var _segment$value$substr;
-      return (_segment$value$substr = params[segment.value.substring(1)]) != null ? _segment$value$substr : "";
-    }
-    return segment.value;
-  }));
-}
-function useLoadRoute() {
-  const location = useLocation();
-  const match = useMatch();
-  const router = useRouter();
-  const buildNext = useBuildNext();
-  return useLatestCallback(async function(navigate, opts) {
-    var _navigate$from;
-    if (navigate === void 0) {
-      navigate = location.current;
-    }
-    const next = buildNext(_extends({}, navigate, {
-      from: (_navigate$from = navigate.from) != null ? _navigate$from : {
-        pathname: match.pathname
-      }
-    }));
-    const matchLoader = new MatchLoader(router, next);
-    return await matchLoader.load(opts);
-  });
-}
-function useParentMatches() {
-  const router = useRouter();
-  const match = useMatch();
-  const matches = router.state.matches;
-  return matches.slice(0, matches.findIndex((d) => d.id === match.id) - 1);
-}
-function useMatches() {
-  return React.useContext(MatchesContext);
-}
-function useMatch() {
-  var _useMatches;
-  return (_useMatches = useMatches()) == null ? void 0 : _useMatches[0];
-}
-function useNavigate() {
-  const location = useLocation();
-  const match = useMatch();
-  const buildNext = useBuildNext();
-  function navigate(_ref7) {
-    var _fromCurrent;
-    let {
-      search,
-      hash,
-      replace,
-      from,
-      to,
-      fromCurrent
-    } = _ref7;
-    fromCurrent = (_fromCurrent = fromCurrent) != null ? _fromCurrent : typeof to === "undefined";
-    const next = buildNext({
-      to,
-      search,
-      hash,
-      from: fromCurrent ? location.current : from != null ? from : {
-        pathname: match.pathname
-      }
-    });
-    location.navigate(next, replace);
-  }
-  return useLatestCallback(navigate);
-}
-function Navigate(options) {
-  let navigate = useNavigate();
-  useLayoutEffect(() => {
-    navigate(options);
-  }, [navigate]);
-  return null;
-}
-function useBuildNext() {
-  const location = useLocation();
-  const router = useRouter();
-  const buildNext = (opts) => {
-    const next = location.buildNext(router.basepath, opts);
-    const matches = matchRoutes(router, next);
-    const __searchFilters = matches.map((match) => {
-      var _match$route$searchFi;
-      return (_match$route$searchFi = match.route.searchFilters) != null ? _match$route$searchFi : [];
-    }).flat().filter(Boolean);
-    return location.buildNext(router.basepath, _extends({}, opts, {
-      __searchFilters
-    }));
-  };
-  return useLatestCallback(buildNext);
-}
-const Link = function Link2(_ref8) {
-  var _preload;
-  let {
-    to = ".",
-    search,
-    hash,
-    children,
-    target,
-    style = {},
-    replace,
-    onClick,
-    onMouseEnter,
-    className = "",
-    getActiveProps = () => ({
-      className: "active"
-    }),
-    getInactiveProps = () => ({}),
-    activeOptions,
-    preload,
-    disabled,
-    _ref
-  } = _ref8, rest = _objectWithoutPropertiesLoose(_ref8, _excluded4);
-  const loadRoute = useLoadRoute();
-  const match = useMatch();
-  const location = useLocation();
-  const router = useRouter();
-  const navigate = useNavigate();
-  const buildNext = useBuildNext();
-  preload = (_preload = preload) != null ? _preload : router.defaultLinkPreloadMaxAge;
-  try {
-    const url = new URL("" + to);
-    warning(false, "<Link /> should not be used for external URLs like: " + url.href);
-  } catch (e) {
-  }
-  const next = buildNext({
-    to,
-    search,
-    hash,
-    from: {
-      pathname: match.pathname
-    }
-  });
-  const handleClick = (e) => {
-    if (disabled)
-      return;
-    if (onClick)
-      onClick(e);
-    if (!isCtrlEvent(e) && !e.defaultPrevented && (!target || target === "_self") && e.button === 0) {
-      e.preventDefault();
-      navigate({
-        to,
-        search,
-        hash,
-        replace,
-        from: {
-          pathname: match.pathname
-        }
-      });
-    }
-  };
-  const handleMouseEnter = (e) => {
-    if (onMouseEnter)
-      onMouseEnter(e);
-    if (preload && preload > 0) {
-      loadRoute({
-        to,
-        search,
-        hash
-      }, {
-        maxAge: preload
-      });
-    }
-  };
-  const pathIsEqual = location.current.pathname === next.pathname;
-  const currentPathSplit = location.current.pathname.split("/");
-  const nextPathSplit = next.pathname.split("/");
-  const pathIsFuzzyEqual = nextPathSplit.every((d, i) => d === currentPathSplit[i]);
-  const hashIsEqual = location.current.hash === next.hash;
-  const pathTest = activeOptions != null && activeOptions.exact ? pathIsEqual : pathIsFuzzyEqual;
-  const hashTest = activeOptions != null && activeOptions.includeHash ? hashIsEqual : true;
-  const isActive = pathTest && hashTest;
-  const _ref9 = isActive ? getActiveProps() : {}, {
-    style: activeStyle = {},
-    className: activeClassName = ""
-  } = _ref9, activeRest = _objectWithoutPropertiesLoose(_ref9, _excluded5);
-  const _ref10 = isActive ? {} : getInactiveProps(), {
-    style: inactiveStyle = {},
-    className: inactiveClassName = ""
-  } = _ref10, inactiveRest = _objectWithoutPropertiesLoose(_ref10, _excluded6);
-  return /* @__PURE__ */ jsx("a", {
-    ref: _ref,
-    href: disabled ? void 0 : next.href,
-    onClick: handleClick,
-    onMouseEnter: handleMouseEnter,
-    target,
-    style: _extends({}, style, activeStyle, inactiveStyle),
-    className: [className, activeClassName, inactiveClassName].filter(Boolean).join(" ") || void 0,
-    ...disabled ? {
-      role: "link",
-      "aria-disabled": true
-    } : void 0,
-    ...rest,
-    ...activeRest,
-    ...inactiveRest,
-    children: typeof children === "function" ? children({
-      isActive
-    }) : children
-  });
-};
-function Outlet() {
-  var _match$errorElement;
-  const router = useRouter();
-  const [_, ...matches] = useMatches();
-  const match = matches[0];
-  if (!match) {
-    return null;
-  }
-  const errorElement = (_match$errorElement = match.errorElement) != null ? _match$errorElement : router.defaultErrorElement;
-  const element = (() => {
-    var _match$pendingElement, _match$element;
-    if (match.status === "rejected") {
-      if (errorElement) {
-        return errorElement;
-      }
-      if (!router.useErrorBoundary) {
-        if (process.env.NODE_ENV !== "production") {
-          const preStyle = {
-            whiteSpace: "normal",
-            display: "inline-block",
-            background: "rgba(0,0,0,.1)",
-            padding: ".1rem .2rem",
-            margin: ".1rem",
-            lineHeight: "1",
-            borderRadius: ".25rem"
-          };
-          return /* @__PURE__ */ jsxs("div", {
-            style: {
-              lineHeight: "1.7"
-            },
-            children: [/* @__PURE__ */ jsxs("strong", {
-              children: ["The following error occured in the loader for you route at:", " ", /* @__PURE__ */ jsx("pre", {
-                style: preStyle,
-                children: match.pathname
-              })]
-            }), ".", /* @__PURE__ */ jsx("br", {}), /* @__PURE__ */ jsx("pre", {
-              style: _extends({}, preStyle, {
-                display: "block",
-                padding: ".5rem",
-                borderRadius: ".5rem"
-              }),
-              children: match.error.toString()
-            }), /* @__PURE__ */ jsx("br", {}), "Your users won't see this message in production, but they will see", " ", /* @__PURE__ */ jsx("strong", {
-              children: '"An unknown error occured!"'
-            }), ", which is at least better than breaking your entire app. \u{1F60A} For a better UX, please specify an ", /* @__PURE__ */ jsx("pre", {
-              style: preStyle,
-              children: "errorElement"
-            }), " for all of your routes that contain asynchronous behavior, or at least provide your own", /* @__PURE__ */ jsx("pre", {
-              style: preStyle,
-              children: "ErrorBoundary"
-            }), " wrapper around your renders to both the elements rendered by", " ", /* @__PURE__ */ jsx("pre", {
-              style: preStyle,
-              children: "useRoutes(routes, { useErrorBoundary: true })"
-            }), " ", "and ", /* @__PURE__ */ jsx("pre", {
-              style: preStyle,
-              children: "<Router useErrorBoundary />"
-            }), ".", " ", /* @__PURE__ */ jsx("br", {}), /* @__PURE__ */ jsx("br", {})]
-          });
-        }
-        return "An unknown error occured!";
-      }
-      throw match.error;
-    }
-    const pendingElement = (_match$pendingElement = match.pendingElement) != null ? _match$pendingElement : router.defaultPendingElement;
-    if (match.status === "loading") {
-      return null;
-    }
-    if (match.status === "pending") {
-      if (match.route.pendingMs || pendingElement) {
-        return pendingElement != null ? pendingElement : null;
-      }
-    }
-    const matchElement = (_match$element = match.element) != null ? _match$element : router.defaultElement;
-    return matchElement != null ? matchElement : /* @__PURE__ */ jsx(Outlet, {});
-  })();
-  return /* @__PURE__ */ jsx(MatchesProvider, {
-    value: matches,
-    children: element
-  });
-}
-function useResolvePath() {
-  const router = useRouter();
-  const match = useMatch();
-  return useLatestCallback((path) => resolvePath(router.basepath, match.pathname, cleanPath(path)));
-}
-function useSearch() {
-  const location = useLocation();
-  return location.current.search;
-}
-function matchRoute(currentLocation, matchLocation) {
-  const pathParams = matchByPath(currentLocation, matchLocation);
-  const searchMatched = matchBySearch(currentLocation, matchLocation);
-  if (matchLocation.to && !pathParams) {
-    return;
-  }
-  if (matchLocation.search && !searchMatched) {
-    return;
-  }
-  return pathParams != null ? pathParams : {};
-}
-function useMatchRoute() {
-  const router = useRouter();
-  const resolvePath2 = useResolvePath();
-  return useLatestCallback((_ref11) => {
-    let {
-      pending
-    } = _ref11, matchLocation = _objectWithoutPropertiesLoose(_ref11, _excluded7);
-    matchLocation = _extends({}, matchLocation, {
-      to: matchLocation.to ? resolvePath2("" + matchLocation.to) : void 0
-    });
-    if (pending) {
-      var _router$pending;
-      if (!((_router$pending = router.pending) != null && _router$pending.location)) {
-        return void 0;
-      }
-      return matchRoute(router.pending.location, matchLocation);
-    }
-    return matchRoute(router.state.location, matchLocation);
-  });
-}
-function MatchRoute(_ref12) {
-  let {
-    children
-  } = _ref12, rest = _objectWithoutPropertiesLoose(_ref12, _excluded8);
-  const matchRoute2 = useMatchRoute();
-  const match = matchRoute2(rest);
-  if (typeof children === "function") {
-    return children(match);
-  }
-  return match ? children : null;
-}
-function usePrompt(message, when) {
-  const location = useLocation();
-  React.useEffect(() => {
-    if (!when)
-      return;
-    let unblock = location.history.block((transition) => {
-      if (window.confirm(message)) {
-        unblock();
-        transition.retry();
-      } else {
-        location.current.pathname = window.location.pathname;
-      }
-    });
-    return unblock;
-  }, [when, location, message]);
-}
-function Prompt(_ref13) {
-  let {
-    message,
-    when,
-    children
-  } = _ref13;
-  usePrompt(message, when != null ? when : true);
-  return children != null ? children : null;
-}
-function warning(cond, message) {
-  if (!cond) {
-    if (typeof console !== "undefined")
-      console.warn(message);
-    try {
-      throw new Error(message);
-    } catch (_unused) {
-    }
-  }
-}
-function isFunction(d) {
-  return typeof d === "function";
-}
-function functionalUpdate(updater, previous) {
-  if (isFunction(updater)) {
-    return updater(previous);
-  }
-  return updater;
-}
-function joinPaths(paths) {
-  return cleanPath(paths.filter(Boolean).join("/"));
-}
-function cleanPath(path) {
-  return ("" + path).replace(/\/{2,}/g, "/");
-}
-function matchByPath(currentLocation, matchLocation) {
-  var _matchLocation$to;
-  const baseSegments = parsePathname(currentLocation.pathname);
-  const routeSegments = parsePathname("" + ((_matchLocation$to = matchLocation.to) != null ? _matchLocation$to : "*"));
-  const params = {};
-  let isMatch = (() => {
-    for (let i = 0; i < Math.max(baseSegments.length, routeSegments.length); i++) {
-      const baseSegment = baseSegments[i];
-      const routeSegment = routeSegments[i];
-      const isLastRouteSegment = i === routeSegments.length - 1;
-      const isLastBaseSegment = i === baseSegments.length - 1;
-      if (routeSegment) {
-        if (routeSegment.type === "wildcard") {
-          if (baseSegment != null && baseSegment.value) {
-            params["*"] = joinPaths(baseSegments.slice(i).map((d) => d.value));
-            return true;
-          }
-          return false;
-        }
-        if (routeSegment.type === "pathname") {
-          if (routeSegment.value === "/" && !(baseSegment != null && baseSegment.value)) {
-            return true;
-          }
-          if (baseSegment) {
-            if (matchLocation.caseSensitive) {
-              if (routeSegment.value !== baseSegment.value) {
-                return false;
-              }
-            } else if (routeSegment.value.toLowerCase() !== baseSegment.value.toLowerCase()) {
-              return false;
-            }
-          }
-        }
-        if (!baseSegment) {
-          return false;
-        }
-        if (routeSegment.type === "param") {
-          params[routeSegment.value.substring(1)] = baseSegment.value;
-        }
-      }
-      if (isLastRouteSegment && !isLastBaseSegment) {
-        return !!matchLocation.fuzzy;
-      }
-    }
-    return true;
-  })();
-  return isMatch ? params : void 0;
-}
-function matchBySearch(currentLocation, matchLocation) {
-  return !!(matchLocation.search && matchLocation.search(currentLocation.search));
-}
-function parsePathname(pathname) {
-  if (!pathname) {
-    return [];
-  }
-  pathname = cleanPath(pathname);
-  const segments = [];
-  if (pathname.slice(0, 1) === "/") {
-    pathname = pathname.substring(1);
-    segments.push({
-      type: "pathname",
-      value: "/"
-    });
-  }
-  if (!pathname) {
-    return segments;
-  }
-  const split = pathname.split("/").filter(Boolean);
-  segments.push(...split.map((part) => {
-    if (part.startsWith("*")) {
-      return {
-        type: "wildcard",
-        value: part
-      };
-    }
-    if (part.charAt(0) === ":") {
-      return {
-        type: "param",
-        value: part
-      };
-    }
-    return {
-      type: "pathname",
-      value: part
-    };
-  }));
-  if (pathname.slice(-1) === "/") {
-    pathname = pathname.substring(1);
-    segments.push({
-      type: "pathname",
-      value: "/"
-    });
-  }
-  return segments;
-}
-function resolvePath(basepath, base, to) {
-  base = base.replace(new RegExp("^" + basepath), "/");
-  to = to.replace(new RegExp("^" + basepath), "/");
-  let baseSegments = parsePathname(base);
-  const toSegments = parsePathname(to);
-  toSegments.forEach((toSegment, index) => {
-    if (toSegment.value === "/") {
-      if (!index) {
-        baseSegments = [toSegment];
-      } else if (index === toSegments.length - 1) {
-        baseSegments.push(toSegment);
-      } else
-        ;
-    } else if (toSegment.value === "..") {
-      baseSegments.pop();
-    } else if (toSegment.value === ".") {
-      return;
-    } else {
-      baseSegments.push(toSegment);
-    }
-  });
-  const joined = joinPaths([basepath, ...baseSegments.map((d) => d.value)]);
-  return cleanPath(joined);
-}
-function isCtrlEvent(e) {
-  return !!(e.metaKey || e.altKey || e.ctrlKey || e.shiftKey);
-}
-function useLatestCallback(cb) {
-  const stableFnRef = React.useRef();
-  const cbRef = React.useRef(cb);
-  cbRef.current = cb;
-  if (!stableFnRef.current) {
-    stableFnRef.current = function() {
-      return cbRef.current(...arguments);
-    };
-  }
-  return stableFnRef.current;
-}
-function replaceEqualDeep(prev, next) {
-  if (prev === next) {
-    return prev;
-  }
-  const array = Array.isArray(prev) && Array.isArray(next);
-  if (array || isPlainObject(prev) && isPlainObject(next)) {
-    const aSize = array ? prev.length : Object.keys(prev).length;
-    const bItems = array ? next : Object.keys(next);
-    const bSize = bItems.length;
-    const copy = array ? [] : {};
-    let equalItems = 0;
-    for (let i = 0; i < bSize; i++) {
-      const key = array ? i : bItems[i];
-      copy[key] = replaceEqualDeep(prev[key], next[key]);
-      if (copy[key] === prev[key]) {
-        equalItems++;
-      }
-    }
-    return aSize === bSize && equalItems === aSize ? prev : copy;
-  }
-  return next;
-}
-function isPlainObject(o) {
-  if (!hasObjectPrototype(o)) {
-    return false;
-  }
-  const ctor = o.constructor;
-  if (typeof ctor === "undefined") {
-    return true;
-  }
-  const prot = ctor.prototype;
-  if (!hasObjectPrototype(prot)) {
-    return false;
-  }
-  if (!prot.hasOwnProperty("isPrototypeOf")) {
-    return false;
-  }
-  return true;
-}
-function hasObjectPrototype(o) {
-  return Object.prototype.toString.call(o) === "[object Object]";
-}
-const defaultParseSearch = parseSearchWith(JSON.parse);
-const defaultStringifySearch = stringifySearchWith(JSON.stringify);
-function parseSearchWith(parser) {
-  return (searchStr) => {
-    if (searchStr.substring(0, 1) === "?") {
-      searchStr = searchStr.substring(1);
-    }
-    let query = decode(searchStr);
-    for (let key in query) {
-      const value = query[key];
-      if (typeof value === "string") {
-        try {
-          query[key] = parser(value);
-        } catch (err) {
-        }
-      }
-    }
-    return query;
-  };
-}
-function stringifySearchWith(stringify) {
-  return (search) => {
-    search = _extends({}, search);
-    if (search) {
-      Object.keys(search).forEach((key) => {
-        const val = search[key];
-        if (typeof val === "undefined" || val === void 0) {
-          delete search[key];
-        } else if (val && typeof val === "object" && val !== null) {
-          try {
-            search[key] = stringify(val);
-          } catch (err) {
-          }
-        }
-      });
-    }
-    const searchStr = encode(search).toString();
-    return searchStr ? "?" + searchStr : "";
-  };
-}
+import { jsx, jsxs, Fragment } from "preact/jsx-runtime";
+import { h as h$2, createContext, Component, toChildArray, cloneElement, options, Fragment as Fragment$1 } from "preact";
+import { shallowEqual } from "fast-equals";
+import { useContext, useState, useEffect } from "preact/hooks";
 function Page$5() {
-  return /* @__PURE__ */ jsx("h1", {
+  return jsx("h1", {
     children: "index.tsx"
   });
 }
 function Page$4() {
-  return /* @__PURE__ */ jsx("h1", {
+  return jsx("h1", {
     children: "test"
   });
 }
 function Page$3() {
-  return /* @__PURE__ */ jsx("h1", {
-    children: "[page]"
-  });
-}
-function Page$2() {
-  return /* @__PURE__ */ jsx("h1", {
+  return jsx("h1", {
     children: "writing/index.tsx"
   });
 }
-function Page$1() {
-  return /* @__PURE__ */ jsx("h1", {
-    children: "page-[wat]"
+const headline = "_headline_djs9q_1";
+const styles = {
+  headline
+};
+function Page$2() {
+  return jsx("h1", {
+    className: styles.headline,
+    children: "writing/hurrdur/page"
   });
 }
+function getRenderedPaths$1() {
+  return [{
+    params: {
+      page: "foo"
+    }
+  }, {
+    params: {
+      page: "bar"
+    },
+    props: {
+      hu1h: 1234
+    }
+  }];
+}
+function Page$1(props) {
+  return jsxs(Fragment, {
+    children: [jsx("h1", {
+      children: "Paginated writing"
+    }), jsx("pre", {
+      children: JSON.stringify(props, null, 2)
+    }), jsx("div", {
+      children: props.url
+    }), jsx("div", {
+      children: props.path
+    }), jsx("div", {
+      children: props.params.page
+    }), jsx("div", {
+      children: props.huah
+    })]
+  });
+}
+function getRenderedPaths() {
+  return [{
+    params: {
+      wat: "oink"
+    }
+  }];
+}
 function Page() {
-  return /* @__PURE__ */ jsx("h1", {
-    children: "hurrdur/page"
+  return jsx("h1", {
+    children: "page-[wat]"
   });
 }
 Page$5.displayName = "Index";
 Page$4.displayName = "Test";
-Page$3.displayName = "Writing$Page";
-Page$2.displayName = "WritingIndex";
-Page$1.displayName = "WritingPage$Wat";
-Page.displayName = "WritingHurrdurPage";
-const routes = [{
-  path: "/",
-  element: /* @__PURE__ */ jsx(Page$5, {})
-}, {
-  path: "test",
-  element: /* @__PURE__ */ jsx(Page$4, {})
-}, {
-  path: "writing/:page",
-  element: /* @__PURE__ */ jsx(Page$3, {})
-}, {
-  path: "writing",
-  element: /* @__PURE__ */ jsx(Page$2, {})
-}, {
-  path: "writing/page-:wat",
-  element: /* @__PURE__ */ jsx(Page$1, {})
-}, {
-  path: "writing/hurrdur/page",
-  element: /* @__PURE__ */ jsx(Page, {})
-}];
-const reactLocation = new ReactLocation();
-function App() {
-  return jsx(React__default.StrictMode, { children: jsx(Router, { location: reactLocation, routes }) });
+Page$3.displayName = "WritingIndex";
+Page$2.displayName = "WritingHurrdurPage";
+Page$1.displayName = "Writing$Page";
+Page.displayName = "WritingPage$Wat";
+const specificMatchProps = {
+  "writing/:page": [
+    {
+      "matches": {
+        "page": "bar"
+      },
+      "props": {
+        "hu1h": 1234
+      }
+    }
+  ]
+};
+const PageWrapper = ({ path, element, matches, url, ...rest }) => {
+  const specificPathProps = specificMatchProps[path];
+  const specific = specificPathProps == null ? void 0 : specificPathProps.find(({ matches: m2 }) => shallowEqual(m2, matches));
+  return h$2(element, { params: matches, path, url, ...specific ? specific.props : {} });
+};
+const routes = [
+  h$2(PageWrapper, { path: "/", element: Page$5 }),
+  h$2(PageWrapper, { path: "test", element: Page$4 }),
+  h$2(PageWrapper, { path: "writing", element: Page$3 }),
+  h$2(PageWrapper, { path: "writing/hurrdur/page", element: Page$2 }),
+  h$2(PageWrapper, { path: "writing/:page", element: Page$1 }),
+  h$2(PageWrapper, { path: "writing/page-:wat", element: Page })
+];
+var a$1 = {};
+function c$1(n2, t) {
+  for (var r2 in t)
+    n2[r2] = t[r2];
+  return n2;
 }
-if (false) {
-  ReactDOM.createRoot(document.getElementById("root")).render(jsx(App, {}));
+function s$1(n2, t, r2) {
+  var i2, o2 = /(?:\?([^#]*))?(#.*)?$/, e = n2.match(o2), u2 = {};
+  if (e && e[1])
+    for (var f2 = e[1].split("&"), c2 = 0; c2 < f2.length; c2++) {
+      var s2 = f2[c2].split("=");
+      u2[decodeURIComponent(s2[0])] = decodeURIComponent(s2.slice(1).join("="));
+    }
+  n2 = d$1(n2.replace(o2, "")), t = d$1(t || "");
+  for (var h2 = Math.max(n2.length, t.length), v2 = 0; v2 < h2; v2++)
+    if (t[v2] && ":" === t[v2].charAt(0)) {
+      var l2 = t[v2].replace(/(^:|[+*?]+$)/g, ""), p2 = (t[v2].match(/[+*?]+$/) || a$1)[0] || "", m2 = ~p2.indexOf("+"), y2 = ~p2.indexOf("*"), U2 = n2[v2] || "";
+      if (!U2 && !y2 && (p2.indexOf("?") < 0 || m2)) {
+        i2 = false;
+        break;
+      }
+      if (u2[l2] = decodeURIComponent(U2), m2 || y2) {
+        u2[l2] = n2.slice(v2).map(decodeURIComponent).join("/");
+        break;
+      }
+    } else if (t[v2] !== n2[v2]) {
+      i2 = false;
+      break;
+    }
+  return (true === r2.default || false !== i2) && u2;
+}
+function h$1(n2, t) {
+  return n2.rank < t.rank ? 1 : n2.rank > t.rank ? -1 : n2.index - t.index;
+}
+function v$1(n2, t) {
+  return n2.index = t, n2.rank = function(n3) {
+    return n3.props.default ? 0 : d$1(n3.props.path).map(l$1).join("");
+  }(n2), n2.props;
+}
+function d$1(n2) {
+  return n2.replace(/(^\/+|\/+$)/g, "").split("/");
+}
+function l$1(n2) {
+  return ":" == n2.charAt(0) ? 1 + "*+?".indexOf(n2.charAt(n2.length - 1)) || 4 : 5;
+}
+var p$1 = {}, m$1 = [], y = [], U = null, g$1 = { url: R() }, k = createContext(g$1);
+function C() {
+  var n2 = useContext(k);
+  if (n2 === g$1) {
+    var t = useState()[1];
+    useEffect(function() {
+      return y.push(t), function() {
+        return y.splice(y.indexOf(t), 1);
+      };
+    }, []);
+  }
+  return [n2, $];
+}
+function R() {
+  var n2;
+  return "" + ((n2 = U && U.location ? U.location : U && U.getCurrentLocation ? U.getCurrentLocation() : "undefined" != typeof location ? location : p$1).pathname || "") + (n2.search || "");
+}
+function $(n2, t) {
+  return void 0 === t && (t = false), "string" != typeof n2 && n2.url && (t = n2.replace, n2 = n2.url), function(n3) {
+    for (var t2 = m$1.length; t2--; )
+      if (m$1[t2].canRoute(n3))
+        return true;
+    return false;
+  }(n2) && function(n3, t2) {
+    void 0 === t2 && (t2 = "push"), U && U[t2] ? U[t2](n3) : "undefined" != typeof history && history[t2 + "State"] && history[t2 + "State"](null, null, n3);
+  }(n2, t ? "replace" : "push"), I(n2);
+}
+function I(n2) {
+  for (var t = false, r2 = 0; r2 < m$1.length; r2++)
+    m$1[r2].routeTo(n2) && (t = true);
+  return t;
+}
+function M(n2) {
+  if (n2 && n2.getAttribute) {
+    var t = n2.getAttribute("href"), r2 = n2.getAttribute("target");
+    if (t && t.match(/^\//g) && (!r2 || r2.match(/^_?self$/i)))
+      return $(t);
+  }
+}
+function b(n2) {
+  return n2.stopImmediatePropagation && n2.stopImmediatePropagation(), n2.stopPropagation && n2.stopPropagation(), n2.preventDefault(), false;
+}
+function W(n2) {
+  if (!(n2.ctrlKey || n2.metaKey || n2.altKey || n2.shiftKey || n2.button)) {
+    var t = n2.target;
+    do {
+      if ("a" === t.localName && t.getAttribute("href")) {
+        if (t.hasAttribute("data-native") || t.hasAttribute("native"))
+          return;
+        if (M(t))
+          return b(n2);
+      }
+    } while (t = t.parentNode);
+  }
+}
+var w = false;
+function D(n2) {
+  n2.history && (U = n2.history), this.state = { url: n2.url || R() };
+}
+c$1(D.prototype = new Component(), { shouldComponentUpdate: function(n2) {
+  return true !== n2.static || n2.url !== this.props.url || n2.onChange !== this.props.onChange;
+}, canRoute: function(n2) {
+  var t = toChildArray(this.props.children);
+  return void 0 !== this.g(t, n2);
+}, routeTo: function(n2) {
+  this.setState({ url: n2 });
+  var t = this.canRoute(n2);
+  return this.p || this.forceUpdate(), t;
+}, componentWillMount: function() {
+  this.p = true;
+}, componentDidMount: function() {
+  var n2 = this;
+  w || (w = true, U || addEventListener("popstate", function() {
+    I(R());
+  }), addEventListener("click", W)), m$1.push(this), U && (this.u = U.listen(function(t) {
+    var r2 = t.location || t;
+    n2.routeTo("" + (r2.pathname || "") + (r2.search || ""));
+  })), this.p = false;
+}, componentWillUnmount: function() {
+  "function" == typeof this.u && this.u(), m$1.splice(m$1.indexOf(this), 1);
+}, componentWillUpdate: function() {
+  this.p = true;
+}, componentDidUpdate: function() {
+  this.p = false;
+}, g: function(n2, t) {
+  n2 = n2.filter(v$1).sort(h$1);
+  for (var r2 = 0; r2 < n2.length; r2++) {
+    var i2 = n2[r2], o2 = s$1(t, i2.props.path, i2.props);
+    if (o2)
+      return [i2, o2];
+  }
+}, render: function(n2, t) {
+  var e, u2, f2 = n2.onChange, a2 = t.url, s2 = this.c, h2 = this.g(toChildArray(n2.children), a2);
+  if (h2 && (u2 = cloneElement(h2[0], c$1(c$1({ url: a2, matches: e = h2[1] }, e), { key: void 0, ref: void 0 }))), a2 !== (s2 && s2.url)) {
+    c$1(g$1, s2 = this.c = { url: a2, previous: s2 && s2.url, current: u2, path: u2 ? u2.props.path : null, matches: e }), s2.router = this, s2.active = u2 ? [u2] : [];
+    for (var v2 = y.length; v2--; )
+      y[v2]({});
+    "function" == typeof f2 && f2(s2);
+  }
+  return h$2(k.Provider, { value: s2 }, u2);
+} });
+var E = function(n2) {
+  return h$2("a", c$1({ onClick: W }, n2));
+}, L = function(n2) {
+  return h$2(n2.component, n2);
+};
+var r = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|^--/i, n = /[&<>"]/;
+function o(e) {
+  var t = String(e);
+  return n.test(t) ? t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : t;
+}
+var a = function(e, t) {
+  return String(e).replace(/(\n+)/g, "$1" + (t || "	"));
+}, i = function(e, t, r2) {
+  return String(e).length > (t || 40) || !r2 && -1 !== String(e).indexOf("\n") || -1 !== String(e).indexOf("<");
+}, l = {};
+function s(e) {
+  var t = "";
+  for (var n2 in e) {
+    var o2 = e[n2];
+    null != o2 && "" !== o2 && (t && (t += " "), t += "-" == n2[0] ? n2 : l[n2] || (l[n2] = n2.replace(/([A-Z])/g, "-$1").toLowerCase()), t += ": ", t += o2, "number" == typeof o2 && false === r.test(n2) && (t += "px"), t += ";");
+  }
+  return t || void 0;
+}
+function f(e, t) {
+  for (var r2 in t)
+    e[r2] = t[r2];
+  return e;
+}
+function u(e, t) {
+  return Array.isArray(t) ? t.reduce(u, e) : null != t && false !== t && e.push(t), e;
+}
+var c = { shallow: true }, p = [], _ = /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/, d = /[\s\n\\/='"\0<>]/;
+function v() {
+  this.__d = true;
+}
+m.render = m;
+var g = function(e, t) {
+  return m(e, t, c);
+}, h = [];
+function m(t, r2, n2) {
+  r2 = r2 || {}, n2 = n2 || {};
+  var o2 = options.__s;
+  options.__s = true;
+  var a2 = x(t, r2, n2);
+  return options.__c && options.__c(t, h), h.length = 0, options.__s = o2, a2;
+}
+function x(r2, n2, l2, c2, g2, h2) {
+  if (null == r2 || "boolean" == typeof r2)
+    return "";
+  if ("object" != typeof r2)
+    return o(r2);
+  var m2 = l2.pretty, y2 = m2 && "string" == typeof m2 ? m2 : "	";
+  if (Array.isArray(r2)) {
+    for (var b2 = "", S = 0; S < r2.length; S++)
+      m2 && S > 0 && (b2 += "\n"), b2 += x(r2[S], n2, l2, c2, g2, h2);
+    return b2;
+  }
+  var k2, w2 = r2.type, O = r2.props, C2 = false;
+  if ("function" == typeof w2) {
+    if (C2 = true, !l2.shallow || !c2 && false !== l2.renderRootComponent) {
+      if (w2 === Fragment$1) {
+        var A = [];
+        return u(A, r2.props.children), x(A, n2, l2, false !== l2.shallowHighOrder, g2, h2);
+      }
+      var H, j = r2.__c = { __v: r2, context: n2, props: r2.props, setState: v, forceUpdate: v, __d: true, __h: [] };
+      options.__b && options.__b(r2);
+      var F = options.__r;
+      if (w2.prototype && "function" == typeof w2.prototype.render) {
+        var M2 = w2.contextType, T = M2 && n2[M2.__c], $2 = null != M2 ? T ? T.props.value : M2.__ : n2;
+        (j = r2.__c = new w2(O, $2)).__v = r2, j._dirty = j.__d = true, j.props = O, null == j.state && (j.state = {}), null == j._nextState && null == j.__s && (j._nextState = j.__s = j.state), j.context = $2, w2.getDerivedStateFromProps ? j.state = f(f({}, j.state), w2.getDerivedStateFromProps(j.props, j.state)) : j.componentWillMount && (j.componentWillMount(), j.state = j._nextState !== j.state ? j._nextState : j.__s !== j.state ? j.__s : j.state), F && F(r2), H = j.render(j.props, j.state, j.context);
+      } else
+        for (var L2 = w2.contextType, E2 = L2 && n2[L2.__c], D2 = null != L2 ? E2 ? E2.props.value : L2.__ : n2, N = 0; j.__d && N++ < 25; )
+          j.__d = false, F && F(r2), H = w2.call(r2.__c, O, D2);
+      return j.getChildContext && (n2 = f(f({}, n2), j.getChildContext())), options.diffed && options.diffed(r2), x(H, n2, l2, false !== l2.shallowHighOrder, g2, h2);
+    }
+    w2 = (k2 = w2).displayName || k2 !== Function && k2.name || function(e) {
+      var t = (Function.prototype.toString.call(e).match(/^\s*function\s+([^( ]+)/) || "")[1];
+      if (!t) {
+        for (var r3 = -1, n3 = p.length; n3--; )
+          if (p[n3] === e) {
+            r3 = n3;
+            break;
+          }
+        r3 < 0 && (r3 = p.push(e) - 1), t = "UnnamedComponent" + r3;
+      }
+      return t;
+    }(k2);
+  }
+  var P, R2, U2 = "<" + w2;
+  if (O) {
+    var W2 = Object.keys(O);
+    l2 && true === l2.sortAttributes && W2.sort();
+    for (var q = 0; q < W2.length; q++) {
+      var z = W2[q], I2 = O[z];
+      if ("children" !== z) {
+        if (!d.test(z) && (l2 && l2.allAttributes || "key" !== z && "ref" !== z && "__self" !== z && "__source" !== z)) {
+          if ("defaultValue" === z)
+            z = "value";
+          else if ("defaultChecked" === z)
+            z = "checked";
+          else if ("defaultSelected" === z)
+            z = "selected";
+          else if ("className" === z) {
+            if (void 0 !== O.class)
+              continue;
+            z = "class";
+          } else
+            g2 && /^xlink:?./.test(z) && (z = z.toLowerCase().replace(/^xlink:?/, "xlink:"));
+          if ("htmlFor" === z) {
+            if (O.for)
+              continue;
+            z = "for";
+          }
+          "style" === z && I2 && "object" == typeof I2 && (I2 = s(I2)), "a" === z[0] && "r" === z[1] && "boolean" == typeof I2 && (I2 = String(I2));
+          var V = l2.attributeHook && l2.attributeHook(z, I2, n2, l2, C2);
+          if (V || "" === V)
+            U2 += V;
+          else if ("dangerouslySetInnerHTML" === z)
+            R2 = I2 && I2.__html;
+          else if ("textarea" === w2 && "value" === z)
+            P = I2;
+          else if ((I2 || 0 === I2 || "" === I2) && "function" != typeof I2) {
+            if (!(true !== I2 && "" !== I2 || (I2 = z, l2 && l2.xml))) {
+              U2 = U2 + " " + z;
+              continue;
+            }
+            if ("value" === z) {
+              if ("select" === w2) {
+                h2 = I2;
+                continue;
+              }
+              "option" === w2 && h2 == I2 && void 0 === O.selected && (U2 += " selected");
+            }
+            U2 = U2 + " " + z + '="' + o(I2) + '"';
+          }
+        }
+      } else
+        P = I2;
+    }
+  }
+  if (m2) {
+    var Z = U2.replace(/\n\s*/, " ");
+    Z === U2 || ~Z.indexOf("\n") ? m2 && ~U2.indexOf("\n") && (U2 += "\n") : U2 = Z;
+  }
+  if (U2 += ">", d.test(w2))
+    throw new Error(w2 + " is not a valid HTML tag name in " + U2);
+  var B, G = _.test(w2) || l2.voidElements && l2.voidElements.test(w2), J = [];
+  if (R2)
+    m2 && i(R2) && (R2 = "\n" + y2 + a(R2, y2)), U2 += R2;
+  else if (null != P && u(B = [], P).length) {
+    for (var K = m2 && ~U2.indexOf("\n"), Q = false, X = 0; X < B.length; X++) {
+      var Y = B[X];
+      if (null != Y && false !== Y) {
+        var ee = x(Y, n2, l2, true, "svg" === w2 || "foreignObject" !== w2 && g2, h2);
+        if (m2 && !K && i(ee) && (K = true), ee)
+          if (m2) {
+            var te = ee.length > 0 && "<" != ee[0];
+            Q && te ? J[J.length - 1] += ee : J.push(ee), Q = te;
+          } else
+            J.push(ee);
+      }
+    }
+    if (m2 && K)
+      for (var re = J.length; re--; )
+        J[re] = "\n" + y2 + a(J[re], y2);
+  }
+  if (J.length || R2)
+    U2 += J.join("");
+  else if (l2 && l2.xml)
+    return U2.substring(0, U2.length - 1) + " />";
+  return !G || B || R2 ? (m2 && ~U2.indexOf("\n") && (U2 += "\n"), U2 = U2 + "</" + w2 + ">") : U2 = U2.replace(/>$/, " />"), U2;
+}
+m.shallowRender = g;
+function App({
+  renderedUrl
+}) {
+  return jsx(D, {
+    url: renderedUrl,
+    children: routes
+  });
+}
+async function renderToString(renderedUrl) {
+  const html = m(jsx(App, {
+    renderedUrl
+  }));
+  return {
+    html
+  };
 }
 export {
-  App as default
+  renderToString as default
 };

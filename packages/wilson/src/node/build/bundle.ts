@@ -1,78 +1,73 @@
-import { SiteConfig } from "@wilson/config";
-import { dirname, join, resolve } from "pathe";
-import glob from "fast-glob";
-import { build, mergeConfig, UserConfig as ViteUserConfig } from "vite";
-import type { RollupOutput } from "rollup";
-import wilsonPlugins from "../plugin";
-import { fileURLToPath } from "url";
+import { SiteConfig } from '@wilson/config'
+import { dirname, join, resolve } from 'pathe'
+import glob from 'fast-glob'
+import { build, mergeConfig, UserConfig as ViteUserConfig } from 'vite'
+import type { RollupOutput } from 'rollup'
+import wilsonPlugins from '../plugin'
+import { fileURLToPath } from 'url'
 
-const _dirname = dirname(fileURLToPath(import.meta.url));
-export const DIST_CLIENT_PATH = join(_dirname, "../client");
-export const APP_PATH = join(DIST_CLIENT_PATH, "app.js");
+const _dirname = dirname(fileURLToPath(import.meta.url))
+export const DIST_CLIENT_PATH = join(_dirname, '../client')
+export const CLIENT_APP_PATH = join(DIST_CLIENT_PATH, 'app.client.js')
+export const SERVER_APP_PATH = join(DIST_CLIENT_PATH, 'app.server.js')
 
 // Internal: Currently SSG supports a single stylesheet for all pages.
-function resolveEntrypoints(config: SiteConfig): Entrypoints {
-  return { app: APP_PATH };
+function resolveEntrypoints(ssr: boolean): Entrypoints {
+  return { app: ssr ? SERVER_APP_PATH : CLIENT_APP_PATH }
 }
 
-type Entrypoints = Record<string, string>;
+type Entrypoints = Record<string, string>
 
 export async function bundle(siteConfig: SiteConfig) {
-  const entrypoints = resolveEntrypoints(siteConfig);
-
-  const [clientResult, serverResult] = await Promise.all([
-    bundleWithVite(siteConfig, entrypoints, { ssr: false }),
-    bundleWithVite(siteConfig, entrypoints, { ssr: true }),
-    bundleHtmlEntrypoints(siteConfig),
-  ]);
-
-  return { clientResult, serverResult };
+  const clientResult = await bundleWithVite(siteConfig, { ssr: false })
+  const serverResult = await bundleWithVite(siteConfig, { ssr: true })
+  await bundleHtmlEntrypoints(siteConfig)
+  return { clientResult, serverResult }
 }
 
 async function bundleHtmlEntrypoints(siteConfig: SiteConfig) {
-  const entrypoints = glob.sync(resolve(siteConfig.pagesDir, "./**/*.html"), {
+  const entrypoints = glob.sync(resolve(siteConfig.pagesDir, './**/*.html'), {
     cwd: siteConfig.root,
-    ignore: ["node_modules/**"],
-  });
+    ignore: ['node_modules/**'],
+  })
 
   if (entrypoints.length > 0)
-    await bundleWithVite(siteConfig, entrypoints, {
+    await bundleWithVite(siteConfig, {
       htmlBuild: true,
       ssr: false,
-    });
+    })
 }
 
 async function bundleWithVite(
   siteConfig: SiteConfig,
-  entrypoints: string[] | Entrypoints,
   options: { ssr: boolean; htmlBuild?: boolean }
 ) {
-  const { htmlBuild = false, ssr } = options;
+  const entrypoints = resolveEntrypoints(options.ssr)
+  const { htmlBuild = false, ssr } = options
 
   const config = mergeConfig(siteConfig.vite, {
-    logLevel: "warn",
+    logLevel: 'warn',
     ssr: {
-      external: ["vue", "@vue/server-renderer"],
-      noExternal: ["wilson"],
+      external: ['vue', '@vue/server-renderer'],
+      noExternal: ['wilson'],
     },
     plugins: wilsonPlugins(siteConfig),
     build: {
       ssr,
       cssCodeSplit: htmlBuild,
-      minify: ssr ? false : "esbuild",
+      manifest: !ssr,
+      ssrManifest: !ssr,
+      minify: ssr ? false : 'esbuild',
       emptyOutDir: ssr,
       outDir: ssr ? siteConfig.tempDir : siteConfig.outDir,
       sourcemap: false,
       rollupOptions: {
         input: entrypoints,
-        preserveEntrySignatures: htmlBuild ? undefined : "allow-extension",
+        preserveEntrySignatures: htmlBuild ? undefined : 'allow-extension',
         treeshake: htmlBuild,
       },
     },
-  } as ViteUserConfig);
+  } as ViteUserConfig)
 
-  console.log(`ssr ${options.ssr}`);
-  console.dir(config, { depth: 5 });
-
-  return (await build(config)) as RollupOutput;
+  return (await build(config)) as RollupOutput
 }

@@ -1,4 +1,4 @@
-import data from "virtual:wilson-route-data";
+import data from 'virtual:wilson-route-data'
 
 export default function NotFound() {
   return (
@@ -15,5 +15,5 @@ export default function NotFound() {
         </dd>
       </dl>
     </div>
-  );
+  )
 }

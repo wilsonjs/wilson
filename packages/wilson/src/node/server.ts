@@ -1,14 +1,14 @@
-import type { ServerOptions, UserConfig as ViteUserConfig } from "vite";
-import { createServer as createViteServer, mergeConfig } from "vite";
-import { resolveConfig } from "@wilson/config";
-import wilsonPlugins from "./plugin";
+import type { ServerOptions, UserConfig as ViteUserConfig } from 'vite'
+import { createServer as createViteServer, mergeConfig } from 'vite'
+import { resolveConfig } from '@wilson/config'
+import wilsonPlugins from './plugin'
 // import { initializePages } from "./pages";
 
 export async function createServer(
   root: string = process.cwd(),
   serverOptions: ServerOptions = {}
 ) {
-  const siteConfig = await resolveConfig(root);
+  const siteConfig = await resolveConfig(root)
 
   // const pages = await initializePages(siteConfig);
   // console.log({ pages });
@@ -16,11 +16,11 @@ export async function createServer(
   const viteConfig = mergeConfig(siteConfig.vite, {
     plugins: wilsonPlugins(siteConfig),
     server: serverOptions,
-  } as ViteUserConfig);
+  } as ViteUserConfig)
 
   return {
     siteConfig,
     viteConfig,
     server: await createViteServer(viteConfig),
-  };
+  }
 }

@@ -12,6 +12,7 @@
     "esModuleInterop": true,
     "useUnknownInCatchVariables": false,
     "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "lib": ["ESNext", "DOM"],
     "types": ["node", "vitest"],
     "paths": {

@@ -6,7 +6,7 @@
   "author": "Christoph Werner <christoph@codepunkt.de>",
   "type": "module",
   "scripts": {
-    "dev": "wilson --open",
+    "dev": "DEBUG=wilson:* wilson --open",
     "build": "wilson build",
     "preview": "wilson preview --open --port 3050",
     "now": "npm run build && npm run preview",
@@ -19,15 +19,11 @@
     "directory": "docs"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "2.0.0-beta.0",
+    "@preact/preset-vite": "^2.3.0",
     "@wilson/config": "workspace:^1.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "fast-equals": "^4.0.1",
+    "preact": "^10.10.0",
     "vite": "3.0.0",
     "wilson": "workspace:^1.0.0"
-  },
-  "devDependencies": {
-    "@types/react": "^18.0.14",
-    "@types/react-dom": "^18.0.6"
   }
 }

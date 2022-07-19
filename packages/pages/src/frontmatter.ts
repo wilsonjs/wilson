@@ -4,8 +4,7 @@ import grayMatter from 'gray-matter'
 
 import type { RawPageMatter, PageMeta } from './types'
 
-const dateRegex =
-  /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})-(?<slug>.*)(?<ext>\.\w+)$/
+const dateRegex = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})-(?<slug>.*)(?<ext>\.\w+)$/
 
 export async function parsePageMatter(filename: string, content: string) {
   const parse = extname(filename) === '.vue' ? parsePageBlock : parseFrontmatter
@@ -23,18 +22,12 @@ async function parsePageBlock(filename: string, content: string) {
   const block = parsed.customBlocks.find((block) => block.type === 'page')
   const templateAttrs = parsed.template?.attrs
 
-  const frontmatter =
-    block &&
-    parseFrontmatter(filename, `---\n${block.content}\n---`, block.lang)
+  const frontmatter = block && parseFrontmatter(filename, `---\n${block.content}\n---`, block.lang)
 
   return { templateAttrs, ...templateAttrs, ...frontmatter }
 }
 
-function parseFrontmatter(
-  filename: string,
-  content: string,
-  language?: string
-) {
+function parseFrontmatter(filename: string, content: string, language?: string) {
   try {
     return grayMatter(content, { language }).data || {}
   } catch (err: any) {
@@ -44,10 +37,7 @@ function parseFrontmatter(
 }
 
 // Internal: Extracts layout, route, and meta data from the frontmatter.
-function preparePageMatter(
-  filename: string,
-  matter: Record<string, any>
-): RawPageMatter {
+function preparePageMatter(filename: string, matter: Record<string, any>): RawPageMatter {
   let { templateAttrs, layout, meta: rawMeta, route, ...frontmatter } = matter
 
   // Users can explicitly provide route to avoid unwanted behavior.
@@ -64,10 +54,7 @@ function preparePageMatter(
 
   // Add filename, date, and id.
   const meta = { filename, ...rawMeta }
-  const { year, month, day, slug } = extractGroups(
-    basename(filename),
-    dateRegex
-  )
+  const { year, month, day, slug } = extractGroups(basename(filename), dateRegex)
   if (slug) {
     meta.date = new Date(year, month - 1, day)
     meta.slug = slug

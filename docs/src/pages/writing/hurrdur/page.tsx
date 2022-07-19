@@ -1,3 +1,5 @@
+import styles from './page.module.scss'
+
 export default function Page() {
-  return <h1>hurrdur/page</h1>;
+  return <h1 className={styles.headline}>writing/hurrdur/page</h1>
 }

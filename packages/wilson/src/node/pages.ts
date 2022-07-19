@@ -1,57 +1,53 @@
-import { SiteConfig } from "@wilson/config";
-import { extname, relative } from "pathe";
-import readdirp from "readdirp";
+import { SiteConfig } from '@wilson/config'
+import { extname, relative } from 'pathe'
+import readdirp from 'readdirp'
 
 type Page = {
   /**
    * React-router route path
    */
-  route: string;
+  route: string
   /**
    * Path of the page relative to the `pagesDir`
    */
-  pagePath: string;
+  pagePath: string
   /**
    * Path of the page relative to the `srcDir`
    */
-  srcPath: string;
+  srcPath: string
   /**
    * Path of the page relative to the site root
    */
-  rootPath: string;
+  rootPath: string
   /**
    * Absolute path of the page
    */
-  absolutePath: string;
+  absolutePath: string
   /**
    * Is the page dynamic?
    */
-  isDynamic: boolean;
+  isDynamic: boolean
   /**
    * The page's file extension
    */
-  fileExtension: string;
-};
+  fileExtension: string
+}
 
 /**
  * Initializes all pages by recursively reading the files in the pages
  * directory.
  */
 export async function initializePages(siteConfig: SiteConfig): Promise<Page[]> {
-  const pages: Page[] = [];
+  const pages: Page[] = []
 
-  for await (let { path: pagePath, fullPath: absolutePath } of readdirp(
-    siteConfig.pagesDir
-  )) {
-    const fileExtension = extname(absolutePath);
+  for await (let { path: pagePath, fullPath: absolutePath } of readdirp(siteConfig.pagesDir)) {
+    const fileExtension = extname(absolutePath)
     // unknown page file extension: ignore file
-    if (
-      !Object.values(siteConfig.pageExtensions).flat().includes(fileExtension)
-    ) {
-      continue;
+    if (!Object.values(siteConfig.pageExtensions).flat().includes(fileExtension)) {
+      continue
     }
 
-    const { route, isDynamic } = extractRouteInfo(pagePath);
+    const { route, isDynamic } = extractRouteInfo(pagePath)
     pages.push({
       route,
       pagePath,
@@ -60,7 +56,7 @@ export async function initializePages(siteConfig: SiteConfig): Promise<Page[]> {
       absolutePath,
       isDynamic,
       fileExtension,
-    });
+    })
     // replace \\ with / for paths on windows
     // fullPath = fullPath.replace(/\\/g, "/");
 
@@ -146,28 +142,24 @@ export async function initializePages(siteConfig: SiteConfig): Promise<Page[]> {
     // }
   }
 
-  return pages;
+  return pages
 }
 
 function isDynamicPath(segment: string) {
-  return /\[[^\]]+\]/.test(segment);
+  return /\[[^\]]+\]/.test(segment)
 }
 
 function extractRouteInfo(relativePath: string) {
-  const isDynamic = isDynamicPath(relativePath);
+  const isDynamic = isDynamicPath(relativePath)
   const reactRouterLike = relativePath
-    .split("/")
+    .split('/')
     .filter((x) => x)
     .map((segment) =>
-      isDynamicPath(segment)
-        ? segment.replace(/\[([^\]]+)\]/g, ":$1")
-        : segment.toLowerCase()
+      isDynamicPath(segment) ? segment.replace(/\[([^\]]+)\]/g, ':$1') : segment.toLowerCase()
     )
-    .join("/");
+    .join('/')
 
-  const route = reactRouterLike
-    .slice(0, reactRouterLike.lastIndexOf("."))
-    .replace(/\/index$/, "");
+  const route = reactRouterLike.slice(0, reactRouterLike.lastIndexOf('.')).replace(/\/index$/, '')
 
-  return { route, isDynamic };
+  return { route, isDynamic }
 }

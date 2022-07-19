@@ -1,50 +1,55 @@
-import type { ViteDevServer } from "vite";
-import type { createApi } from "./api";
+import { FunctionComponent, RenderableProps } from 'preact'
+import type { ViteDevServer } from 'vite'
+import type { createApi } from './api'
 
 // these virtual module ids should not have slashes in them, because
 // module resolution of modules imported in them is harder otherwise.
-export const ROUTES_MODULE_ID = "virtual:wilson-routes";
-export const RESOLVED_ROUTES_MODULE_ID = "\0" + ROUTES_MODULE_ID + ".tsx";
-export const DATA_MODULE_ID = "virtual:wilson-route-data";
-export const RESOLVED_DATA_MODULE_ID = "\0" + DATA_MODULE_ID + ".tsx";
+export const ROUTES_MODULE_ID = 'virtual:wilson-routes'
+export const RESOLVED_ROUTES_MODULE_ID = '\0' + ROUTES_MODULE_ID + '.tsx'
+export const DATA_MODULE_ID = 'virtual:wilson-route-data'
+export const RESOLVED_DATA_MODULE_ID = '\0' + DATA_MODULE_ID + '.tsx'
 
-export type Awaitable<T> = T | Promise<T>;
+export type Awaitable<T> = T | Promise<T>
 
 export type Page = {
   /**
    * React-router route path
    */
-  route: string;
+  route: string
   /**
    * Path of the page relative to the `pagesDir`
    */
-  path: string;
+  path: string
   /**
    * Path of the page relative to the `srcDir`
    */
-  srcPath: string;
+  srcPath: string
   /**
    * Path of the page relative to the site root
    */
-  rootPath: string;
+  rootPath: string
   /**
    * Absolute path of the page
    */
-  absolutePath: string;
+  absolutePath: string
   /**
    * Is the page dynamic?
    */
-  isDynamic: boolean;
+  isDynamic: boolean
   /**
    * The page's file extension
    */
-  fileExtension: string;
+  fileExtension: string
   /**
    * The page's component name
    */
-  componentName: string;
-  frontmatter: RawPageMatter;
-};
+  componentName: string
+  /**
+   *
+   */
+  instances: (StaticPageInfo | DynamicPageInfo)[]
+  frontmatter: RawPageMatter
+}
 
 /**
  * The definition of a route in Wilson, used to render pages.
@@ -56,15 +61,15 @@ export type Route = {
   /**
    * The route's path
    */
-  path: string;
+  path: string
   /**
    * Name of the route's component
    */
-  componentName: string;
+  componentName: string
   /**
    * Path to import the route's component
    */
-  importPath: string;
+  importPath: string
   // /**
   //  * Additional paths for the page, that behave like a copy of the route.
   //  * When building the site, each path will be rendered separately.
@@ -74,7 +79,7 @@ export type Route = {
   //  * Frontmatter associated with the page.
   //  */
   // frontmatter: RawPageMatter;
-};
+}
 
 /**
  * Options specific to this plugin
@@ -84,11 +89,11 @@ export interface PagesOptions {
    * Specify the pages directory (relative to srcDir).
    * @default 'pages'
    */
-  pagesDir: string;
+  pagesDir: string
   /**
    * Allowed extensions of page files.
    */
-  pageExtensions: string[];
+  pageExtensions: string[]
   // /**
   //  * Use this hook to modify the frontmatter for pages and MDX files.
   //  * See `extendRoute` if you only want to modify route information.
@@ -105,7 +110,7 @@ export interface PagesOptions {
   /**
    * Use this hook to access the generated routes, and optionally modify them.
    */
-  extendRoutes?: (routes: Route[]) => Awaitable<Route[] | void>;
+  extendRoutes?: (routes: Route[]) => Awaitable<Route[] | void>
 }
 
 /**
@@ -115,17 +120,29 @@ export interface Options extends PagesOptions {
   /**
    * The root of the project.
    */
-  root: string;
+  root: string
   /**
    * Specify the directory where the app source is located (relative to project root).
    * @default 'src'
    */
-  srcDir: string;
+  srcDir: string
   /**
    * Vite dev server instance
    */
-  server?: ViteDevServer;
+  server?: ViteDevServer
 }
+
+export type DynamicPageExports = {
+  getRenderedPaths: () => RenderedPathInfo[]
+  default: FunctionComponent
+}
+export type DynamicPageInfo<T extends string = string> = StaticPageInfo & {
+  params: Record<T, string>
+  props?: Record<string, any>
+}
+export type StaticPageInfo = { url: string }
+export type DynamicPageProps<T extends string = string> = RenderableProps<DynamicPageInfo<T>>
+export type RenderedPathInfo<T extends string = string> = Omit<DynamicPageInfo<T>, 'url'>
 
 //
 //
@@ -134,22 +151,22 @@ export interface Options extends PagesOptions {
 //           V
 //
 //
-export type PagesApi = ReturnType<typeof createApi>;
+export type PagesApi = ReturnType<typeof createApi>
 
 export interface PageFrontmatter extends Record<string, any> {}
 
 export interface RawPageMatter extends PageFrontmatter {
-  meta: PageMeta;
-  layout: false | string;
+  meta: PageMeta
+  layout: false | string
   route: {
-    name?: string;
-    path?: string;
-    redirect?: string;
-    alias?: string | string[];
-  };
+    name?: string
+    path?: string
+    redirect?: string
+    alias?: string | string[]
+  }
 }
 
 export interface PageMeta extends Record<string, any> {
-  filename: string;
-  href: string;
+  filename: string
+  href: string
 }
