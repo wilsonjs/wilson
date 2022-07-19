@@ -9,7 +9,8 @@ import type {
   Page,
   DynamicPageExports,
   DynamicPageProps,
-  DynamicPageInfo,
+  GetRenderedPathsResult,
+  PageInfo,
 } from './types'
 import pc from 'picocolors'
 import { parsePageMatter } from './frontmatter'
@@ -95,7 +96,7 @@ export function createApi({
       absolutePath: string,
       path: string,
       route: string
-    ): Promise<DynamicPageProps[]> {
+    ): Promise<PageInfo[]> {
       const fileContents = await fs.readFile(absolutePath, 'utf8')
       const transformResult = await transformWithEsbuild(fileContents, absolutePath, {
         loader: 'tsx',
@@ -130,8 +131,8 @@ export function createApi({
         })
         return {
           ...renderedPath,
-          params: renderedPath.params,
           url,
+          path: '/',
         }
       })
     },
@@ -139,9 +140,7 @@ export function createApi({
       const path = relative(pagesDir, absolutePath)
       this.errorOnDisallowedCharacters(path)
       const { route, isDynamic } = this.extractRouteInfo(path)
-      const instances = isDynamic
-        ? await this.getRenderedInstances(absolutePath, path, route)
-        : [{ url: route }]
+      const instances = isDynamic ? await this.getRenderedInstances(absolutePath, path, route) : []
       const frontmatter = await this.frontmatterForFile(absolutePath)
       const srcPath = relative(srcDir, absolutePath)
       const rootPath = relative(root, absolutePath)
@@ -264,10 +263,10 @@ export function createApi({
         const page = this.getPageByImportPath(route.importPath)
         if (!page || !page.isDynamic) return acc
 
-        const toMatchedProps = (acc: any[], i: DynamicPageProps) =>
+        const toMatchedProps = (acc: any[], i: GetRenderedPathsResult) =>
           i.props ? [...acc, { matches: i.params, props: i.props }] : acc
 
-        const matchedProps = (page.instances as DynamicPageInfo[]).reduce(toMatchedProps, [])
+        const matchedProps = (page.instances as GetRenderedPathsResult[]).reduce(toMatchedProps, [])
         return matchedProps.length > 0 ? { ...acc, [route.path]: matchedProps } : acc
       }, {})
     },
@@ -338,7 +337,7 @@ export function countSlash(value: string) {
   return (value.match(/\//g) || []).length
 }
 
-// Internal: Ensures that paths with less dynamic params are added before.
+// TODO: Ensure that paths with less dynamic params are added before.
 function byDynamicParams({ route: a }: Page, { route: b }: Page) {
   const diff = countSlash(a) - countSlash(b)
   if (diff) return diff

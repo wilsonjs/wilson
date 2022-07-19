@@ -11,11 +11,10 @@ import {
 
 export * from './types'
 export { getPages } from './api'
-export type { DynamicPageProps, RenderedPathInfo } from './types'
+export type { DynamicPageProps, GetRenderedPathsResult } from './types'
 
 // TODO: show 404 in development for dynamic routes where the
 // parameters are not in getRenderedPaths return values
-// TODO: better typescript typing for page props
 // TODO: enable production builds
 export default function WilsonPages({
   extendRoutes,
