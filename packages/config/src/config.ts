@@ -154,7 +154,7 @@ function siteConfigDefaults(
         return [
           ...routes,
           {
-            path: '*',
+            route: '*',
             importPath: 'wilson/dist/client/components/not-found',
             componentName: 'NotFound',
           },

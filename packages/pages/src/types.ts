@@ -29,6 +29,10 @@ export type Page = {
    */
   rootPath: string
   /**
+   * Import path of the page relative to the site root
+   */
+  importPath: string
+  /**
    * Absolute path of the page
    */
   absolutePath: string
@@ -55,31 +59,14 @@ export type Page = {
  * The definition of a route in Wilson, used to render pages.
  *
  * By default most routes would be inferred from files in the `pagesDir`, but a
- * user might provide custom routes using the `extendRoutes` hook.
+ * user can provide custom routes using the `extendRoutes` hook.
  */
-export type Route = {
-  /**
-   * The route's path
-   */
-  path: string
-  /**
-   * Name of the route's component
-   */
-  componentName: string
-  /**
-   * Path to import the route's component
-   */
-  importPath: string
-  // /**
-  //  * Additional paths for the page, that behave like a copy of the route.
-  //  * When building the site, each path will be rendered separately.
-  //  */
-  // alias?: string | string[];
-  // /**
-  //  * Frontmatter associated with the page.
-  //  */
-  // frontmatter: RawPageMatter;
-}
+export type Route = Pick<Page, 'route' | 'componentName' | 'importPath'>
+//  * Additional paths for the page, that behave like a copy of the route.
+// /**
+//  * When building the site, each path will be rendered separately.
+//  */
+// alias?: string | string[];
 
 /**
  * Options specific to this plugin

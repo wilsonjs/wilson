@@ -153,6 +153,7 @@ export function createApi({
       const { route, isDynamic } = this.extractRouteInfo(path)
       const renderedPaths = isDynamic ? await this.getRenderedPaths(absolutePath, path, route) : []
       const frontmatter = await this.frontmatterForFile(absolutePath)
+      const rootPath = relative(root, absolutePath)
       const page: Page = {
         path,
         fileExtension: extname(absolutePath),
@@ -160,7 +161,8 @@ export function createApi({
         isDynamic,
         frontmatter,
         absolutePath,
-        rootPath: relative(root, absolutePath),
+        rootPath,
+        importPath: `./${rootPath}`,
         srcPath: relative(srcDir, absolutePath),
         renderedPaths,
         componentName: this.createComponentName(path),
@@ -223,20 +225,19 @@ export function createApi({
       if (route === '') route = '/'
       return { route, isDynamic }
     },
-    async getExtendedRoutes(id: string): Promise<Route[]> {
-      const routes: Route[] = Array.from(pageByPath.values()).map(
-        ({ componentName, route: path, rootPath }) => {
-          return {
-            path,
-            componentName,
-            importPath: './' + rootPath,
-          }
-        }
-      )
+
+    async getExtendedRoutes(pages: Page[]): Promise<Route[]> {
+      const routes: Route[] = pages.map(({ componentName, route, importPath }) => ({
+        route,
+        componentName,
+        importPath,
+      }))
       return (await extendRoutes?.(routes)) || routes
     },
+
     async generateDataModule(id: string): Promise<string> {
-      const routes = await this.getExtendedRoutes(id)
+      const pages = Array.from(pageByPath.values())
+      const routes = await this.getExtendedRoutes(pages)
       const code = `export default ${JSON.stringify(routes, null, 2)}`
       debug.virtual(
         `generated code for ${pc.green(DATA_MODULE_ID)}:\n${code
@@ -247,20 +248,19 @@ export function createApi({
       return code
     },
     /**
-     * Returns the page for the given route import path.
+     * Returns the page for the given importPath.
      *
-     * @param importPath route import path, e.g. './src/pages/blog/[page].tsx'
-     * @returns A page object
+     * @param importPath page importPath, e.g. `src/pages/blog/[page].tsx`
      */
     getPageByImportPath(importPath: string): Page | undefined {
-      return Array.from(pageByPath.values()).find((page) => './' + page.rootPath === importPath)
+      return Array.from(pageByPath.values()).find((page) => page.importPath === importPath)
     },
 
     /**
      * Returns an object that maps dynamic route paths to props for specific
      * parameter matches.
      *
-     * @param routes An array of Route objects.
+     * @param routes An array of routes
      */
     getSpecificRouteProps(routes: Route[]): {
       [dynamicRoutePath: string]: {
@@ -268,32 +268,52 @@ export function createApi({
         props: Record<string, any>
       }
     } {
-      return routes.reduce((acc: {}, route: Route) => {
-        const page = this.getPageByImportPath(route.importPath)
+      return routes.reduce((acc: {}, { importPath, route }: Route) => {
+        const page = this.getPageByImportPath(importPath)
         if (!page || !page.isDynamic) return acc
 
         const toMatchedProps = (acc: any[], i: RenderedPath) =>
           i.props ? [...acc, { matches: i.params, props: i.props }] : acc
 
         const matchedProps = page.renderedPaths.reduce(toMatchedProps, [])
-        return matchedProps.length > 0 ? { ...acc, [route.path]: matchedProps } : acc
+        return matchedProps.length > 0 ? { ...acc, [route]: matchedProps } : acc
       }, {})
     },
+
+    /**
+     * Returns import statement source code for the given route, e.g.
+     * `import BlogIndex from './src/pages/blog/index.tsx';`
+     */
+    getRouteImportCode({ componentName, importPath }: Route): string {
+      return `import ${componentName} from '${importPath}';`
+    },
+
+    /**
+     * Returns displayName assignment source code for the given route, e.g.
+     * `BlogIndex.displayName = 'BlogIndex';`
+     */
+    getRouteDisplayNameCode({ componentName }: Route): string {
+      return `${componentName}.displayName = '${componentName}';`
+    },
+
+    /**
+     * Returns createElement preact source code for the given route, e.g.
+     * `h(BlogIndex, { path: '/blog', element: BlogIndex })`
+     */
+    getRouteCreateElementCode({ componentName, route }: Route): string {
+      return `h(PageWrapper, { path: "${route}", element: ${componentName} })`
+    },
+
     async generateRoutesModule(id: string): Promise<string> {
-      const routes = await this.getExtendedRoutes(id)
+      const pages = Array.from(pageByPath.values())
+      const routes = await this.getExtendedRoutes(pages)
       const specificMatchProps = this.getSpecificRouteProps(routes)
 
-      const routeToImport = (route: Route) =>
-        `import ${route.componentName} from '${route.importPath}';`
-      const routeToDisplayName = (route: Route) =>
-        `${route.componentName}.displayName = '${route.componentName}';`
-      const routeToCreateElement = (route: Route) =>
-        `h(PageWrapper, { path: "${route.path}", element: ${route.componentName} })`
       // TODO sort byDynamicParams
       const code = `import { h } from 'preact';
 import { shallowEqual } from 'fast-equals';
-${routes.map(routeToImport).join('\n')}\n
-${routes.map(routeToDisplayName).join('\n')}\n
+${routes.map(this.getRouteImportCode).join('\n')}\n
+${routes.map(this.getRouteDisplayNameCode).join('\n')}\n
 export const specificMatchProps = ${JSON.stringify(specificMatchProps, null, 2)};
 
 const PageWrapper = ({ path, element, matches, url, ...rest }) => {
@@ -303,7 +323,7 @@ const PageWrapper = ({ path, element, matches, url, ...rest }) => {
 }
 
 export default [
-  ${routes.map(routeToCreateElement).join(',\n  ')}
+  ${routes.map(this.getRouteCreateElementCode).join(',\n  ')}
 ];`
       debug.virtual(
         `generated code for ${pc.green(ROUTES_MODULE_ID)}:\n${code
