@@ -8,9 +8,8 @@ import type {
   Options,
   Page,
   DynamicPageExports,
-  DynamicPageProps,
   GetRenderedPathsResult,
-  PageInfo,
+  RenderedPath,
 } from './types'
 import pc from 'picocolors'
 import { parsePageMatter } from './frontmatter'
@@ -85,6 +84,11 @@ export function createApi({
         )
       }
     },
+    /**
+     * Throws an error when the given path includes forbidden characters.
+     *
+     * @param path The path of a page file.
+     */
     errorOnDisallowedCharacters(path: string) {
       if (path.match(/^[0-9a-z._\-\/\[\]]+$/i) === null) {
         throw new Error(
@@ -92,11 +96,19 @@ export function createApi({
         )
       }
     },
-    async getRenderedInstances(
+
+    /**
+     *
+     * @param absolutePath
+     * @param path
+     * @param route
+     * @returns
+     */
+    async getRenderedPaths(
       absolutePath: string,
       path: string,
       route: string
-    ): Promise<PageInfo[]> {
+    ): Promise<RenderedPath[]> {
       const fileContents = await fs.readFile(absolutePath, 'utf8')
       const transformResult = await transformWithEsbuild(fileContents, absolutePath, {
         loader: 'tsx',
@@ -132,7 +144,6 @@ export function createApi({
         return {
           ...renderedPath,
           url,
-          path: '/',
         }
       })
     },
@@ -140,23 +151,19 @@ export function createApi({
       const path = relative(pagesDir, absolutePath)
       this.errorOnDisallowedCharacters(path)
       const { route, isDynamic } = this.extractRouteInfo(path)
-      const instances = isDynamic ? await this.getRenderedInstances(absolutePath, path, route) : []
+      const renderedPaths = isDynamic ? await this.getRenderedPaths(absolutePath, path, route) : []
       const frontmatter = await this.frontmatterForFile(absolutePath)
-      const srcPath = relative(srcDir, absolutePath)
-      const rootPath = relative(root, absolutePath)
-      const fileExtension = extname(absolutePath)
-      const componentName = this.createComponentName(path)
       const page: Page = {
         path,
-        fileExtension,
+        fileExtension: extname(absolutePath),
         route,
         isDynamic,
         frontmatter,
         absolutePath,
-        rootPath,
-        srcPath,
-        instances,
-        componentName,
+        rootPath: relative(root, absolutePath),
+        srcPath: relative(srcDir, absolutePath),
+        renderedPaths,
+        componentName: this.createComponentName(path),
       }
       pageByPath.set(absolutePath, page)
       this.errorOnDuplicateRoutes()
@@ -168,16 +175,17 @@ export function createApi({
     async updatePage(pagePath: string) {
       const page = this.pageForFilename(pagePath)
       const prevMatter = page?.frontmatter
-      const prevInstances = page?.instances
-      const { frontmatter, instances } = await this.addPage(pagePath)
+      const prevInstances = page?.renderedPaths
+      const { frontmatter, renderedPaths } = await this.addPage(pagePath)
       // Could do this comparison of previous and new page
       // with jest-diff or similar for better readability.
       debug.hmr('%s old: %O', pagePath, prevMatter, prevInstances)
-      debug.hmr('%s new: %O', pagePath, frontmatter, instances)
+      debug.hmr('%s new: %O', pagePath, frontmatter, renderedPaths)
       return {
-        changed: !deepEqual(prevMatter, frontmatter) || !deepEqual(prevInstances, instances),
+        changed: !deepEqual(prevMatter, frontmatter) || !deepEqual(prevInstances, renderedPaths),
         needsReload:
-          !deepEqual(prevMatter?.route, frontmatter?.route) || !deepEqual(prevInstances, instances),
+          !deepEqual(prevMatter?.route, frontmatter?.route) ||
+          !deepEqual(prevInstances, renderedPaths),
       }
     },
     createComponentName(path: string) {
@@ -247,6 +255,7 @@ export function createApi({
     getPageByImportPath(importPath: string): Page | undefined {
       return Array.from(pageByPath.values()).find((page) => './' + page.rootPath === importPath)
     },
+
     /**
      * Returns an object that maps dynamic route paths to props for specific
      * parameter matches.
@@ -263,10 +272,10 @@ export function createApi({
         const page = this.getPageByImportPath(route.importPath)
         if (!page || !page.isDynamic) return acc
 
-        const toMatchedProps = (acc: any[], i: GetRenderedPathsResult) =>
+        const toMatchedProps = (acc: any[], i: RenderedPath) =>
           i.props ? [...acc, { matches: i.params, props: i.props }] : acc
 
-        const matchedProps = (page.instances as GetRenderedPathsResult[]).reduce(toMatchedProps, [])
+        const matchedProps = page.renderedPaths.reduce(toMatchedProps, [])
         return matchedProps.length > 0 ? { ...acc, [route.path]: matchedProps } : acc
       }, {})
     },

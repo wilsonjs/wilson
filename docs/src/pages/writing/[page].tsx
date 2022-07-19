@@ -3,7 +3,7 @@ import type { DynamicPageProps, GetRenderedPathsResult } from 'wilson'
 type Props = { wat: number }
 
 export function getRenderedPaths(): GetRenderedPathsResult<'page', Props>[] {
-  return [{ params: { page: 'foo' } }, { params: { page: 'bar' }, props: { wat: 1254 } }]
+  return [{ params: { page: 'foo' } }, { params: { page: 'bar' }, props: { wat: 6 } }]
 }
 
 export default function Page(props: DynamicPageProps<'page', Props>) {

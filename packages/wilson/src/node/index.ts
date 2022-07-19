@@ -1,2 +1,2 @@
 export { defineConfig } from '@wilson/config'
-export type { DynamicPageProps, GetRenderedPathsResult } from '@wilson/pages'
+export type { StaticPageProps, DynamicPageProps, GetRenderedPathsResult } from '@wilson/pages'

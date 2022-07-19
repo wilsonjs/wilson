@@ -47,7 +47,7 @@ export type Page = {
   /**
    *
    */
-  instances: PageInfo[]
+  renderedPaths: RenderedPath[]
   frontmatter: RawPageMatter
 }
 
@@ -132,11 +132,6 @@ export interface Options extends PagesOptions {
   server?: ViteDevServer
 }
 
-/**
- * Record keyed by with specified strings.
- */
-type SpecificKeys<R extends string> = Record<R, string>
-
 export type DynamicPageExports = {
   getRenderedPaths: () => GetRenderedPathsResult[]
   default: FunctionComponent
@@ -144,29 +139,30 @@ export type DynamicPageExports = {
 
 export type GetRenderedPathsResult<
   Params extends string = string,
-  Props extends { [propName: string]: any } = Record<string, any>
-> = Wat1<Params> & Wat2<Props>
+  Props extends Record<string, any> = Record<string, any>
+> = SpecificParams<Params> & InjectedProps<Props>
 
-type Wat1<Params extends string> = { params: SpecificKeys<Params> }
-type Wat2<Props extends { [propName: string]: any }> = { props?: Props }
+export type RenderedPath = GetRenderedPathsResult & { url: string }
 
-export type StaticPageInfo = {
-  /**
-   * The route's path
-   */
+type SpecificParams<Params extends string> = {
+  params: Record<Params, string>
+}
+
+type InjectedProps<Props extends Record<string, any>> = {
+  props?: Props
+}
+
+type RoutingInfo = {
   path: string
   url: string
 }
 
-export type PageInfo<
-  Params extends string = string,
-  Props extends { [propName: string]: any } = Record<string, any>
-> = StaticPageInfo | (StaticPageInfo & GetRenderedPathsResult<Params, Props>)
+export type StaticPageProps = RenderableProps<RoutingInfo>
 
 export type DynamicPageProps<
   Params extends string,
-  Props extends { [propName: string]: any } = Record<string, any>
-> = RenderableProps<StaticPageInfo & Wat1<Params> & Props>
+  Props extends Record<string, any> = Record<string, any>
+> = RenderableProps<RoutingInfo & SpecificParams<Params> & Props>
 
 //
 //

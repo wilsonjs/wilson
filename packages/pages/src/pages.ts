@@ -11,7 +11,7 @@ import {
 
 export * from './types'
 export { getPages } from './api'
-export type { DynamicPageProps, GetRenderedPathsResult } from './types'
+export type { StaticPageProps, DynamicPageProps, GetRenderedPathsResult } from './types'
 
 // TODO: show 404 in development for dynamic routes where the
 // parameters are not in getRenderedPaths return values

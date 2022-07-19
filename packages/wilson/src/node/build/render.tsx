@@ -1,6 +1,6 @@
 import { SiteConfig } from '@wilson/config'
 import { getPages } from '@wilson/pages'
-import type { Page } from '@wilson/pages'
+import type { Page, RenderedPath } from '@wilson/pages'
 import { existsSync } from 'fs'
 import { join } from 'pathe'
 import { withSpinner } from '../utils'
@@ -28,10 +28,10 @@ export async function renderPages(
   // TODO: render multiple urls for dynamic pages
   await withSpinner('rendering pages', async () => {
     for (const page of pages) {
-      for (const instance of page.instances) {
+      for (const path of page.renderedPaths) {
         const renderedPage: RenderedPage = {
           ...page,
-          rendered: await renderPage(config, clientChunks, instance, rendertoString),
+          rendered: await renderPage(config, clientChunks, path, rendertoString),
         }
         renderedPages.push(renderedPage)
       }
@@ -44,10 +44,10 @@ export async function renderPages(
 export async function renderPage(
   config: SiteConfig,
   clientChunks: RollupOutput['output'],
-  instance: Page['instances'][0],
+  path: RenderedPath,
   rendertoString: RenderToStringFn
 ) {
-  const { html } = await rendertoString(instance.url)
+  const { html } = await rendertoString(path.url)
   return `<!DOCTYPE html>
 <html>
   <head>
