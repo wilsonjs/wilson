@@ -1,19 +1,16 @@
 import { SiteConfig } from '@wilson/config'
-import { getPages } from '@wilson/pages'
-import type { Page, RenderedPath } from '@wilson/pages'
 import { existsSync } from 'fs'
 import { join } from 'pathe'
 import { withSpinner } from '../utils'
 import { RollupOutput } from 'rollup'
 import type { bundle } from './bundle'
-import type { RenderToStringFn } from '../../client/app.server'
-
-type RenderedPage = Page & { rendered: string }
+import type { RenderToStringFn } from 'src/client/app.server'
+import { getPagesToRender, PageToRender } from './pages'
 
 export async function renderPages(
   config: SiteConfig,
   { clientResult }: Awaited<ReturnType<typeof bundle>>
-): Promise<{ renderedPages: RenderedPage[] }> {
+): Promise<PageToRender[]> {
   const appPath = ['js', 'mjs', 'cjs']
     .map((ext) => join(config.tempDir, `app.${ext}`))
     .find(existsSync)
@@ -21,33 +18,25 @@ export async function renderPages(
   if (!appPath) throw new Error(`Could not find the SSR build for the app in ${config.tempDir}`)
 
   const rendertoString: RenderToStringFn = (await import(appPath)).default
-  const pages = await getPages()
+
+  const pagesToRender = await withSpinner('resolving static paths', getPagesToRender)
   const clientChunks = clientResult.output
 
-  const renderedPages: RenderedPage[] = []
-  // TODO: render multiple urls for dynamic pages
   await withSpinner('rendering pages', async () => {
-    for (const page of pages) {
-      for (const path of page.renderedPaths) {
-        const renderedPage: RenderedPage = {
-          ...page,
-          rendered: await renderPage(config, clientChunks, path, rendertoString),
-        }
-        renderedPages.push(renderedPage)
-      }
-    }
+    for (const page of pagesToRender)
+      page.rendered = await renderPage(config, clientChunks, page, rendertoString)
   })
 
-  return { renderedPages }
+  return pagesToRender
 }
 
 export async function renderPage(
   config: SiteConfig,
   clientChunks: RollupOutput['output'],
-  path: RenderedPath,
+  page: PageToRender,
   rendertoString: RenderToStringFn
 ) {
-  const { html } = await rendertoString(path.url)
+  const { html } = await rendertoString(page.path)
   return `<!DOCTYPE html>
 <html>
   <head>

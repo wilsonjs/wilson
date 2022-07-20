@@ -151,7 +151,9 @@ export function createApi({
       const path = relative(pagesDir, absolutePath)
       this.errorOnDisallowedCharacters(path)
       const { route, isDynamic } = this.extractRouteInfo(path)
-      const renderedPaths = isDynamic ? await this.getRenderedPaths(absolutePath, path, route) : []
+      const renderedPaths = isDynamic
+        ? await this.getRenderedPaths(absolutePath, path, route)
+        : [{ params: {}, url: route }]
       const frontmatter = await this.frontmatterForFile(absolutePath)
       const rootPath = relative(root, absolutePath)
       const page: Page = {

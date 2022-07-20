@@ -13,8 +13,6 @@ export * from './types'
 export { getPages } from './api'
 export type { StaticPageProps, DynamicPageProps, GetRenderedPathsResult } from './types'
 
-// TODO: show 404 in development for dynamic routes where the
-// parameters are not in getRenderedPaths return values
 // TODO: allow dynamic params inside a path segment, e.g. src/pages/blog/page-[pageNo]
 // might need to switch to preact-iso router for this, preact-router doesn't seem to
 // support it

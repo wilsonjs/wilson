@@ -131,11 +131,11 @@ export type GetRenderedPathsResult<
 
 export type RenderedPath = GetRenderedPathsResult & { url: string }
 
-type SpecificParams<Params extends string> = {
+type SpecificParams<in Params extends string> = {
   params: Record<Params, string>
 }
 
-type InjectedProps<Props extends Record<string, any>> = {
+type InjectedProps<out Props extends Record<string, any>> = {
   props?: Props
 }
 

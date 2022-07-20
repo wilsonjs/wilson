@@ -1,31 +1,31 @@
 import { resolveConfig } from '@wilson/config'
-import fs from 'fs'
-// import { initializePages } from "../pages";
 import { withSpinner } from '../utils'
 import { bundle } from './bundle'
 import { renderPages } from './render'
+import { writePages } from './write'
+import { debug, rmDir, timeSince } from '../utils'
 
+// TODO: write sitemap after `pagesToRender` are available
 export async function build(root: string = process.cwd()) {
-  const start = Date.now()
+  const startTime = performance.now()
 
   process.env.NODE_ENV = 'production'
-  const siteConfig = await resolveConfig(root, {
-    command: 'build',
-    mode: 'production',
-  })
+  const siteConfig = await resolveConfig(root, { command: 'build', mode: 'production' })
 
-  console.log(`started building site ${root} at ${start}`, { siteConfig })
-  fs.rmSync(siteConfig.outDir, { recursive: true, force: true })
+  rmDir(siteConfig.outDir)
 
   const bundleResult = await withSpinner(
     'building client + server bundles',
     async () => await bundle(siteConfig)
   )
 
-  // const pages = await initializePages(siteConfig);
-  // console.log({ pages });
+  const pagesToRender = await renderPages(siteConfig, bundleResult)
+  pagesToRender.map(({ path, outputFilename }) =>
+    debug.build(`rendering page ${path} to ${outputFilename}`)
+  )
 
-  const { renderedPages } = await renderPages(siteConfig, bundleResult)
-  console.dir(renderedPages, { depth: 10 })
-  //   console.log({ bundleResult, pagesResult });
+  await withSpinner('writing pages', async () => await writePages(siteConfig, pagesToRender))
+
+  rmDir(siteConfig.tempDir)
+  console.info(`build complete in ${timeSince(startTime)}.`)
 }
