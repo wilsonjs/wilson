@@ -1,10 +1,9 @@
 import { promises as fs } from 'fs'
 import glob from 'fast-glob'
 import deepEqual from 'deep-equal'
-import { extname, join, relative, resolve } from 'pathe'
+import { basename, dirname, extname, join, relative, resolve } from 'pathe'
 import pc from 'picocolors'
-import { transformWithEsbuild } from 'vite'
-import { outputFile } from 'fs-extra'
+import { build } from 'vite'
 import type {
   DynamicPageExports,
   Options,
@@ -19,7 +18,7 @@ import { debug, slash } from './utils'
 import { DATA_MODULE_ID, ROUTES_MODULE_ID } from './types'
 
 const pageByPath = new Map<string, Page>()
-const tmpPageFiles = new Map<string, string>()
+const pageBuildsByPath = new Map<string, string>()
 
 /**
  * Returns one or all pages.
@@ -102,18 +101,30 @@ export function createApi(options: Options) {
       absolutePath: string,
       path: string,
     ): Promise<T> {
-      const tmpPath = join(process.cwd(), '.wilson/pages', path.replace(/\.tsx$/, '.js'))
+      let importPath = pageBuildsByPath.get(absolutePath)
 
-      if (tmpPageFiles.get(tmpPath) === undefined) {
-        const fileContents = await fs.readFile(absolutePath, 'utf8')
-        const transformResult = await transformWithEsbuild(fileContents, absolutePath, {
-          loader: 'tsx',
-          jsxFactory: 'h',
-          jsxFragment: 'Fragment',
+      if (importPath === undefined) {
+        const dir = dirname(path)
+        const filenameDir = dir === '.' ? '' : `${dir.replace(/^\[/, '_').replace(/\]$/, '_')}/`
+        const base = basename(path)
+        const filenameBase = base
+          .slice(0, base.lastIndexOf('.'))
+          .replace(/^\[/, '_')
+          .replace(/\]$/, '_')
+        const entryFileNames = `${filenameDir}${filenameBase}.js`
+        importPath = join(process.cwd(), '.wilson/pages', entryFileNames)
+
+        await build({
+          logLevel: 'silent',
+          build: {
+            outDir: '.wilson/pages',
+            ssr: true,
+            emptyOutDir: false,
+            rollupOptions: { input: absolutePath, output: { entryFileNames } },
+          },
         })
-        const javascriptCode = `import { h, Fragment } from "preact";\n${transformResult.code}`
-        await outputFile(tmpPath, javascriptCode)
-        tmpPageFiles.set(tmpPath, javascriptCode)
+
+        pageBuildsByPath.set(absolutePath, importPath)
       }
 
       // There is no import cache invalidation in nodejs, so we need to append
@@ -125,7 +136,7 @@ export function createApi(options: Options) {
       // instead of importing the file - but that comes with it's own caveats.
       //
       // @see https://github.com/nodejs/modules/issues/307
-      const cacheBustingImportPath = `${tmpPath}?update=${Date.now()}`
+      const cacheBustingImportPath = `${importPath}?update=${Date.now()}`
 
       const pageExports = (await import(cacheBustingImportPath)) as T
       return pageExports
@@ -363,7 +374,6 @@ export default [
       fileContents ||= await fs.readFile(absolutePath, 'utf8')
       const relativePath = relative(root, absolutePath)
       const matter = await parseFrontmatter(relativePath, fileContents)
-      console.log({ fileContents, matter })
       return matter
     },
 

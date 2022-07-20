@@ -1,4 +1,5 @@
 import type { DynamicPageProps, GetRenderedPathsResult } from 'wilson'
+import styles from './[page].module.scss'
 
 interface Props {
   items: any[]
@@ -44,7 +45,7 @@ export function getRenderedPaths(): GetRenderedPathsResult<Params, Props>[] {
 export default function Page(props: DynamicPageProps<Params, Props>) {
   return (
     <>
-      <h1>Blog</h1>
+      <h1 className={styles.headline}>Blog</h1>
       <pre>{JSON.stringify(props.items, null, 2)}</pre>
       {props.prevPage && <a href={props.prevPage}>Prev</a>}
       {props.nextPage && <a href={props.nextPage}>Next</a>}
