@@ -1,14 +1,13 @@
 import routes from 'virtual:wilson-routes'
 import { Router } from 'preact-router'
 import render from 'preact-render-to-string'
-import { RenderableProps } from 'preact'
+import type { RenderableProps } from 'preact'
 
 function App({
   renderedUrl,
 }: RenderableProps<{
   renderedUrl: string
 }>) {
-  // @ts-ignore
   return <Router url={renderedUrl}>{routes}</Router>
 }
 

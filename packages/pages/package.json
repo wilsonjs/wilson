@@ -1,39 +1,31 @@
 {
   "name": "@wilson/pages",
-  "version": "1.0.0",
-  "license": "MIT",
-  "author": "Christoph Werner <christoph@codepunkt.de>",
   "type": "module",
-  "scripts": {
-    "dev": "npm run build -- --watch",
-    "build": "tsup src/pages.ts",
-    "lint": "eslint ."
-  },
+  "version": "1.0.0",
+  "author": "Christoph Werner <christoph@codepunkt.de>",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/codepunkt/wilson",
     "directory": "packages/pages"
   },
+  "exports": {
+    ".": {
+      "require": "./src/pages.cjs",
+      "import": "./dist/pages.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "dist/pages.js",
+  "types": "dist/pages.d.ts",
   "files": [
     "dist",
     "src"
   ],
-  "types": "dist/pages.d.ts",
-  "main": "dist/pages.js",
-  "exports": {
-    ".": {
-      "import": "./dist/pages.js",
-      "require": "./src/pages.cjs"
-    },
-    "./package.json": "./package.json"
-  },
-  "devDependencies": {
-    "@types/deep-equal": "^1.0.1",
-    "@types/fs-extra": "^9.0.13",
-    "@types/node": "^18.0.0",
-    "preact": "^10.10.0",
-    "tsup": "^6.1.3",
-    "vite": "3.0.0"
+  "scripts": {
+    "dev": "npm run build -- --watch",
+    "build": "tsup src/pages.ts",
+    "lint": "eslint ."
   },
   "dependencies": {
     "debug": "^4.3.4",
@@ -44,5 +36,13 @@
     "gray-matter": "^4.0.3",
     "pathe": "^0.3.2",
     "picocolors": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/deep-equal": "^1.0.1",
+    "@types/fs-extra": "^9.0.13",
+    "@types/node": "^18.0.0",
+    "preact": "^10.10.0",
+    "tsup": "^6.1.3",
+    "vite": "3.0.0"
   }
 }

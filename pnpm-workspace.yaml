@@ -3,4 +3,5 @@ packages:
   - packages/pages
   - packages/utils
   - packages/wilson
-  - docs
+  - sites/docs
+  - sites/codepunkt.de

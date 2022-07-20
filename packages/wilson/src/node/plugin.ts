@@ -4,7 +4,7 @@ import pages from '@wilson/pages'
 import debug from 'debug'
 import { relative } from 'pathe'
 import pc from 'picocolors'
-import { PluginOption, ViteDevServer } from 'vite'
+import type { PluginOption, ViteDevServer } from 'vite'
 import { createServer } from './server'
 
 /**
@@ -26,7 +26,7 @@ function devConfigWatch(siteConfig: SiteConfig): PluginOption {
       timestamp: true,
     })
     await existingServer.close()
-    // @ts-ignore
+    // @ts-expect-error __vite_start_time is not available on global type
     global.__vite_start_time = performance.now()
     const { server: newServer } = await createServer(root, serverOptions)
     await newServer.listen()
@@ -49,7 +49,7 @@ function devConfigWatch(siteConfig: SiteConfig): PluginOption {
  */
 function virtualClientEntrypoint(): PluginOption {
   const VIRTUAL_MODULE_ID = '/@virtual:wilson-client'
-  const RESOLVED_VIRTUAL_MODULE_ID = '\0' + VIRTUAL_MODULE_ID
+  const RESOLVED_VIRTUAL_MODULE_ID = `\0${VIRTUAL_MODULE_ID}`
 
   return {
     name: 'wilson:virtual-client-entrypoint',
@@ -57,7 +57,7 @@ function virtualClientEntrypoint(): PluginOption {
       if (id === VIRTUAL_MODULE_ID) return RESOLVED_VIRTUAL_MODULE_ID
     },
     async load(id) {
-      if (id === RESOLVED_VIRTUAL_MODULE_ID) return `import "wilson/dist/client/app.client.js";`
+      if (id === RESOLVED_VIRTUAL_MODULE_ID) return 'import "wilson/dist/client/app.client.js";'
     },
   }
 }

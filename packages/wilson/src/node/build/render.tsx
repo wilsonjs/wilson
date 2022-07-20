@@ -1,15 +1,16 @@
-import { SiteConfig } from '@wilson/config'
 import { existsSync } from 'fs'
+import type { SiteConfig } from '@wilson/config'
 import { join } from 'pathe'
-import { withSpinner } from '../utils'
-import { RollupOutput } from 'rollup'
-import type { bundle } from './bundle'
+import type { RollupOutput } from 'rollup'
 import type { RenderToStringFn } from 'src/client/app.server'
-import { getPagesToRender, PageToRender } from './pages'
+import { withSpinner } from '../utils'
+import type { bundle } from './bundle'
+import type { PageToRender } from './pages'
+import { getPagesToRender } from './pages'
 
 export async function renderPages(
   config: SiteConfig,
-  { clientResult }: Awaited<ReturnType<typeof bundle>>
+  { clientResult }: Awaited<ReturnType<typeof bundle>>,
 ): Promise<PageToRender[]> {
   const appPath = ['js', 'mjs', 'cjs']
     .map((ext) => join(config.tempDir, `app.${ext}`))
@@ -34,7 +35,7 @@ export async function renderPage(
   config: SiteConfig,
   clientChunks: RollupOutput['output'],
   page: PageToRender,
-  rendertoString: RenderToStringFn
+  rendertoString: RenderToStringFn,
 ) {
   const { html } = await rendertoString(page.path)
   return `<!DOCTYPE html>

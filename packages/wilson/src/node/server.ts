@@ -6,12 +6,9 @@ import wilsonPlugins from './plugin'
 
 export async function createServer(
   root: string = process.cwd(),
-  serverOptions: ServerOptions = {}
+  serverOptions: ServerOptions = {},
 ) {
   const siteConfig = await resolveConfig(root)
-
-  // const pages = await initializePages(siteConfig);
-  // console.log({ pages });
 
   const viteConfig = mergeConfig(siteConfig.vite, {
     plugins: wilsonPlugins(siteConfig),

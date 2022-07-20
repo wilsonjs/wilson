@@ -1,17 +1,17 @@
-import { FunctionComponent, RenderableProps } from 'preact'
+import type { FunctionComponent, RenderableProps } from 'preact'
 import type { ViteDevServer } from 'vite'
 import type { createApi } from './api'
 
 // these virtual module ids should not have slashes in them, because
 // module resolution of modules imported in them is harder otherwise.
 export const ROUTES_MODULE_ID = 'virtual:wilson-routes'
-export const RESOLVED_ROUTES_MODULE_ID = '\0' + ROUTES_MODULE_ID + '.tsx'
+export const RESOLVED_ROUTES_MODULE_ID = `\0${ROUTES_MODULE_ID}.tsx`
 export const DATA_MODULE_ID = 'virtual:wilson-route-data'
-export const RESOLVED_DATA_MODULE_ID = '\0' + DATA_MODULE_ID + '.tsx'
+export const RESOLVED_DATA_MODULE_ID = `\0${DATA_MODULE_ID}.tsx`
 
 export type Awaitable<T> = T | Promise<T>
 
-export type Page = {
+export interface Page {
   /**
    * React-router route path
    */
@@ -119,27 +119,27 @@ export interface Options extends PagesOptions {
   server?: ViteDevServer
 }
 
-export type DynamicPageExports = {
+export interface DynamicPageExports {
   getRenderedPaths: () => GetRenderedPathsResult[]
   default: FunctionComponent
 }
 
 export type GetRenderedPathsResult<
   Params extends string = string,
-  Props extends Record<string, any> = Record<string, any>
+  Props extends Record<string, any> = Record<string, any>,
 > = SpecificParams<Params> & InjectedProps<Props>
 
 export type RenderedPath = GetRenderedPathsResult & { url: string }
 
-type SpecificParams<in Params extends string> = {
+interface SpecificParams<in Params extends string> {
   params: Record<Params, string>
 }
 
-type InjectedProps<out Props extends Record<string, any>> = {
+interface InjectedProps<out Props extends Record<string, any>> {
   props?: Props
 }
 
-type RoutingInfo = {
+interface RoutingInfo {
   path: string
   url: string
 }
@@ -148,7 +148,7 @@ export type StaticPageProps = RenderableProps<RoutingInfo>
 
 export type DynamicPageProps<
   Params extends string,
-  Props extends Record<string, any> = Record<string, any>
+  Props extends Record<string, any> = Record<string, any>,
 > = RenderableProps<RoutingInfo & SpecificParams<Params> & Props>
 
 //

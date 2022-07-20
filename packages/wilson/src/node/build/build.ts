@@ -1,9 +1,8 @@
 import { resolveConfig } from '@wilson/config'
-import { withSpinner } from '../utils'
+import { debug, rmDir, timeSince, withSpinner } from '../utils'
 import { bundle } from './bundle'
 import { renderPages } from './render'
 import { writePages } from './write'
-import { debug, rmDir, timeSince } from '../utils'
 
 // TODO: write sitemap after `pagesToRender` are available
 export async function build(root: string = process.cwd()) {
@@ -16,12 +15,12 @@ export async function build(root: string = process.cwd()) {
 
   const bundleResult = await withSpinner(
     'building client + server bundles',
-    async () => await bundle(siteConfig)
+    async () => await bundle(siteConfig),
   )
 
   const pagesToRender = await renderPages(siteConfig, bundleResult)
   pagesToRender.map(({ path, outputFilename }) =>
-    debug.build(`rendering page ${path} to ${outputFilename}`)
+    debug.build(`rendering page ${path} to ${outputFilename}`),
   )
 
   await withSpinner('writing pages', async () => await writePages(siteConfig, pagesToRender))

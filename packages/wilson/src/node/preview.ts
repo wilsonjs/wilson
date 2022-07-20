@@ -1,5 +1,5 @@
 import type { ServerOptions, UserConfig as ViteUserConfig } from 'vite'
-import { preview as vitePreview, mergeConfig } from 'vite'
+import { mergeConfig, preview as vitePreview } from 'vite'
 import { resolveConfig } from '@wilson/config'
 import wilsonPlugins from './plugin'
 

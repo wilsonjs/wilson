@@ -1,4 +1,5 @@
-import { getPages, RenderedPath } from '@wilson/pages'
+import type { RenderedPath } from '@wilson/pages'
+import { getPages } from '@wilson/pages'
 
 /**
  * A page that is about to be rendered to a static .html file.

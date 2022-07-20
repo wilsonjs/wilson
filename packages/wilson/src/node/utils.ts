@@ -1,6 +1,6 @@
+import fs from 'fs'
 import newSpinner from 'mico-spinner'
 import Debug from 'debug'
-import fs from 'fs'
 
 /**
  * Object holding specific debug instances

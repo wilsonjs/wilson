@@ -1,6 +1,7 @@
-import { ModuleNode, ViteDevServer } from 'vite'
+import type { ViteDevServer } from 'vite'
 import { debug, slash } from './utils'
-import { Awaitable, ROUTES_MODULE_ID, PagesApi } from './types'
+import type { Awaitable, PagesApi } from './types'
+import { ROUTES_MODULE_ID } from './types'
 
 export function handleHMR(api: PagesApi, server: ViteDevServer, clearRoutes: () => void) {
   onPage('add', async (path) => {

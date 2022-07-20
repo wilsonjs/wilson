@@ -1,10 +1,10 @@
-import type { SiteConfig, UserConfig } from './types'
+import { fileURLToPath } from 'url'
 import type { ConfigEnv, UserConfig as ViteOptions } from 'vite'
 import { loadConfigFromFile, mergeConfig as mergeViteConfig } from 'vite'
 import createDebugger from 'debug'
 import pc from 'picocolors'
 import { dirname, join, resolve } from 'pathe'
-import { fileURLToPath } from 'url'
+import type { SiteConfig, UserConfig } from './types'
 
 const debug = createDebugger('@wilson/config')
 
@@ -90,7 +90,7 @@ export const DIST_CLIENT_PATH = join(_dirname, '../client')
  * @param userConfig
  * @returns
  */
-function viteConfigDefaults(root: string, userConfig: UserConfig): ViteOptions {
+function viteConfigDefaults(root: string): ViteOptions {
   return {
     root,
     clearScreen: false,
@@ -110,7 +110,7 @@ function viteConfigDefaults(root: string, userConfig: UserConfig): ViteOptions {
       exclude: [],
     },
     esbuild: {
-      jsxInject: `import { h, Fragment } from 'preact'`,
+      jsxInject: "import { h, Fragment } from 'preact'",
       jsxFactory: 'h',
       jsxFragment: 'Fragment',
     },
@@ -127,7 +127,7 @@ function viteConfigDefaults(root: string, userConfig: UserConfig): ViteOptions {
 function siteConfigDefaults(
   siteConfig: SiteConfig,
   userConfig: UserConfig,
-  env: ConfigEnv
+  env: ConfigEnv,
 ): Omit<SiteConfig, 'mode'> {
   const { root } = siteConfig
   const isDevelopmentMode = env.mode === 'development'
@@ -148,9 +148,9 @@ function siteConfigDefaults(
     siteUrl: '',
     srcDir,
     pageExtensions: ['.md', '.tsx'],
-    vite: viteConfigDefaults(root, userConfig),
+    vite: viteConfigDefaults(root),
     extendRoutes(routes) {
-      if (isDevelopmentMode)
+      if (isDevelopmentMode) {
         return [
           ...routes,
           {
@@ -159,6 +159,7 @@ function siteConfigDefaults(
             componentName: 'NotFound',
           },
         ]
+      }
       // else if (!drafts)
       //   return routes.filter(route => !route.frontmatter?.draft)
     },
@@ -173,7 +174,7 @@ function siteConfigDefaults(
  */
 async function resolveConfig(
   root: string = process.cwd(),
-  env: ConfigEnv = { mode: 'development', command: 'serve' }
+  env: ConfigEnv = { mode: 'development', command: 'serve' },
 ): Promise<SiteConfig> {
   const siteConfig = await resolveUserConfig(root, env)
   siteConfig.mode = env.mode

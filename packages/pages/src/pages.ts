@@ -1,22 +1,26 @@
 import type { PluginOption, ResolvedConfig } from 'vite'
-import type { PagesApi, Options } from './types'
+import type { Options, PagesApi } from './types'
 import { createApi } from './api'
 import { handleHMR } from './hmr'
 import {
-  ROUTES_MODULE_ID,
-  RESOLVED_ROUTES_MODULE_ID,
   DATA_MODULE_ID,
   RESOLVED_DATA_MODULE_ID,
+  RESOLVED_ROUTES_MODULE_ID,
+  ROUTES_MODULE_ID,
 } from './types'
 
-export * from './types'
 export { getPages } from './api'
-export type { StaticPageProps, DynamicPageProps, GetRenderedPathsResult } from './types'
+export type {
+  StaticPageProps,
+  DynamicPageProps,
+  GetRenderedPathsResult,
+  RenderedPath,
+  Route,
+} from './types'
 
 // TODO: allow dynamic params inside a path segment, e.g. src/pages/blog/page-[pageNo]
 // might need to switch to preact-iso router for this, preact-router doesn't seem to
 // support it
-// TODO: enable production builds
 export default function WilsonPages({
   extendRoutes,
   pageExtensions,
@@ -54,9 +58,9 @@ export default function WilsonPages({
     },
     async load(id) {
       if (id === RESOLVED_ROUTES_MODULE_ID)
-        return (generatedRoutesModule ||= await api.generateRoutesModule(id))
+        return (generatedRoutesModule ||= await api.generateRoutesModule())
       if (id === RESOLVED_DATA_MODULE_ID)
-        return (generatedDataModule ||= await api.generateDataModule(id))
+        return (generatedDataModule ||= await api.generateDataModule())
     },
     // async transform(_code, id) {
     //   if (id.includes('vue&type=page')) return 'export default {};'

@@ -2,7 +2,7 @@ import { basename, extname } from 'pathe'
 import grayMatter from 'gray-matter'
 // import { parse as parseSFC } from 'vue/compiler-sfc'
 
-import type { RawPageMatter, PageMeta } from './types'
+import type { RawPageMatter } from './types'
 
 const dateRegex = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})-(?<slug>.*)(?<ext>\.\w+)$/
 
@@ -67,7 +67,9 @@ function preparePageMatter(filename: string, matter: Record<string, any>): RawPa
  * Clear undefined fields from an object. It mutates the object
  */
 export function clearUndefined<T extends object>(obj: T): T {
-  for (const key in obj) if (obj[key] === undefined) delete obj[key]
+  for (const key in obj) {
+    if (obj[key] === undefined) delete obj[key]
+  }
   return obj
 }
 

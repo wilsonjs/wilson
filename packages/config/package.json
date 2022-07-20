@@ -1,36 +1,31 @@
 {
   "name": "@wilson/config",
-  "version": "1.0.0",
-  "license": "MIT",
-  "author": "Christoph Werner <christoph@codepunkt.de>",
   "type": "module",
-  "scripts": {
-    "dev": "npm run build -- --watch",
-    "build": "tsup src/config.ts",
-    "lint": "eslint ."
-  },
+  "version": "1.0.0",
+  "author": "Christoph Werner <christoph@codepunkt.de>",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/codepunkt/wilson",
     "directory": "packages/config"
   },
+  "exports": {
+    ".": {
+      "require": "./src/config.cjs",
+      "import": "./dist/config.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "dist/config.js",
+  "types": "dist/config.d.ts",
   "files": [
     "dist",
     "src"
   ],
-  "types": "dist/config.d.ts",
-  "main": "dist/config.js",
-  "exports": {
-    ".": {
-      "import": "./dist/config.js",
-      "require": "./src/config.cjs"
-    },
-    "./package.json": "./package.json"
-  },
-  "devDependencies": {
-    "@types/debug": "^4.1.7",
-    "@wilson/pages": "workspace:^1.0.0",
-    "tsup": "^6.1.3"
+  "scripts": {
+    "dev": "npm run build -- --watch",
+    "build": "tsup src/config.ts",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@wilson/utils": "workspace:^1.0.0",
@@ -38,5 +33,10 @@
     "pathe": "^0.3.2",
     "picocolors": "^1.0.0",
     "vite": "3.0.0"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.7",
+    "@wilson/pages": "workspace:^1.0.0",
+    "tsup": "^6.1.3"
   }
 }

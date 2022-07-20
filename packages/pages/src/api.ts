@@ -2,23 +2,15 @@ import { promises as fs } from 'fs'
 import glob from 'fast-glob'
 import deepEqual from 'deep-equal'
 import { extname, join, relative, resolve } from 'pathe'
-import type {
-  RawPageMatter,
-  Route,
-  Options,
-  Page,
-  DynamicPageExports,
-  GetRenderedPathsResult,
-  RenderedPath,
-} from './types'
 import pc from 'picocolors'
+import { transformWithEsbuild } from 'vite'
+import { outputFile } from 'fs-extra'
+import type { DynamicPageExports, Options, Page, RawPageMatter, RenderedPath, Route } from './types'
 import { parsePageMatter } from './frontmatter'
 import { debug, slash } from './utils'
 import { DATA_MODULE_ID, ROUTES_MODULE_ID } from './types'
-import { transformWithEsbuild } from 'vite'
-import { outputFile } from 'fs-extra'
 
-let pageByPath = new Map<string, Page>()
+const pageByPath = new Map<string, Page>()
 
 /**
  * Returns one or all pages.
@@ -29,7 +21,7 @@ let pageByPath = new Map<string, Page>()
 export async function getPages(absolutePath?: undefined): Promise<Page[]>
 export async function getPages(absolutePath: string): Promise<Page | undefined>
 export async function getPages(
-  absolutePath: string | undefined
+  absolutePath: string | undefined,
 ): Promise<Page[] | Page | undefined> {
   return absolutePath === undefined
     ? (Array.from(pageByPath.values()) as Page[])
@@ -64,7 +56,7 @@ export function createApi({
         onlyFiles: true,
       })
       await Promise.all(
-        absolutePaths.map(async (absolutePath) => await this.addPage(slash(absolutePath)))
+        absolutePaths.map(async (absolutePath) => await this.addPage(slash(absolutePath))),
       )
     },
     async addAllPages() {
@@ -74,13 +66,13 @@ export function createApi({
     errorOnDuplicateRoutes() {
       const allPages = Array.from(pageByPath).map(([_, p]) => p)
       const duplicateRoutePages = allPages.filter((p1) =>
-        allPages.some((p2) => p1.path !== p2.path && p1.route === p2.route)
+        allPages.some((p2) => p1.path !== p2.path && p1.route === p2.route),
       )
       if (duplicateRoutePages.length > 0) {
         throw new Error(
           `Multiple pages with route "${
             duplicateRoutePages[0].route
-          }" detected: [${duplicateRoutePages.map((r) => r.path).join(', ')}]"`
+          }" detected: [${duplicateRoutePages.map((r) => r.path).join(', ')}]"`,
         )
       }
     },
@@ -92,7 +84,7 @@ export function createApi({
     errorOnDisallowedCharacters(path: string) {
       if (path.match(/^[0-9a-z._\-\/\[\]]+$/i) === null) {
         throw new Error(
-          `Page "${path}" has forbidden characters. Pages can only have 0-9a-zA-Z._-/[]\n`
+          `Page "${path}" has forbidden characters. Pages can only have 0-9a-zA-Z._-/[]\n`,
         )
       }
     },
@@ -107,7 +99,7 @@ export function createApi({
     async getRenderedPaths(
       absolutePath: string,
       path: string,
-      route: string
+      route: string,
     ): Promise<RenderedPath[]> {
       const fileContents = await fs.readFile(absolutePath, 'utf8')
       const transformResult = await transformWithEsbuild(fileContents, absolutePath, {
@@ -115,7 +107,7 @@ export function createApi({
         jsxFactory: 'h',
         jsxFragment: 'Fragment',
       })
-      const javascriptCode = 'import { h, Fragment } from "preact";\n' + transformResult.code
+      const javascriptCode = `import { h, Fragment } from "preact";\n${transformResult.code}`
       const tmpPath = join(process.cwd(), '.wilson/pages', path.replace(/\.tsx$/, '.js'))
       await outputFile(tmpPath, javascriptCode)
       // There is no import cache invalidation in nodejs, so we need to append
@@ -129,15 +121,15 @@ export function createApi({
       // @see https://github.com/nodejs/modules/issues/307
       const cacheBustingImportPath = `${tmpPath}?update=${Date.now()}`
       const pageExports = (await import(cacheBustingImportPath)) as DynamicPageExports
-      if (pageExports.getRenderedPaths === undefined) {
+      if (pageExports.getRenderedPaths === undefined)
         throw new Error(`dynamic page "${path}" has no getRenderedPaths() export`)
-      }
+
       const renderedPaths = pageExports.getRenderedPaths()
-      if (!Array.isArray(renderedPaths)) {
+      if (!Array.isArray(renderedPaths))
         throw new Error(`getRenderedPaths() of dynamic page "${path}" must return an array`)
-      }
+
       return renderedPaths.map((renderedPath) => {
-        let url = route
+        let url = route.replace(/\?$/, '')
         Object.entries(renderedPath.params).forEach(([key, value]) => {
           url = url.replace(new RegExp(`:${key}`, 'g'), value)
         })
@@ -202,7 +194,7 @@ export function createApi({
       const onlyAllowedChars = variablesReplaced.replace(/[^a-z0-9$_]/gi, '')
       return onlyAllowedChars.replace(
         /\$(.{1})/g,
-        (s: string) => s.charAt(0) + s.charAt(1).toUpperCase()
+        (s: string) => s.charAt(0) + s.charAt(1).toUpperCase(),
       )
     },
     isDynamicPath(segment: string) {
@@ -216,14 +208,15 @@ export function createApi({
         .map((segment) =>
           this.isDynamicPath(segment)
             ? segment.replace(/\[([^\]]+)\]/g, ':$1')
-            : segment.toLowerCase()
+            : segment.toLowerCase(),
         )
         .join('/')
-      let route =
-        reactRouterLike
-          .slice(0, reactRouterLike.lastIndexOf('.'))
-          .replace(/index$/, '')
-          .replace(/^\/|\/$/g, '') ?? '/'
+      let route = reactRouterLike
+        .slice(0, reactRouterLike.lastIndexOf('.'))
+        .replace(/index$/, '')
+        .replace(/^\/|\/$/g, '')
+        .replace(/(:[^/]+)$/, '$1?')
+
       if (route === '') route = '/'
       return { route, isDynamic }
     },
@@ -245,7 +238,7 @@ export function createApi({
       return Array.from(pageByPath.values()).sort(byPathSegmentsAndDynamicParams)
     },
 
-    async generateDataModule(id: string): Promise<string> {
+    async generateDataModule(): Promise<string> {
       const pages = this.getSortedPages()
       const routes = await this.getExtendedRoutes(pages)
       const code = `export default ${JSON.stringify(routes, null, 2)}`
@@ -253,7 +246,7 @@ export function createApi({
         `generated code for ${pc.green(DATA_MODULE_ID)}:\n${code
           .split('\n')
           .map((line) => pc.gray(`  ${line}`))
-          .join('\n')}`
+          .join('\n')}`,
       )
       return code
     },
@@ -313,7 +306,7 @@ export function createApi({
       return `h(PageWrapper, { path: "${route}", element: ${componentName} })`
     },
 
-    async generateRoutesModule(id: string): Promise<string> {
+    async generateRoutesModule(): Promise<string> {
       const pages = this.getSortedPages()
       const routes = await this.getExtendedRoutes(pages)
       const specificMatchProps = this.getSpecificRouteProps(routes)
@@ -337,7 +330,7 @@ export default [
         `generated code for ${pc.green(ROUTES_MODULE_ID)}:\n${code
           .split('\n')
           .map((line) => pc.gray(`  ${line}`))
-          .join('\n')}`
+          .join('\n')}`,
       )
       return code
     },

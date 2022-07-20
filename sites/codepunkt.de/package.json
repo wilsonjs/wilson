@@ -1,5 +1,5 @@
 {
-  "name": "docs",
+  "name": "codepunkt.de",
   "version": "1.0.0",
   "private": true,
   "license": "MIT",
@@ -10,13 +10,12 @@
     "build": "wilson build",
     "preview": "wilson preview --open --port 3050",
     "now": "npm run build && npm run preview",
-    "lint": "eslint . --ext .ts,.js,.vue,.html",
-    "check": "vue-tsc --noEmit"
+    "lint": "eslint . --ext .ts,.js,.tsx,.jsx,.html"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/codepunkt/wilson",
-    "directory": "docs"
+    "directory": "sites/docs"
   },
   "dependencies": {
     "@preact/preset-vite": "^2.3.0",

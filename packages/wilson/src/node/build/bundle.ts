@@ -1,10 +1,11 @@
-import { SiteConfig } from '@wilson/config'
+import { fileURLToPath } from 'url'
+import type { SiteConfig } from '@wilson/config'
 import { dirname, join, resolve } from 'pathe'
 import glob from 'fast-glob'
-import { build, mergeConfig, UserConfig as ViteUserConfig } from 'vite'
+import type { UserConfig as ViteUserConfig } from 'vite'
+import { build, mergeConfig } from 'vite'
 import type { RollupOutput } from 'rollup'
 import wilsonPlugins from '../plugin'
-import { fileURLToPath } from 'url'
 
 const _dirname = dirname(fileURLToPath(import.meta.url))
 export const DIST_CLIENT_PATH = join(_dirname, '../client')
@@ -31,16 +32,17 @@ async function bundleHtmlEntrypoints(siteConfig: SiteConfig) {
     ignore: ['node_modules/**'],
   })
 
-  if (entrypoints.length > 0)
+  if (entrypoints.length > 0) {
     await bundleWithVite(siteConfig, {
       htmlBuild: true,
       ssr: false,
     })
+  }
 }
 
 async function bundleWithVite(
   siteConfig: SiteConfig,
-  options: { ssr: boolean; htmlBuild?: boolean }
+  options: { ssr: boolean; htmlBuild?: boolean },
 ) {
   const entrypoints = resolveEntrypoints(options.ssr)
   const { htmlBuild = false, ssr } = options

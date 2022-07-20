@@ -1,31 +1,31 @@
 {
   "name": "@wilson/utils",
-  "version": "1.0.0",
-  "license": "MIT",
-  "author": "Christoph Werner <christoph@codepunkt.de>",
   "type": "module",
-  "scripts": {
-    "dev": "npm run build -- --watch",
-    "build": "tsup src/utils.ts",
-    "lint": "eslint ."
-  },
+  "version": "1.0.0",
+  "author": "Christoph Werner <christoph@codepunkt.de>",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/codepunkt/wilson",
     "directory": "packages/utils"
   },
+  "exports": {
+    ".": {
+      "require": "./src/utils.cjs",
+      "import": "./dist/utils.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "dist/utils.js",
+  "types": "dist/utils.d.ts",
   "files": [
     "dist",
     "src"
   ],
-  "types": "dist/utils.d.ts",
-  "main": "dist/utils.js",
-  "exports": {
-    ".": {
-      "import": "./dist/utils.js",
-      "require": "./src/utils.cjs"
-    },
-    "./package.json": "./package.json"
+  "scripts": {
+    "dev": "npm run build -- --watch",
+    "build": "tsup src/utils.ts",
+    "lint": "eslint ."
   },
   "devDependencies": {
     "tsup": "^6.1.3"
