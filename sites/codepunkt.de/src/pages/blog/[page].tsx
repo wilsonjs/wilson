@@ -38,7 +38,7 @@ function paginate<T>(items: T[], pageSize = 10): GetRenderedPathsResult<Params, 
 }
 
 export function getRenderedPaths(): GetRenderedPathsResult<Params, Props>[] {
-  return paginate(posts, 2)
+  return paginate(posts, 6)
 }
 
 export default function Page(props: DynamicPageProps<Params, Props>) {

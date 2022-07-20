@@ -52,7 +52,7 @@ export interface Page {
    *
    */
   renderedPaths: RenderedPath[]
-  frontmatter: RawPageMatter
+  frontmatter: RawFrontmatter
 }
 
 /**
@@ -86,9 +86,9 @@ export interface PagesOptions {
   //  * See `extendRoute` if you only want to modify route information.
   //  */
   // extendFrontmatter?: (
-  //   frontmatter: RawPageMatter,
+  //   frontmatter: RawFrontmatter,
   //   filename: string
-  // ) => Awaitable<RawPageMatter | void>
+  // ) => Awaitable<RawFrontmatter | void>
   // /**
   //  * Use this hook to modify route
   //  * See `extendFrontmatter` if you want to add metadata.
@@ -119,9 +119,13 @@ export interface Options extends PagesOptions {
   server?: ViteDevServer
 }
 
-export interface DynamicPageExports {
-  getRenderedPaths: () => GetRenderedPathsResult[]
+export interface StaticPageExports {
   default: FunctionComponent
+  frontmatter: RawFrontmatter
+}
+
+export interface DynamicPageExports extends StaticPageExports {
+  getRenderedPaths: () => GetRenderedPathsResult[]
 }
 
 export type GetRenderedPathsResult<
@@ -162,7 +166,7 @@ export type PagesApi = ReturnType<typeof createApi>
 
 export interface PageFrontmatter extends Record<string, any> {}
 
-export interface RawPageMatter extends PageFrontmatter {
+export interface RawFrontmatter extends PageFrontmatter {
   meta: PageMeta
   layout: false | string
   route: {

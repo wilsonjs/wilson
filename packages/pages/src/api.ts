@@ -5,12 +5,21 @@ import { extname, join, relative, resolve } from 'pathe'
 import pc from 'picocolors'
 import { transformWithEsbuild } from 'vite'
 import { outputFile } from 'fs-extra'
-import type { DynamicPageExports, Options, Page, RawPageMatter, RenderedPath, Route } from './types'
-import { parsePageMatter } from './frontmatter'
+import type {
+  DynamicPageExports,
+  Options,
+  Page,
+  RawFrontmatter,
+  RenderedPath,
+  Route,
+  StaticPageExports,
+} from './types'
+import { parseFrontmatter } from './frontmatter'
 import { debug, slash } from './utils'
 import { DATA_MODULE_ID, ROUTES_MODULE_ID } from './types'
 
 const pageByPath = new Map<string, Page>()
+const tmpPageFiles = new Map<string, string>()
 
 /**
  * Returns one or all pages.
@@ -28,14 +37,8 @@ export async function getPages(
     : pageByPath.get(absolutePath)
 }
 
-export function createApi({
-  extendRoutes,
-  pageExtensions,
-  pagesDir,
-  root,
-  server,
-  srcDir,
-}: Options) {
+export function createApi(options: Options) {
+  const { extendRoutes, pageExtensions, pagesDir, root, server, srcDir } = options
   let addedAllPages: Promise<void>
 
   const extensionsRE = new RegExp(`(${pageExtensions.join('|')})$`)
@@ -90,6 +93,45 @@ export function createApi({
     },
 
     /**
+     * Returns the module exports of a page.
+     * @param absolutePath Absolute page path
+     * @param path Page path relative to the `pagesDir`
+     * @returns Exports of the page.
+     */
+    async getPageExports<T extends StaticPageExports>(
+      absolutePath: string,
+      path: string,
+    ): Promise<T> {
+      const tmpPath = join(process.cwd(), '.wilson/pages', path.replace(/\.tsx$/, '.js'))
+
+      if (tmpPageFiles.get(tmpPath) === undefined) {
+        const fileContents = await fs.readFile(absolutePath, 'utf8')
+        const transformResult = await transformWithEsbuild(fileContents, absolutePath, {
+          loader: 'tsx',
+          jsxFactory: 'h',
+          jsxFragment: 'Fragment',
+        })
+        const javascriptCode = `import { h, Fragment } from "preact";\n${transformResult.code}`
+        await outputFile(tmpPath, javascriptCode)
+        tmpPageFiles.set(tmpPath, javascriptCode)
+      }
+
+      // There is no import cache invalidation in nodejs, so we need to append
+      // a unique query string to the import to force node to actually import the file
+      // instead of reading from cache.
+      //
+      // This will increase memory usage because old versions of the imported file will
+      // stay cached. If this becomes a problem, we could think about working with `eval`
+      // instead of importing the file - but that comes with it's own caveats.
+      //
+      // @see https://github.com/nodejs/modules/issues/307
+      const cacheBustingImportPath = `${tmpPath}?update=${Date.now()}`
+
+      const pageExports = (await import(cacheBustingImportPath)) as T
+      return pageExports
+    },
+
+    /**
      *
      * @param absolutePath
      * @param path
@@ -101,26 +143,7 @@ export function createApi({
       path: string,
       route: string,
     ): Promise<RenderedPath[]> {
-      const fileContents = await fs.readFile(absolutePath, 'utf8')
-      const transformResult = await transformWithEsbuild(fileContents, absolutePath, {
-        loader: 'tsx',
-        jsxFactory: 'h',
-        jsxFragment: 'Fragment',
-      })
-      const javascriptCode = `import { h, Fragment } from "preact";\n${transformResult.code}`
-      const tmpPath = join(process.cwd(), '.wilson/pages', path.replace(/\.tsx$/, '.js'))
-      await outputFile(tmpPath, javascriptCode)
-      // There is no import cache invalidation in nodejs, so we need to append
-      // a unique query string to the import to force node to actually import the file
-      // instead of reading from cache.
-      //
-      // This will increase memory usage because old versions of the imported file will
-      // stay cached. If this becomes a problem, we could think about working with `eval`
-      // instead of importing the file - but that comes with it's own caveats.
-      //
-      // @see https://github.com/nodejs/modules/issues/307
-      const cacheBustingImportPath = `${tmpPath}?update=${Date.now()}`
-      const pageExports = (await import(cacheBustingImportPath)) as DynamicPageExports
+      const pageExports = await this.getPageExports<DynamicPageExports>(absolutePath, path)
       if (pageExports.getRenderedPaths === undefined)
         throw new Error(`dynamic page "${path}" has no getRenderedPaths() export`)
 
@@ -139,6 +162,7 @@ export function createApi({
         }
       })
     },
+
     async addPage(absolutePath: string) {
       const path = relative(pagesDir, absolutePath)
       this.errorOnDisallowedCharacters(path)
@@ -335,31 +359,20 @@ export default [
       return code
     },
 
-    ///
-    async frontmatterForPageOrFile(file: string, content?: string): Promise<RawPageMatter> {
-      file = resolve(root, file)
-      return this.isPage(file)
-        ? (this.pageForFilename(file) || (await this.addPage(file))).frontmatter
-        : await this.frontmatterForFile(file, content)
+    async frontmatterForFile(absolutePath: string, fileContents?: string): Promise<RawFrontmatter> {
+      fileContents ||= await fs.readFile(absolutePath, 'utf8')
+      const relativePath = relative(root, absolutePath)
+      const matter = await parseFrontmatter(relativePath, fileContents)
+      console.log({ fileContents, matter })
+      return matter
     },
-    async frontmatterForFile(file: string, content?: string): Promise<RawPageMatter> {
-      try {
-        file = resolve(root, file)
-        if (content === undefined) content = await fs.readFile(file, 'utf8')
-        file = relative(root, file)
-        const matter = await parsePageMatter(file, content!)
-        return matter
-        // return (await options.extendFrontmatter?.(matter, file)) || matter;
-      } catch (error: any) {
-        if (!server) throw error
-        server.config.logger.error(error.message, {
-          timestamp: true,
-          error,
-        })
-        server.ws.send({ type: 'error', err: error })
-        return { frontmatter: {}, meta: {} as any, route: {}, layout: false }
-      }
-    },
+
+    // async frontmatterForPageOrFile(file: string, content?: string): Promise<RawFrontmatter> {
+    //   file = resolve(root, file)
+    //   return this.isPage(file)
+    //     ? (this.pageForFilename(file) || (await this.addPage(file))).frontmatter
+    //     : await this.frontmatterForFile(file, content)
+    // },
   }
 }
 
