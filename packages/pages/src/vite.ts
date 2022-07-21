@@ -1,7 +1,6 @@
 import { basename, dirname, join } from 'pathe'
 import { build } from 'vite'
 import type { StaticPageExports } from '@wilson/types'
-import type { Options } from './types'
 
 const pageBuildsByPathCache = new Map<string, string>()
 
@@ -9,7 +8,7 @@ const pageBuildsByPathCache = new Map<string, string>()
  * Performs an SSR build of a page with vite.
  */
 async function performViteBuild(
-  options: Options,
+  tempDir: string,
   input: string,
   outputFilename: string,
 ): Promise<void> {
@@ -17,7 +16,7 @@ async function performViteBuild(
     clearScreen: false,
     build: {
       emptyOutDir: false,
-      outDir: `${options.tempDir}/pages`,
+      outDir: `${tempDir}/pages`,
       rollupOptions: { input, output: { entryFileNames: outputFilename } },
       ssr: true,
     },
@@ -35,12 +34,12 @@ function replaceBrackets(string: string): string {
 
 /**
  * Returns output filename for vite build of the given page path.
- * @param options Plugin options, based on `siteConfig`
  * @param absolutePath Absolute path of the page
+ * @param pagesDir Path to the pages directory
  * @returns Output filename
  */
-function getOutputFilename(options: Options, absolutePath: string): string {
-  const relativePath = absolutePath.replace(new RegExp(`^${options.pagesDir}`), '')
+function getOutputFilename(absolutePath: string, pagesDir: string): string {
+  const relativePath = absolutePath.replace(new RegExp(`^${pagesDir}`), '')
   const dirName = dirname(relativePath).replace(/^\//, '') || '.'
   const directoryPart = dirName === '.' ? '' : `${replaceBrackets(dirName)}/`
   const baseName = basename(absolutePath)
@@ -60,14 +59,13 @@ export function clearPageBuild(absolutePath: string): boolean {
 /**
  * Returns the module exports of a page.
  *
- * @param config Wilson site config
  * @param absolutePath Absolute path of the page to retrieve exports from
- * @param path Page path relative to the `pagesDir`
  * @returns Exports of the page
  */
 export async function getPageExports<T extends StaticPageExports>(
-  options: Options,
   absolutePath: string,
+  tempDir: string,
+  pagesDir: string,
 ): Promise<T> {
   let importPath = pageBuildsByPathCache.get(absolutePath)
   let cacheBustingImportPath: string
@@ -75,8 +73,8 @@ export async function getPageExports<T extends StaticPageExports>(
   if (importPath !== undefined) {
     cacheBustingImportPath = importPath
   } else {
-    const outputFilename = getOutputFilename(options, absolutePath)
-    await performViteBuild(options, absolutePath, outputFilename)
+    const outputFilename = getOutputFilename(absolutePath, pagesDir)
+    await performViteBuild(tempDir, absolutePath, outputFilename)
     importPath = join(process.cwd(), '.wilson/pages', outputFilename)
 
     // There is no import cache invalidation in nodejs, so we need to append
@@ -90,7 +88,7 @@ export async function getPageExports<T extends StaticPageExports>(
     // @see https://github.com/nodejs/modules/issues/307
     cacheBustingImportPath = `${importPath}?update=${Date.now()}`
 
-    pageBuildsByPathCache.set(absolutePath, importPath)
+    pageBuildsByPathCache.set(absolutePath, cacheBustingImportPath)
   }
 
   const pageExports = (await import(cacheBustingImportPath)) as T

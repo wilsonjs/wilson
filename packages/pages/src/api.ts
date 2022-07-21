@@ -2,11 +2,12 @@ import glob from 'fast-glob'
 import deepEqual from 'deep-equal'
 import { extname, relative, resolve } from 'pathe'
 import pc from 'picocolors'
-import type { DynamicPageExports, Page, RawFrontmatter, RenderedPath, Route } from '@wilson/types'
+import type { Page, RenderedPath, Route } from '@wilson/types'
 import type { Options } from './types'
 import { debug, slash } from './utils'
 import { DATA_MODULE_ID, ROUTES_MODULE_ID } from './types'
-import { clearPageBuild, getPageExports } from './vite'
+import { clearPageBuild } from './vite'
+import { getFrontmatter, getRenderedPaths } from './typescript'
 
 const pageByPath = new Map<string, Page>()
 
@@ -81,57 +82,14 @@ export function createApi(options: Options) {
       }
     },
 
-    /**
-     *
-     * @param absolutePath
-     * @param path
-     * @returns
-     */
-    async getFrontmatter(absolutePath: string): Promise<RawFrontmatter> {
-      const { frontmatter } = await getPageExports<DynamicPageExports>(options, absolutePath)
-      return frontmatter
-    },
-
-    /**
-     *
-     * @param absolutePath
-     * @param path
-     * @param route
-     * @returns
-     */
-    async getRenderedPaths(
-      absolutePath: string,
-      path: string,
-      route: string,
-    ): Promise<RenderedPath[]> {
-      const pageExports = await getPageExports<DynamicPageExports>(options, absolutePath)
-      if (pageExports.getRenderedPaths === undefined)
-        throw new Error(`dynamic page "${path}" has no getRenderedPaths() export`)
-
-      const renderedPaths = pageExports.getRenderedPaths()
-      if (!Array.isArray(renderedPaths))
-        throw new Error(`getRenderedPaths() of dynamic page "${path}" must return an array`)
-
-      return renderedPaths.map((renderedPath) => {
-        let url = route.replace(/\?$/, '')
-        Object.entries(renderedPath.params).forEach(([key, value]) => {
-          url = url.replace(new RegExp(`:${key}`, 'g'), value)
-        })
-        return {
-          ...renderedPath,
-          url,
-        }
-      })
-    },
-
     async addPage(absolutePath: string) {
       const path = relative(pagesDir, absolutePath)
       this.errorOnDisallowedCharacters(path)
       const { route, isDynamic } = this.extractRouteInfo(path)
       const renderedPaths = isDynamic
-        ? await this.getRenderedPaths(absolutePath, path, route)
+        ? await getRenderedPaths(options, absolutePath, path, route)
         : [{ params: {}, url: route }]
-      const frontmatter = await this.getFrontmatter(absolutePath)
+      const frontmatter = await getFrontmatter(absolutePath, options.tempDir, options.pagesDir)
       const rootPath = relative(root, absolutePath)
       const page: Page = {
         path,
@@ -153,6 +111,7 @@ export function createApi(options: Options) {
     removePage(absolutePath: string) {
       pageByPath.delete(absolutePath)
     },
+
     async updatePage(absolutePath: string) {
       const page = this.pageForFilename(absolutePath)
       const prevMatter = page?.frontmatter
@@ -170,6 +129,7 @@ export function createApi(options: Options) {
           !deepEqual(prevInstances, renderedPaths),
       }
     },
+
     createComponentName(path: string) {
       const withoutExtension = path.slice(0, path.lastIndexOf('.'))
       const pascalCased = withoutExtension
