@@ -1,5 +1,5 @@
-import type { FunctionComponent, RenderableProps } from 'preact'
 import type { ViteDevServer } from 'vite'
+import type { SiteConfig } from '@wilson/types'
 import type { createApi } from './api'
 
 // these virtual module ids should not have slashes in them, because
@@ -11,173 +11,14 @@ export const RESOLVED_DATA_MODULE_ID = `\0${DATA_MODULE_ID}.tsx`
 
 export type Awaitable<T> = T | Promise<T>
 
-export interface Page {
-  /**
-   * React-router route path
-   */
-  route: string
-  /**
-   * Path of the page relative to the `pagesDir`
-   */
-  path: string
-  /**
-   * Path of the page relative to the `srcDir`
-   */
-  srcPath: string
-  /**
-   * Path of the page relative to the site root
-   */
-  rootPath: string
-  /**
-   * Import path of the page relative to the site root
-   */
-  importPath: string
-  /**
-   * Absolute path of the page
-   */
-  absolutePath: string
-  /**
-   * Is the page dynamic?
-   */
-  isDynamic: boolean
-  /**
-   * The page's file extension
-   */
-  fileExtension: string
-  /**
-   * The page's component name
-   */
-  componentName: string
-  /**
-   *
-   */
-  renderedPaths: RenderedPath[]
-  frontmatter: RawFrontmatter
-}
-
-/**
- * The definition of a route in Wilson, used to render pages.
- *
- * By default most routes would be inferred from files in the `pagesDir`, but a
- * user can provide custom routes using the `extendRoutes` hook.
- */
-export type Route = Pick<Page, 'route' | 'componentName' | 'importPath'>
-//  * Additional paths for the page, that behave like a copy of the route.
-// /**
-//  * When building the site, each path will be rendered separately.
-//  */
-// alias?: string | string[];
-
-/**
- * Options specific to this plugin
- */
-export interface PagesOptions {
-  /**
-   * Specify the pages directory (relative to srcDir).
-   * @default 'pages'
-   */
-  pagesDir: string
-  /**
-   * Allowed extensions of page files.
-   */
-  pageExtensions: string[]
-  // /**
-  //  * Use this hook to modify the frontmatter for pages and MDX files.
-  //  * See `extendRoute` if you only want to modify route information.
-  //  */
-  // extendFrontmatter?: (
-  //   frontmatter: RawFrontmatter,
-  //   filename: string
-  // ) => Awaitable<RawFrontmatter | void>
-  // /**
-  //  * Use this hook to modify route
-  //  * See `extendFrontmatter` if you want to add metadata.
-  //  */
-  // extendRoute?: (route: PageRoute) => Awaitable<PageRoute | void>
-  /**
-   * Use this hook to access the generated routes, and optionally modify them.
-   */
-  extendRoutes?: (routes: Route[]) => Awaitable<Route[] | void>
-}
-
 /**
  * Options this plugin is invoked with.
  */
-export interface Options extends PagesOptions {
-  /**
-   * The root of the project.
-   */
-  root: string
-  /**
-   * Specify the directory where the app source is located (relative to project root).
-   * @default 'src'
-   */
-  srcDir: string
+export interface Options extends SiteConfig {
   /**
    * Vite dev server instance
    */
   server?: ViteDevServer
 }
 
-export interface StaticPageExports {
-  default: FunctionComponent
-  frontmatter: RawFrontmatter
-}
-
-export interface DynamicPageExports extends StaticPageExports {
-  getRenderedPaths: () => GetRenderedPathsResult[]
-}
-
-export type GetRenderedPathsResult<
-  Params extends string = string,
-  Props extends Record<string, any> = Record<string, any>,
-> = SpecificParams<Params> & InjectedProps<Props>
-
-export type RenderedPath = GetRenderedPathsResult & { url: string }
-
-interface SpecificParams<in Params extends string> {
-  params: Record<Params, string>
-}
-
-interface InjectedProps<out Props extends Record<string, any>> {
-  props?: Props
-}
-
-interface RoutingInfo {
-  path: string
-  url: string
-}
-
-export type StaticPageProps = RenderableProps<RoutingInfo>
-
-export type DynamicPageProps<
-  Params extends string,
-  Props extends Record<string, any> = Record<string, any>,
-> = RenderableProps<RoutingInfo & SpecificParams<Params> & Props>
-
-//
-//
-// unchecked |
-//           |
-//           V
-//
-//
 export type PagesApi = ReturnType<typeof createApi>
-
-export interface PageFrontmatter extends Record<string, any> {}
-
-export interface RawFrontmatter extends PageFrontmatter {
-  meta: PageMeta
-  layout: false | string
-  route: {
-    name?: string
-    path?: string
-    redirect?: string
-    alias?: string | string[]
-  }
-}
-
-export interface PageMeta extends Record<string, any> {
-  filename: string
-  href: string
-}

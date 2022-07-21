@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "@preact/preset-vite": "^2.3.0",
-    "@wilson/config": "workspace:^1.0.0",
     "fast-equals": "^4.0.1",
     "preact": "^10.10.0",
     "vite": "3.0.0",

@@ -1,6 +1,6 @@
 import type { ServerOptions, UserConfig as ViteUserConfig } from 'vite'
 import { createServer as createViteServer, mergeConfig } from 'vite'
-import { resolveConfig } from '@wilson/config'
+import { resolveConfig } from './config'
 import wilsonPlugins from './plugin'
 // import { initializePages } from "./pages";
 

@@ -6,6 +6,7 @@ import Debug from 'debug'
  * Object holding specific debug instances
  */
 export const debug = {
+  config: Debug('wilson:config'),
   build: Debug('wilson:build'),
 }
 

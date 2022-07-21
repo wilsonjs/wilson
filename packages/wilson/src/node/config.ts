@@ -1,14 +1,12 @@
 import { fileURLToPath } from 'url'
 import type { ConfigEnv, UserConfig as ViteOptions } from 'vite'
 import { loadConfigFromFile, mergeConfig as mergeViteConfig } from 'vite'
-import createDebugger from 'debug'
 import pc from 'picocolors'
 import { dirname, join, resolve } from 'pathe'
 import type { SiteConfig, UserConfig } from './types'
+import { debug } from './utils'
 
-const debug = createDebugger('@wilson/config')
-
-function defineConfig(config: UserConfig) {
+export function defineConfig(config: UserConfig) {
   return config
 }
 
@@ -67,14 +65,14 @@ async function loadUserConfigFile(root: string, env: ConfigEnv): Promise<UserCon
     const { path, config = {} } = (await loadConfigFromFile(env, 'wilson.config.ts', root)) || {}
     if (path && config) {
       ;(config as SiteConfig).configPath = path
-      debug(`loaded config at ${pc.yellow(path)}`)
+      debug.config(`loaded config at ${pc.yellow(path)}`)
     } else {
-      debug('no wilson.config.ts file found.')
+      debug.config('no wilson.config.ts file found.')
     }
     return config as UserConfig
   } catch (error) {
     if (error instanceof Error && error.message.includes('Could not resolve')) {
-      debug('no wilson.config.ts file found.')
+      debug.config('no wilson.config.ts file found.')
       return {}
     }
     throw error
@@ -172,7 +170,7 @@ function siteConfigDefaults(
  * @param env
  * @returns The site config
  */
-async function resolveConfig(
+export async function resolveConfig(
   root: string = process.cwd(),
   env: ConfigEnv = { mode: 'development', command: 'serve' },
 ): Promise<SiteConfig> {
@@ -190,6 +188,3 @@ async function resolveConfig(
 
   return siteConfig
 }
-
-export * from './types'
-export { defineConfig, resolveConfig }

@@ -1,4 +1,4 @@
-import { resolveConfig } from '@wilson/config'
+import { resolveConfig } from '../config'
 import { debug, rmDir, timeSince, withSpinner } from '../utils'
 import { bundle } from './bundle'
 import { renderPages } from './render'

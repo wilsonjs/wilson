@@ -1,4 +1,4 @@
-import type { RenderedPath } from '@wilson/pages'
+import type { RenderedPath } from '@wilson/types'
 import { getPages } from '@wilson/pages'
 
 /**

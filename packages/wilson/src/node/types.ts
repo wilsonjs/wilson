@@ -1,5 +1,5 @@
 import type { UserConfig as ViteOptions } from 'vite'
-import type { Route } from '@wilson/pages'
+import type { Route } from '@wilson/types'
 
 export type Awaitable<T> = T | Promise<T>
 

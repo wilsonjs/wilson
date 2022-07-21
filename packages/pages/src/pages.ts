@@ -1,4 +1,5 @@
-import type { PluginOption, ResolvedConfig } from 'vite'
+import type { PluginOption } from 'vite'
+import type { SiteConfig } from '@wilson/types'
 import type { Options, PagesApi } from './types'
 import { createApi } from './api'
 import { handleHMR } from './hmr'
@@ -10,23 +11,11 @@ import {
 } from './types'
 
 export { getPages } from './api'
-export type {
-  StaticPageProps,
-  DynamicPageProps,
-  GetRenderedPathsResult,
-  RenderedPath,
-  Route,
-} from './types'
 
 // TODO: allow dynamic params inside a path segment, e.g. src/pages/blog/page-[pageNo]
 // might need to switch to preact-iso router for this, preact-router doesn't seem to
 // support it
-export default function WilsonPages({
-  extendRoutes,
-  pageExtensions,
-  pagesDir,
-  srcDir,
-}: Pick<Options, 'extendRoutes' | 'pageExtensions' | 'pagesDir' | 'srcDir'>): PluginOption {
+export default function WilsonPages(siteConfig: SiteConfig): PluginOption {
   let api: PagesApi
   let options: Options
   let generatedRoutesModule: string | undefined
@@ -35,14 +24,8 @@ export default function WilsonPages({
   return {
     name: 'wilson:pages',
     enforce: 'pre',
-    configResolved(config: ResolvedConfig) {
-      options = {
-        root: config.root,
-        srcDir,
-        pagesDir,
-        pageExtensions,
-        extendRoutes,
-      }
+    configResolved() {
+      options = siteConfig
       api ||= createApi(options)
     },
     async configureServer(server) {

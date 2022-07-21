@@ -1,5 +1,5 @@
 import { promises as fs } from 'fs'
-import type { SiteConfig } from '@wilson/config'
+import type { SiteConfig } from '@wilson/types'
 import { dirname, resolve } from 'pathe'
 import type { PageToRender } from './pages'
 

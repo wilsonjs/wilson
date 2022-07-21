@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'url'
-import type { SiteConfig } from '@wilson/config'
+import type { SiteConfig } from '@wilson/types'
 import { dirname, join, resolve } from 'pathe'
 import glob from 'fast-glob'
 import type { UserConfig as ViteUserConfig } from 'vite'

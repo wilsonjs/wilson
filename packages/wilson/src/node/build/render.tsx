@@ -1,5 +1,5 @@
 import { existsSync } from 'fs'
-import type { SiteConfig } from '@wilson/config'
+import type { SiteConfig } from '@wilson/types'
 import { join } from 'pathe'
 import type { RollupOutput } from 'rollup'
 import type { RenderToStringFn } from 'src/client/app.server'

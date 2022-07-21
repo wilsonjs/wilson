@@ -1,24 +1,14 @@
-import { promises as fs } from 'fs'
 import glob from 'fast-glob'
 import deepEqual from 'deep-equal'
-import { basename, dirname, extname, join, relative, resolve } from 'pathe'
+import { extname, relative, resolve } from 'pathe'
 import pc from 'picocolors'
-import { build } from 'vite'
-import type {
-  DynamicPageExports,
-  Options,
-  Page,
-  RawFrontmatter,
-  RenderedPath,
-  Route,
-  StaticPageExports,
-} from './types'
-import { parseFrontmatter } from './frontmatter'
+import type { DynamicPageExports, Page, RawFrontmatter, RenderedPath, Route } from '@wilson/types'
+import type { Options } from './types'
 import { debug, slash } from './utils'
 import { DATA_MODULE_ID, ROUTES_MODULE_ID } from './types'
+import { clearPageBuild, getPageExports } from './vite'
 
 const pageByPath = new Map<string, Page>()
-const pageBuildsByPath = new Map<string, string>()
 
 /**
  * Returns one or all pages.
@@ -37,7 +27,7 @@ export async function getPages(
 }
 
 export function createApi(options: Options) {
-  const { extendRoutes, pageExtensions, pagesDir, root, server, srcDir } = options
+  const { extendRoutes, pageExtensions, pagesDir, root, srcDir } = options
   let addedAllPages: Promise<void>
 
   const extensionsRE = new RegExp(`(${pageExtensions.join('|')})$`)
@@ -92,54 +82,14 @@ export function createApi(options: Options) {
     },
 
     /**
-     * Returns the module exports of a page.
-     * @param absolutePath Absolute page path
-     * @param path Page path relative to the `pagesDir`
-     * @returns Exports of the page.
+     *
+     * @param absolutePath
+     * @param path
+     * @returns
      */
-    async getPageExports<T extends StaticPageExports>(
-      absolutePath: string,
-      path: string,
-    ): Promise<T> {
-      let importPath = pageBuildsByPath.get(absolutePath)
-
-      if (importPath === undefined) {
-        const dir = dirname(path)
-        const filenameDir = dir === '.' ? '' : `${dir.replace(/^\[/, '_').replace(/\]$/, '_')}/`
-        const base = basename(path)
-        const filenameBase = base
-          .slice(0, base.lastIndexOf('.'))
-          .replace(/^\[/, '_')
-          .replace(/\]$/, '_')
-        const entryFileNames = `${filenameDir}${filenameBase}.js`
-        importPath = join(process.cwd(), '.wilson/pages', entryFileNames)
-
-        await build({
-          logLevel: 'silent',
-          build: {
-            outDir: '.wilson/pages',
-            ssr: true,
-            emptyOutDir: false,
-            rollupOptions: { input: absolutePath, output: { entryFileNames } },
-          },
-        })
-
-        pageBuildsByPath.set(absolutePath, importPath)
-      }
-
-      // There is no import cache invalidation in nodejs, so we need to append
-      // a unique query string to the import to force node to actually import the file
-      // instead of reading from cache.
-      //
-      // This will increase memory usage because old versions of the imported file will
-      // stay cached. If this becomes a problem, we could think about working with `eval`
-      // instead of importing the file - but that comes with it's own caveats.
-      //
-      // @see https://github.com/nodejs/modules/issues/307
-      const cacheBustingImportPath = `${importPath}?update=${Date.now()}`
-
-      const pageExports = (await import(cacheBustingImportPath)) as T
-      return pageExports
+    async getFrontmatter(absolutePath: string): Promise<RawFrontmatter> {
+      const { frontmatter } = await getPageExports<DynamicPageExports>(options, absolutePath)
+      return frontmatter
     },
 
     /**
@@ -154,7 +104,7 @@ export function createApi(options: Options) {
       path: string,
       route: string,
     ): Promise<RenderedPath[]> {
-      const pageExports = await this.getPageExports<DynamicPageExports>(absolutePath, path)
+      const pageExports = await getPageExports<DynamicPageExports>(options, absolutePath)
       if (pageExports.getRenderedPaths === undefined)
         throw new Error(`dynamic page "${path}" has no getRenderedPaths() export`)
 
@@ -181,7 +131,7 @@ export function createApi(options: Options) {
       const renderedPaths = isDynamic
         ? await this.getRenderedPaths(absolutePath, path, route)
         : [{ params: {}, url: route }]
-      const frontmatter = await this.getFrontmatter(absolutePath, path)
+      const frontmatter = await this.getFrontmatter(absolutePath)
       const rootPath = relative(root, absolutePath)
       const page: Page = {
         path,
@@ -207,7 +157,7 @@ export function createApi(options: Options) {
       const page = this.pageForFilename(absolutePath)
       const prevMatter = page?.frontmatter
       const prevInstances = page?.renderedPaths
-      pageBuildsByPath.delete(absolutePath)
+      clearPageBuild(absolutePath)
       const { frontmatter, renderedPaths } = await this.addPage(absolutePath)
       // Could do this comparison of previous and new page
       // with jest-diff or similar for better readability.
@@ -342,6 +292,11 @@ export function createApi(options: Options) {
       return `h(PageWrapper, { path: "${route}", element: ${componentName} })`
     },
 
+    /**
+     * Generates routes module, which exports an array of preact-router
+     * route components.
+     * @returns Source code for routes module.
+     */
     async generateRoutesModule(): Promise<string> {
       const pages = this.getSortedPages()
       const routes = await this.getExtendedRoutes(pages)
@@ -351,7 +306,7 @@ export function createApi(options: Options) {
 import { shallowEqual } from 'fast-equals';
 ${routes.map(this.getRouteImportCode).join('\n')}\n
 ${routes.map(this.getRouteDisplayNameCode).join('\n')}\n
-export const specificMatchProps = ${JSON.stringify(specificMatchProps, null, 2)};
+const specificMatchProps = ${JSON.stringify(specificMatchProps, null, 2)};
 
 const PageWrapper = ({ path, element, matches, url, ...rest }) => {
   const specificPathProps = specificMatchProps[path]
@@ -370,20 +325,6 @@ export default [
       )
       return code
     },
-
-    async frontmatterForFile(absolutePath: string, fileContents?: string): Promise<RawFrontmatter> {
-      fileContents ||= await fs.readFile(absolutePath, 'utf8')
-      const relativePath = relative(root, absolutePath)
-      const matter = await parseFrontmatter(relativePath, fileContents)
-      return matter
-    },
-
-    // async frontmatterForPageOrFile(file: string, content?: string): Promise<RawFrontmatter> {
-    //   file = resolve(root, file)
-    //   return this.isPage(file)
-    //     ? (this.pageForFilename(file) || (await this.addPage(file))).frontmatter
-    //     : await this.frontmatterForFile(file, content)
-    // },
   }
 }
 

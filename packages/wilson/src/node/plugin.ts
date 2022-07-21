@@ -1,5 +1,5 @@
 import preact from '@preact/preset-vite'
-import type { SiteConfig } from '@wilson/config'
+import type { SiteConfig } from '@wilson/types'
 import pages from '@wilson/pages'
 import debug from 'debug'
 import { relative } from 'pathe'
