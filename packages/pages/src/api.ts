@@ -181,7 +181,7 @@ export function createApi(options: Options) {
       const renderedPaths = isDynamic
         ? await this.getRenderedPaths(absolutePath, path, route)
         : [{ params: {}, url: route }]
-      const frontmatter = await this.frontmatterForFile(absolutePath)
+      const frontmatter = await this.getFrontmatter(absolutePath, path)
       const rootPath = relative(root, absolutePath)
       const page: Page = {
         path,
@@ -203,15 +203,16 @@ export function createApi(options: Options) {
     removePage(absolutePath: string) {
       pageByPath.delete(absolutePath)
     },
-    async updatePage(pagePath: string) {
-      const page = this.pageForFilename(pagePath)
+    async updatePage(absolutePath: string) {
+      const page = this.pageForFilename(absolutePath)
       const prevMatter = page?.frontmatter
       const prevInstances = page?.renderedPaths
-      const { frontmatter, renderedPaths } = await this.addPage(pagePath)
+      pageBuildsByPath.delete(absolutePath)
+      const { frontmatter, renderedPaths } = await this.addPage(absolutePath)
       // Could do this comparison of previous and new page
       // with jest-diff or similar for better readability.
-      debug.hmr('%s old: %O', pagePath, prevMatter, prevInstances)
-      debug.hmr('%s new: %O', pagePath, frontmatter, renderedPaths)
+      debug.hmr('%s old: %O', absolutePath, prevMatter, prevInstances)
+      debug.hmr('%s new: %O', absolutePath, frontmatter, renderedPaths)
       return {
         changed: !deepEqual(prevMatter, frontmatter) || !deepEqual(prevInstances, renderedPaths),
         needsReload:

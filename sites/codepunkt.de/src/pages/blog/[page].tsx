@@ -42,6 +42,10 @@ export function getRenderedPaths(): GetRenderedPathsResult<Params, Props>[] {
   return paginate(posts, 6)
 }
 
+export const frontmatter = {
+  title: 'Page',
+}
+
 export default function Page(props: DynamicPageProps<Params, Props>) {
   return (
     <>
