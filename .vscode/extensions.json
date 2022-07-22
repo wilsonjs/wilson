@@ -1,11 +1,12 @@
 {
   "recommendations": [
+    "be5invis.toml",
+    "bierner.comment-tagged-templates",
     "christian-kohler.npm-intellisense",
     "christian-kohler.path-intellisense",
-    "esbenp.prettier-vscode",
-    "be5invis.toml",
     "dbaeumer.vscode-eslint",
-    "syler.sass-indented",
-    "jock.svg"
+    "esbenp.prettier-vscode",
+    "jock.svg",
+    "syler.sass-indented"
   ]
 }

@@ -1,4 +1,4 @@
-export default function Page() {
+export default function IndexPage() {
   return (
     <>
       <h1>Welcome to my blog</h1>

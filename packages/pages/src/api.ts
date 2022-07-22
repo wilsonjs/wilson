@@ -1,11 +1,9 @@
 import glob from 'fast-glob'
 import deepEqual from 'deep-equal'
 import { extname, relative, resolve } from 'pathe'
-import pc from 'picocolors'
-import type { Page, RenderedPath, Route } from '@wilson/types'
+import type { Page } from '@wilson/types'
 import type { Options } from './types'
 import { debug, slash } from './utils'
-import { DATA_MODULE_ID, ROUTES_MODULE_ID } from './types'
 import { clearPageBuild } from './vite'
 import { getFrontmatter, getRenderedPaths } from './typescript'
 
@@ -28,7 +26,7 @@ export async function getPages(
 }
 
 export function createApi(options: Options) {
-  const { extendRoutes, pageExtensions, pagesDir, root, srcDir } = options
+  const { pageExtensions, pagesDir, root, srcDir } = options
   let addedAllPages: Promise<void>
 
   const extensionsRE = new RegExp(`(${pageExtensions.join('|')})$`)
@@ -108,6 +106,7 @@ export function createApi(options: Options) {
       this.errorOnDuplicateRoutes()
       return page
     },
+
     removePage(absolutePath: string) {
       pageByPath.delete(absolutePath)
     },
@@ -166,125 +165,6 @@ export function createApi(options: Options) {
       if (route === '') route = '/'
       return { route, isDynamic }
     },
-
-    async getExtendedRoutes(pages: Page[]): Promise<Route[]> {
-      const routes: Route[] = pages.map(({ componentName, route, importPath }) => ({
-        route,
-        componentName,
-        importPath,
-      }))
-      return (await extendRoutes?.(routes)) || routes
-    },
-
-    /**
-     * Returns an array of all pages, sorted by path segments and dynamic params.
-     * @returns Array of pages.
-     */
-    getSortedPages(): Page[] {
-      return Array.from(pageByPath.values()).sort(byPathSegmentsAndDynamicParams)
-    },
-
-    async generateDataModule(): Promise<string> {
-      const pages = this.getSortedPages()
-      const routes = await this.getExtendedRoutes(pages)
-      const code = `export default ${JSON.stringify(routes, null, 2)}`
-      debug.virtual(
-        `generated code for ${pc.green(DATA_MODULE_ID)}:\n${code
-          .split('\n')
-          .map((line) => pc.gray(`  ${line}`))
-          .join('\n')}`,
-      )
-      return code
-    },
-
-    /**
-     * Returns the page for the given importPath.
-     * @param importPath page importPath, e.g. `src/pages/blog/[page].tsx`
-     */
-    getPageByImportPath(importPath: string): Page | undefined {
-      return Array.from(pageByPath.values()).find((page) => page.importPath === importPath)
-    },
-
-    /**
-     * Returns an object that maps dynamic route paths to props for specific
-     * parameter matches.
-     * @param routes An array of routes
-     */
-    getSpecificRouteProps(routes: Route[]): {
-      [dynamicRoutePath: string]: {
-        matches: { [routeParameter: string]: string }
-        props: Record<string, any>
-      }
-    } {
-      return routes.reduce((acc: {}, { importPath, route }: Route) => {
-        const page = this.getPageByImportPath(importPath)
-        if (!page || !page.isDynamic) return acc
-
-        const toMatchedProps = (acc: any[], i: RenderedPath) =>
-          i.props ? [...acc, { matches: i.params, props: i.props }] : acc
-
-        const matchedProps = page.renderedPaths.reduce(toMatchedProps, [])
-        return matchedProps.length > 0 ? { ...acc, [route]: matchedProps } : acc
-      }, {})
-    },
-
-    /**
-     * Returns import statement source code for the given route, e.g.
-     * `import BlogIndex from './src/pages/blog/index.tsx';`
-     */
-    getRouteImportCode({ componentName, importPath }: Route): string {
-      return `import ${componentName} from '${importPath}';`
-    },
-
-    /**
-     * Returns displayName assignment source code for the given route, e.g.
-     * `BlogIndex.displayName = 'BlogIndex';`
-     */
-    getRouteDisplayNameCode({ componentName }: Route): string {
-      return `${componentName}.displayName = '${componentName}';`
-    },
-
-    /**
-     * Returns createElement preact source code for the given route, e.g.
-     * `h(BlogIndex, { path: '/blog', element: BlogIndex })`
-     */
-    getRouteCreateElementCode({ componentName, route }: Route): string {
-      return `h(PageWrapper, { path: "${route}", element: ${componentName} })`
-    },
-
-    /**
-     * Generates routes module, which exports an array of preact-router
-     * route components.
-     * @returns Source code for routes module.
-     */
-    async generateRoutesModule(): Promise<string> {
-      const pages = this.getSortedPages()
-      const routes = await this.getExtendedRoutes(pages)
-      const specificMatchProps = this.getSpecificRouteProps(routes)
-
-      const code = `import { h } from 'preact';
-import { shallowEqual } from 'fast-equals';
-${routes.map(this.getRouteImportCode).join('\n')}\n
-${routes.map(this.getRouteDisplayNameCode).join('\n')}\n
-const specificMatchProps = ${JSON.stringify(specificMatchProps, null, 2)};
-
-const PageWrapper = ({ path, element, matches, url, ...rest }) => {
-  const specificPathProps = specificMatchProps[path]
-  const specific = specificPathProps?.find(({ matches: m }) => shallowEqual(m, matches))
-  return h(element, { params: matches, path, url, ...(specific ? specific.props : {}) });
-}
-
-export default [
-  ${routes.map(this.getRouteCreateElementCode).join(',\n  ')}
-];`
-      debug.virtual(
-        `generated code for ${pc.green(ROUTES_MODULE_ID)}:\n${code
-          .split('\n')
-          .map((line) => pc.gray(`  ${line}`))
-          .join('\n')}`,
-      )
-      return code
-    },
   }
 }
 
@@ -296,6 +176,22 @@ export default [
  */
 export function countOccurence(search: string, char: string) {
   return (search.match(new RegExp(char, 'g')) || []).length
+}
+
+/**
+ * Returns an array of all pages, sorted by path segments and dynamic params.
+ * @returns Array of pages.
+ */
+export function getSortedPages(): Page[] {
+  return Array.from(pageByPath.values()).sort(byPathSegmentsAndDynamicParams)
+}
+
+/**
+ * Returns the page for the given importPath.
+ * @param importPath page importPath, e.g. `src/pages/blog/[page].tsx`
+ */
+export function getPageByImportPath(importPath: string): Page | undefined {
+  return Array.from(pageByPath.values()).find((page) => page.importPath === importPath)
 }
 
 /**

@@ -43,7 +43,7 @@ export function getRenderedPaths(): GetRenderedPathsResult<Params, Props>[] {
 }
 
 export const frontmatter = {
-  title: 'Page',
+  title: 'Bar',
 }
 
 export default function Page(props: DynamicPageProps<Params, Props>) {
