@@ -1,4 +1,4 @@
-import type { RenderedPath, Route } from '@wilson/types'
+import type { PageFrontmatter, RenderedPath, Route } from '@wilson/types'
 import pc from 'picocolors'
 import { getPageByImportPath, getSortedPages } from './api'
 import type { Options } from './types'
@@ -42,10 +42,10 @@ function getRouteCreateElementCode({ componentName, route }: Route): string {
  */
 async function getRoutes(extendRoutes: ExtendRoutes): Promise<Route[]> {
   const pages = getSortedPages()
-  const routes: Route[] = pages.map(({ componentName, route, importPath }) => ({
-    route,
+  const routes: Route[] = pages.map(({ componentName, importPath, route }) => ({
     componentName,
     importPath,
+    route,
   }))
   return (await extendRoutes?.(routes)) || routes
 }
@@ -62,7 +62,7 @@ function getSpecificRouteProps(routes: Route[]): {
     props: Record<string, any>
   }
 } {
-  return routes.reduce((acc: {}, { importPath, route }: Route) => {
+  return routes.reduce((acc, { importPath, route }: Route) => {
     const page = getPageByImportPath(importPath)
     if (!page || !page.isDynamic) return acc
 
@@ -71,6 +71,19 @@ function getSpecificRouteProps(routes: Route[]): {
 
     const matchedProps = page.renderedPaths.reduce(toMatchedProps, [])
     return matchedProps.length > 0 ? { ...acc, [route]: matchedProps } : acc
+  }, {})
+}
+
+// TODO: comment this function
+/**
+ *
+ * @param routes
+ * @returns
+ */
+function getFrontmatterByPath(routes: Route[]): { [route: string]: PageFrontmatter } {
+  return routes.reduce((acc, { importPath, route }) => {
+    const page = getPageByImportPath(importPath)
+    return page ? { ...acc, [route]: page.frontmatter } : acc
   }, {})
 }
 
@@ -99,6 +112,7 @@ function debugCodeForModule(code: string, module: string): void {
 export async function generateRoutesModule(extendRoutes: ExtendRoutes): Promise<string> {
   const routes = await getRoutes(extendRoutes)
   const specificMatchProps = getSpecificRouteProps(routes)
+  const frontMatterByPath = getFrontmatterByPath(routes)
 
   const code = /* js */ `
     import { h } from 'preact';
@@ -106,11 +120,12 @@ export async function generateRoutesModule(extendRoutes: ExtendRoutes): Promise<
     ${routes.map(getRouteImportCode).join('\n')}\n
     ${routes.map(getRouteDisplayNameCode).join('\n')}\n
     const specificMatchProps = ${JSON.stringify(specificMatchProps, null, 2)};
+    const frontMatterByPath = ${JSON.stringify(frontMatterByPath, null, 2)};
 
     const PageWrapper = ({ path, element, matches, url, ...rest }) => {
-      const specificPathProps = specificMatchProps[path]
-      const specific = specificPathProps?.find(({ matches: m }) => shallowEqual(m, matches))
-      return h(element, { params: matches, path, url, ...(specific ? specific.props : {}) });
+      const frontmatter = frontMatterByPath[path] ?? {};
+      const specific = specificMatchProps[path]?.find(({ matches: m }) => shallowEqual(m, matches))
+      return h(element, { params: matches, path, url, frontmatter, ...(specific ? specific.props : {}) });
     }
 
     export default [

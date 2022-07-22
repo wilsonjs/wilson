@@ -1,8 +1,11 @@
 import type { DynamicPageProps, GetRenderedPathsResult } from 'wilson'
 import styles from './[page].module.scss'
 
+interface Post {
+  title: string
+}
 interface Props {
-  items: any[]
+  items: Post[]
   nextPage?: string
   prevPage?: string
 }
@@ -20,7 +23,7 @@ const posts = [
   { title: 'Post 9' },
 ]
 
-function paginate<T>(items: T[], pageSize = 10): GetRenderedPathsResult<Params, Props>[] {
+function paginate<T>(items: T[], pageSize = 10): GetRenderedPathsResult<Params, Props<T>>[] {
   const pagesCount = Math.max(1, Math.ceil(items.length / pageSize))
   function numberToPath(pageNumber: number): string {
     return pageNumber === 1 ? '' : `page-${pageNumber}`
@@ -43,16 +46,22 @@ export function getRenderedPaths(): GetRenderedPathsResult<Params, Props>[] {
 }
 
 export const frontmatter = {
-  title: 'Bar',
+  title: 'Blog',
 }
 
 export default function Page(props: DynamicPageProps<Params, Props>) {
+  const { frontmatter: fm, items, prevPage, nextPage } = props
+
   return (
     <>
-      <h1 className={styles.headline}>Blog</h1>
-      <pre>{JSON.stringify(props.items, null, 2)}</pre>
-      {props.prevPage && <a href={props.prevPage}>Prev</a>}
-      {props.nextPage && <a href={props.nextPage}>Next</a>}
+      <h1 className={styles.headline}>
+        {fm.title || 'Blog'}
+        <br />
+        <small>Last modified at: {fm.meta.lastUpdated}</small>
+      </h1>
+      <pre>{JSON.stringify(items, null, 2)}</pre>
+      {prevPage && <a href={prevPage}>Prev</a>}
+      {nextPage && <a href={nextPage}>Next</a>}
     </>
   )
 }

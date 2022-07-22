@@ -136,7 +136,7 @@ export interface Page {
    *
    */
   renderedPaths: RenderedPath[]
-  frontmatter: RawFrontmatter
+  frontmatter: PageFrontmatter
 }
 
 /**
@@ -145,34 +145,36 @@ export interface Page {
  * By default most routes would be inferred from files in the `pagesDir`, but a
  * user can provide custom routes using the `extendRoutes` hook.
  */
-export type Route = Pick<Page, 'route' | 'componentName' | 'importPath'>
+export type Route = Pick<Page, 'componentName' | 'importPath' | 'route'>
 //  * Additional paths for the page, that behave like a copy of the route.
 // /**
 //  * When building the site, each path will be rendered separately.
 //  */
 // alias?: string | string[];
 
-export interface RawFrontmatter extends PageFrontmatter {
-  meta: PageMeta
-  layout: false | string
-  route: {
-    name?: string
-    path?: string
-    redirect?: string
-    alias?: string | string[]
-  }
+export interface UserFrontmatter {
+  [key: string]: string | object | undefined
 }
 
-export interface PageFrontmatter extends Record<string, any> {}
+export interface PageFrontmatter extends Record<string, any> {
+  meta: PageMeta
+  // layout: false | string
+  // route: {
+  //   name?: string
+  //   path?: string
+  //   redirect?: string
+  //   alias?: string | string[]
+  // }
+}
 
 export interface PageMeta extends Record<string, any> {
   filename: string
-  href: string
+  lastUpdated: Date
 }
 
 export interface StaticPageExports {
   default: FunctionComponent
-  frontmatter: RawFrontmatter
+  frontmatter?: UserFrontmatter
 }
 
 export interface DynamicPageExports extends StaticPageExports {
@@ -194,14 +196,15 @@ interface InjectedProps<out Props extends Record<string, any>> {
   props?: Props
 }
 
-interface RoutingInfo {
+interface BaseProps {
   path: string
   url: string
+  frontmatter: PageFrontmatter
 }
 
-export type StaticPageProps = RenderableProps<RoutingInfo>
+export type StaticPageProps = RenderableProps<BaseProps>
 
 export type DynamicPageProps<
   Params extends string,
   Props extends Record<string, any> = Record<string, any>,
-> = RenderableProps<RoutingInfo & SpecificParams<Params> & Props>
+> = RenderableProps<BaseProps & SpecificParams<Params> & Props>

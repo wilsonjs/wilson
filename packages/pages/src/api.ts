@@ -5,7 +5,8 @@ import type { Page } from '@wilson/types'
 import type { Options } from './types'
 import { debug, slash } from './utils'
 import { clearPageBuild } from './vite'
-import { getFrontmatter, getRenderedPaths } from './typescript'
+import { getRenderedPaths } from './typescript'
+import { parseFrontmatter } from './frontmatter'
 
 const pageByPath = new Map<string, Page>()
 
@@ -87,7 +88,7 @@ export function createApi(options: Options) {
       const renderedPaths = isDynamic
         ? await getRenderedPaths(options, absolutePath, path, route)
         : [{ params: {}, url: route }]
-      const frontmatter = await getFrontmatter(absolutePath, options.tempDir, options.pagesDir)
+      const frontmatter = await parseFrontmatter(absolutePath, options)
       const rootPath = relative(root, absolutePath)
       const page: Page = {
         path,
@@ -124,8 +125,7 @@ export function createApi(options: Options) {
       return {
         changed: !deepEqual(prevMatter, frontmatter) || !deepEqual(prevInstances, renderedPaths),
         needsReload:
-          !deepEqual(prevMatter?.route, frontmatter?.route) ||
-          !deepEqual(prevInstances, renderedPaths),
+          !deepEqual(prevMatter, frontmatter) || !deepEqual(prevInstances, renderedPaths),
       }
     },
 
@@ -170,6 +170,7 @@ export function createApi(options: Options) {
 
 /**
  * Counts how often a string occurs in a string.
+ *
  * @param value String to be searched in
  * @param char String to be searched for
  * @returns Number of occurrences

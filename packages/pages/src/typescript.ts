@@ -1,8 +1,8 @@
 import type {
   DynamicPageExports,
-  RawFrontmatter,
   RenderedPath,
   StaticPageExports,
+  UserFrontmatter,
 } from '@wilson/types'
 import { relative } from 'pathe'
 import type { Options } from './types'
@@ -19,16 +19,15 @@ import { getPageExports } from './vite'
  */
 export async function getFrontmatter(
   absolutePath: string,
-  tempDir: string,
-  pagesDir: string,
-): Promise<RawFrontmatter> {
+  { tempDir, pagesDir }: Options,
+): Promise<UserFrontmatter> {
   const { frontmatter } = await getPageExports<StaticPageExports>(absolutePath, tempDir, pagesDir)
   if (frontmatter !== undefined && !isObject(frontmatter)) {
     throw new Error(
       `page "${relative(pagesDir, absolutePath)}" has frontmatter that is not an object`,
     )
   }
-  return frontmatter
+  return frontmatter ?? {}
 }
 
 export async function getRenderedPaths(
