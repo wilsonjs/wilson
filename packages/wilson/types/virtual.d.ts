@@ -1,5 +1,3 @@
-declare module 'virtual:wilson-client' {}
-
 declare module 'virtual:wilson-routes' {
   import type { Route } from '@tanstack/react-location'
   const routes: Route[]

@@ -1,4 +1,5 @@
 import type { DynamicPageProps, GetRenderedPathsResult } from 'wilson'
+import Counter from '../../component/Counter'
 import styles from './[page].module.scss'
 
 interface Post {
@@ -23,7 +24,7 @@ const posts = [
   { title: 'Post 9' },
 ]
 
-function paginate<T>(items: T[], pageSize = 10): GetRenderedPathsResult<Params, Props<T>>[] {
+function paginate(items: Post[], pageSize = 10): GetRenderedPathsResult<Params, Props>[] {
   const pagesCount = Math.max(1, Math.ceil(items.length / pageSize))
   function numberToPath(pageNumber: number): string {
     return pageNumber === 1 ? '' : `page-${pageNumber}`
@@ -62,6 +63,7 @@ export default function Page(props: DynamicPageProps<Params, Props>) {
       <pre>{JSON.stringify(items, null, 2)}</pre>
       {prevPage && <a href={prevPage}>Prev</a>}
       {nextPage && <a href={nextPage}>Next</a>}
+      <Counter clientLoad />
     </>
   )
 }

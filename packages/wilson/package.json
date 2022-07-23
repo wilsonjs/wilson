@@ -28,7 +28,9 @@
   "files": [
     "dist",
     "src",
-    "virtual.d.ts"
+    "types",
+    "index.cjs",
+    "client.d.ts"
   ],
   "scripts": {
     "clean": "node -e \"fs.rmSync('dist', { force: true, recursive: true })\"",
