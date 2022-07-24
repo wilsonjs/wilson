@@ -60,7 +60,7 @@
     "@codepunkt/wasm-layout-text": "^3.0.0",
     "@mapbox/hast-util-to-jsx": "^2.0.0",
     "@preact/preset-vite": "^2.1.0",
-    "@svgr/core": "^6.2.1",
+    "@svgr/core": "^6.3.1",
     "acorn": "^8.5.0",
     "astring": "^1.7.4",
     "boxen": "^6.2.1",
