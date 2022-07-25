@@ -8,13 +8,16 @@ const command = argv._[0]
 const root = argv._[command ? 1 : 0]
 if (root) argv.root = root
 
-const getVersion = () => pc.cyan(`wilson v${version}`) + pc.yellow(` vite v${viteVersion}`)
+const getVersion = () =>
+  pc.cyan(`wilson v${version}`) + pc.yellow(` vite v${viteVersion}`)
 
 const printVersion = () => console.info(getVersion())
 
-executeCommand(!command || command === 'dev' ? 'serve' : command).catch((error) => {
-  throw error
-})
+executeCommand(!command || command === 'dev' ? 'serve' : command).catch(
+  (error) => {
+    throw error
+  },
+)
 
 async function executeCommand(command: string) {
   if (command === 'serve') {

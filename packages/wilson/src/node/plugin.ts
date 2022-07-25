@@ -57,7 +57,8 @@ function virtualClientEntrypoint(): PluginOption {
       if (id === VIRTUAL_MODULE_ID) return RESOLVED_VIRTUAL_MODULE_ID
     },
     async load(id) {
-      if (id === RESOLVED_VIRTUAL_MODULE_ID) return 'import "wilson/dist/client/app.client.js";'
+      if (id === RESOLVED_VIRTUAL_MODULE_ID)
+        return 'import "wilson/dist/client/app.client.js";'
     },
   }
 }

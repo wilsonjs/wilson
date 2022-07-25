@@ -18,7 +18,10 @@ export interface PageToRender {
  * - Represents paths ending in "/" with index.html files
  */
 function pathToFilename(path: string) {
-  return `${(path.endsWith('/') ? `${path}index` : path).replace(/^\//g, '')}.html`
+  return `${(path.endsWith('/') ? `${path}index` : path).replace(
+    /^\//g,
+    '',
+  )}.html`
 }
 
 /**
@@ -35,5 +38,7 @@ function toPageToRender({ url: path }: RenderedPath): PageToRender {
  * depending on the return values of their `getRenderedPaths` implementation.
  */
 export async function getPagesToRender(): Promise<PageToRender[]> {
-  return (await getPages()).map((page) => page.renderedPaths.map(toPageToRender)).flat()
+  return (await getPages())
+    .map((page) => page.renderedPaths.map(toPageToRender))
+    .flat()
 }

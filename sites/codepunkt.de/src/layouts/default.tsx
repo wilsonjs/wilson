@@ -1,6 +1,10 @@
 import type { ComponentChildren } from 'preact'
 
-export default function DefaultLayout({ children }: { children: ComponentChildren }) {
+export default function DefaultLayout({
+  children,
+}: {
+  children: ComponentChildren
+}) {
   return (
     <>
       <header>

@@ -43,7 +43,9 @@ function getOutputFilename(absolutePath: string, pagesDir: string): string {
   const dirName = dirname(relativePath).replace(/^\//, '') || '.'
   const directoryPart = dirName === '.' ? '' : `${replaceBrackets(dirName)}/`
   const baseName = basename(absolutePath)
-  const filenamePart = replaceBrackets(baseName.slice(0, baseName.lastIndexOf('.')))
+  const filenamePart = replaceBrackets(
+    baseName.slice(0, baseName.lastIndexOf('.')),
+  )
   return `${directoryPart}${filenamePart}.js`
 }
 

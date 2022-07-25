@@ -45,9 +45,13 @@ export default function WilsonPages(siteConfig: SiteConfig): Plugin {
     },
     async load(id) {
       if (id === RESOLVED_ROUTES_MODULE_ID)
-        return (generatedRoutesModule ||= await generateRoutesModule(options.extendRoutes))
+        return (generatedRoutesModule ||= await generateRoutesModule(
+          options.extendRoutes,
+        ))
       if (id === RESOLVED_DATA_MODULE_ID)
-        return (generatedDataModule ||= await generateDataModule(options.extendRoutes))
+        return (generatedDataModule ||= await generateDataModule(
+          options.extendRoutes,
+        ))
     },
     // async transform(_code, id) {
     //   if (id.includes('vue&type=page')) return 'export default {};'

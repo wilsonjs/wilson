@@ -16,16 +16,27 @@ export async function renderPages(
     .map((ext) => join(config.tempDir, `app.${ext}`))
     .find(existsSync)
 
-  if (!appPath) throw new Error(`Could not find the SSR build for the app in ${config.tempDir}`)
+  if (!appPath)
+    throw new Error(
+      `Could not find the SSR build for the app in ${config.tempDir}`,
+    )
 
   const rendertoString: RenderToStringFn = (await import(appPath)).default
 
-  const pagesToRender = await withSpinner('resolving static paths', getPagesToRender)
+  const pagesToRender = await withSpinner(
+    'resolving static paths',
+    getPagesToRender,
+  )
   const clientChunks = clientResult.output
 
   await withSpinner('rendering pages', async () => {
     for (const page of pagesToRender)
-      page.rendered = await renderPage(config, clientChunks, page, rendertoString)
+      page.rendered = await renderPage(
+        config,
+        clientChunks,
+        page,
+        rendertoString,
+      )
   })
 
   return pagesToRender
@@ -66,9 +77,17 @@ export async function renderPage(
   //   </html>`;
 }
 
-function stylesheetTagsFrom(config: SiteConfig, clientChunks: RollupOutput['output']) {
+function stylesheetTagsFrom(
+  config: SiteConfig,
+  clientChunks: RollupOutput['output'],
+) {
   return clientChunks
-    .filter((chunk) => chunk.type === 'asset' && chunk.fileName.endsWith('.css'))
-    .map((chunk) => `<link rel="stylesheet" href="${config.base}${chunk.fileName}">`)
+    .filter(
+      (chunk) => chunk.type === 'asset' && chunk.fileName.endsWith('.css'),
+    )
+    .map(
+      (chunk) =>
+        `<link rel="stylesheet" href="${config.base}${chunk.fileName}">`,
+    )
     .join('\n')
 }

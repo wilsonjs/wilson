@@ -4,4 +4,9 @@
  * Please control the side-effects by checking the ./dist/node-cjs/publicUtils.cjs bundle
  */
 export { VERSION as version } from './constants'
-export { version as viteVersion, esbuildVersion, rollupVersion, mergeConfig } from 'vite'
+export {
+  version as viteVersion,
+  esbuildVersion,
+  rollupVersion,
+  mergeConfig,
+} from 'vite'

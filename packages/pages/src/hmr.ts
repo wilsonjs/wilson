@@ -31,10 +31,14 @@ export function handleHMR(
     }
   }
 
-  function onPage(eventName: string, handler: (path: string) => Awaitable<void | boolean>) {
+  function onPage(
+    eventName: string,
+    handler: (path: string) => Awaitable<void | boolean>,
+  ) {
     server.watcher.on(eventName, async (path) => {
       path = slash(path)
-      if (api.isPage(path) && (await handler(path))) fullReload(server, clearRoutes)
+      if (api.isPage(path) && (await handler(path)))
+        fullReload(server, clearRoutes)
     })
   }
 }

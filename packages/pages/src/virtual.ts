@@ -80,7 +80,9 @@ function getSpecificRouteProps(routes: Route[]): {
  * @param routes
  * @returns
  */
-function getFrontmatterByPath(routes: Route[]): { [route: string]: PageFrontmatter } {
+function getFrontmatterByPath(routes: Route[]): {
+  [route: string]: PageFrontmatter
+} {
   return routes.reduce((acc, { importPath, route }) => {
     const page = getPageByImportPath(importPath)
     return page ? { ...acc, [route]: page.frontmatter } : acc
@@ -109,7 +111,9 @@ function debugCodeForModule(code: string, module: string): void {
  * @param extendRoutes User-configurable function to access and optionally modify routes
  * @returns Source code for routes module.
  */
-export async function generateRoutesModule(extendRoutes: ExtendRoutes): Promise<string> {
+export async function generateRoutesModule(
+  extendRoutes: ExtendRoutes,
+): Promise<string> {
   const routes = await getRoutes(extendRoutes)
   const specificMatchProps = getSpecificRouteProps(routes)
   const frontMatterByPath = getFrontmatterByPath(routes)
@@ -143,7 +147,9 @@ export async function generateRoutesModule(extendRoutes: ExtendRoutes): Promise<
  * @param extendRoutes User-configurable function to access and optionally modify routes
  * @returns Source code for routes data module.
  */
-export async function generateDataModule(extendRoutes: ExtendRoutes): Promise<string> {
+export async function generateDataModule(
+  extendRoutes: ExtendRoutes,
+): Promise<string> {
   const routes = await getRoutes(extendRoutes)
 
   const code = /* js */ `

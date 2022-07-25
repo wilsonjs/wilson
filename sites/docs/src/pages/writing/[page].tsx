@@ -6,7 +6,10 @@ interface Props {
 type Params = 'page'
 
 export function getRenderedPaths(): GetRenderedPathsResult<Params, Props>[] {
-  return [{ params: { page: 'foo' } }, { params: { page: 'bar' }, props: { wat: 6 } }]
+  return [
+    { params: { page: 'foo' } },
+    { params: { page: 'bar' }, props: { wat: 6 } },
+  ]
 }
 
 export default function Page(props: DynamicPageProps<Params, Props>) {

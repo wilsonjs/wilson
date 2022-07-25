@@ -44,11 +44,16 @@ export function createApi(options: Options) {
       return pageByPath.get(resolve(root, file))
     },
     async forceAddAllPages() {
-      const absolutePaths = await glob(`${pagesDir}/**/*{${pageExtensions.join(',')}}`, {
-        onlyFiles: true,
-      })
+      const absolutePaths = await glob(
+        `${pagesDir}/**/*{${pageExtensions.join(',')}}`,
+        {
+          onlyFiles: true,
+        },
+      )
       await Promise.all(
-        absolutePaths.map(async (absolutePath) => await this.addPage(slash(absolutePath))),
+        absolutePaths.map(
+          async (absolutePath) => await this.addPage(slash(absolutePath)),
+        ),
       )
     },
     async addAllPages() {
@@ -123,9 +128,12 @@ export function createApi(options: Options) {
       debug.hmr('%s old: %O', absolutePath, prevMatter, prevInstances)
       debug.hmr('%s new: %O', absolutePath, frontmatter, renderedPaths)
       return {
-        changed: !deepEqual(prevMatter, frontmatter) || !deepEqual(prevInstances, renderedPaths),
+        changed:
+          !deepEqual(prevMatter, frontmatter) ||
+          !deepEqual(prevInstances, renderedPaths),
         needsReload:
-          !deepEqual(prevMatter, frontmatter) || !deepEqual(prevInstances, renderedPaths),
+          !deepEqual(prevMatter, frontmatter) ||
+          !deepEqual(prevInstances, renderedPaths),
       }
     },
 
@@ -192,13 +200,18 @@ export function getSortedPages(): Page[] {
  * @param importPath page importPath, e.g. `src/pages/blog/[page].tsx`
  */
 export function getPageByImportPath(importPath: string): Page | undefined {
-  return Array.from(pageByPath.values()).find((page) => page.importPath === importPath)
+  return Array.from(pageByPath.values()).find(
+    (page) => page.importPath === importPath,
+  )
 }
 
 /**
  * Compares two pages by their number of path segments and dynamic params.
  */
-function byPathSegmentsAndDynamicParams({ route: a }: Page, { route: b }: Page) {
+function byPathSegmentsAndDynamicParams(
+  { route: a }: Page,
+  { route: b }: Page,
+) {
   if (a === '/') return -1
   if (b === '/') return 1
   const slashDiff = countOccurence(a, '/') - countOccurence(b, '/')

@@ -14,7 +14,11 @@ function isObject(value: unknown): value is Record<string, any> {
   return Object.prototype.toString.call(value) === '[object Object]'
 }
 
-function mergeConfig<T = Record<string, any>>(a: T, b: T, isRoot = true): SiteConfig {
+function mergeConfig<T = Record<string, any>>(
+  a: T,
+  b: T,
+  isRoot = true,
+): SiteConfig {
   const merged: Record<string, any> = { ...a }
   for (const key in b) {
     const value = b[key as keyof T]
@@ -26,7 +30,8 @@ function mergeConfig<T = Record<string, any>>(a: T, b: T, isRoot = true): SiteCo
       continue
     }
     if (isObject(existing) && isObject(value)) {
-      if (isRoot && key === 'vite') merged[key] = mergeViteConfig(existing, value)
+      if (isRoot && key === 'vite')
+        merged[key] = mergeViteConfig(existing, value)
       else merged[key] = mergeConfig(existing, value, false)
 
       continue
@@ -44,7 +49,10 @@ async function resolveUserConfig(root: string, env: ConfigEnv) {
 
   const siteUrl = config.siteUrl || ''
   const protocolIndex = siteUrl.indexOf('//')
-  const baseIndex = siteUrl.indexOf('/', protocolIndex > -1 ? protocolIndex + 2 : 0)
+  const baseIndex = siteUrl.indexOf(
+    '/',
+    protocolIndex > -1 ? protocolIndex + 2 : 0,
+  )
   config.siteUrl = baseIndex > -1 ? siteUrl.slice(0, baseIndex) : siteUrl
   config.base = baseIndex > -1 ? siteUrl.slice(baseIndex) : '/'
   if (!config.base.endsWith('/')) config.base = `${config.base}/`
@@ -60,9 +68,13 @@ async function resolveUserConfig(root: string, env: ConfigEnv) {
  * @param configEnv
  * @returns
  */
-async function loadUserConfigFile(root: string, env: ConfigEnv): Promise<UserConfig> {
+async function loadUserConfigFile(
+  root: string,
+  env: ConfigEnv,
+): Promise<UserConfig> {
   try {
-    const { path, config = {} } = (await loadConfigFromFile(env, 'wilson.config.ts', root)) || {}
+    const { path, config = {} } =
+      (await loadConfigFromFile(env, 'wilson.config.ts', root)) || {}
     if (path && config) {
       ;(config as SiteConfig).configPath = path
       debug.config(`loaded config at ${pc.yellow(path)}`)

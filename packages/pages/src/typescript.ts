@@ -21,10 +21,17 @@ export async function getFrontmatter(
   absolutePath: string,
   { tempDir, pagesDir }: Options,
 ): Promise<UserFrontmatter> {
-  const { frontmatter } = await getPageExports<StaticPageExports>(absolutePath, tempDir, pagesDir)
+  const { frontmatter } = await getPageExports<StaticPageExports>(
+    absolutePath,
+    tempDir,
+    pagesDir,
+  )
   if (frontmatter !== undefined && !isObject(frontmatter)) {
     throw new Error(
-      `page "${relative(pagesDir, absolutePath)}" has frontmatter that is not an object`,
+      `page "${relative(
+        pagesDir,
+        absolutePath,
+      )}" has frontmatter that is not an object`,
     )
   }
   return frontmatter ?? {}
@@ -46,7 +53,9 @@ export async function getRenderedPaths(
 
   const renderedPaths = getRenderedPaths()
   if (!Array.isArray(renderedPaths))
-    throw new Error(`getRenderedPaths() of dynamic page "${path}" must return an array`)
+    throw new Error(
+      `getRenderedPaths() of dynamic page "${path}" must return an array`,
+    )
 
   return renderedPaths.map((renderedPath) => {
     let url = route.replace(/\?$/, '')

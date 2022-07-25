@@ -7,4 +7,5 @@ export default function App() {
   return <Router>{routes}</Router>
 }
 
-if (!import.meta.env.SSR) render(<App />, document.getElementById('root') as HTMLElement)
+if (!import.meta.env.SSR)
+  render(<App />, document.getElementById('root') as HTMLElement)
