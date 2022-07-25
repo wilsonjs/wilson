@@ -9,7 +9,10 @@ export async function build(root: string = process.cwd()) {
   const startTime = performance.now()
 
   process.env.NODE_ENV = 'production'
-  const siteConfig = await resolveConfig(root, { command: 'build', mode: 'production' })
+  const siteConfig = await resolveConfig(root, {
+    command: 'build',
+    mode: 'production',
+  })
 
   rmDir(siteConfig.outDir)
 
@@ -23,7 +26,10 @@ export async function build(root: string = process.cwd()) {
     debug.build(`rendering page ${path} to ${outputFilename}`),
   )
 
-  await withSpinner('writing pages', async () => await writePages(siteConfig, pagesToRender))
+  await withSpinner(
+    'writing pages',
+    async () => await writePages(siteConfig, pagesToRender),
+  )
 
   rmDir(siteConfig.tempDir)
   console.info(`build complete in ${timeSince(startTime)}.`)

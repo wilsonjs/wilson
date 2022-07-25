@@ -24,22 +24,33 @@ const posts = [
   { title: 'Post 9' },
 ]
 
-function paginate(items: Post[], pageSize = 10): GetRenderedPathsResult<Params, Props>[] {
+function paginate(
+  items: Post[],
+  pageSize = 10,
+): GetRenderedPathsResult<Params, Props>[] {
   const pagesCount = Math.max(1, Math.ceil(items.length / pageSize))
   function numberToPath(pageNumber: number): string {
     return pageNumber === 1 ? '' : `page-${pageNumber}`
   }
-  return Array.from({ length: pagesCount }, (_, i) => i + 1).map((pageNumber) => {
-    const firstItem = (pageNumber - 1) * pageSize
-    return {
-      params: { page: numberToPath(pageNumber) },
-      props: {
-        items: items.slice(firstItem, firstItem + pageSize),
-        nextPage: pageNumber !== pagesCount ? `/blog/${numberToPath(pageNumber + 1)}` : undefined,
-        prevPage: pageNumber === 1 ? undefined : `/blog/${numberToPath(pageNumber - 1)}`,
-      },
-    }
-  })
+  return Array.from({ length: pagesCount }, (_, i) => i + 1).map(
+    (pageNumber) => {
+      const firstItem = (pageNumber - 1) * pageSize
+      return {
+        params: { page: numberToPath(pageNumber) },
+        props: {
+          items: items.slice(firstItem, firstItem + pageSize),
+          nextPage:
+            pageNumber !== pagesCount
+              ? `/blog/${numberToPath(pageNumber + 1)}`
+              : undefined,
+          prevPage:
+            pageNumber === 1
+              ? undefined
+              : `/blog/${numberToPath(pageNumber - 1)}`,
+        },
+      }
+    },
+  )
 }
 
 export function getRenderedPaths(): GetRenderedPathsResult<Params, Props>[] {
@@ -63,7 +74,7 @@ export default function Page(props: DynamicPageProps<Params, Props>) {
       <pre>{JSON.stringify(items, null, 2)}</pre>
       {prevPage && <a href={prevPage}>Prev</a>}
       {nextPage && <a href={nextPage}>Next</a>}
-      <Counter clientLoad />
+      <Counter initialValue={10} clientLoad />
     </>
   )
 }

@@ -16,7 +16,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
-    "types": ["vite/client"]
+    "types": ["vite/client", "wilson/client"]
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

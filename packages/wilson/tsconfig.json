@@ -14,11 +14,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "lib": ["ESNext", "DOM"],
-    "types": ["node", "vitest"],
-    "paths": {
-      "src/*": ["src/*"],
-      "shared/*": ["src/shared/*"]
-    }
+    "types": ["node", "vitest"]
   },
   "include": ["src", "tests", "types"]
 }
