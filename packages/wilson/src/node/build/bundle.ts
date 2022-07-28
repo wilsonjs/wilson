@@ -48,9 +48,11 @@ async function bundleWithVite(
   const { htmlBuild = false, ssr } = options
 
   const config = mergeConfig(siteConfig.vite, {
-    logLevel: 'warn',
+    logLevel: siteConfig.vite.logLevel ?? 'warn',
     ssr: {
-      external: ['vue', '@vue/server-renderer'],
+      external: ssr
+        ? []
+        : ['preact', 'preact-router', 'preact-render-to-string'],
       noExternal: ['wilson'],
     },
     plugins: wilsonPlugins(siteConfig),
@@ -60,7 +62,7 @@ async function bundleWithVite(
       manifest: !ssr,
       ssrManifest: !ssr,
       minify: ssr ? false : 'esbuild',
-      emptyOutDir: ssr,
+      emptyOutDir: false,
       outDir: ssr ? siteConfig.tempDir : siteConfig.outDir,
       sourcemap: false,
       rollupOptions: {

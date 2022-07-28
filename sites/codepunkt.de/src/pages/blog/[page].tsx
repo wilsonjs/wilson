@@ -1,7 +1,9 @@
 import type { DynamicPageProps, GetRenderedPathsResult } from 'wilson'
-import Counter from '../../component/Counter'
+import D, { foo, bar } from '../../islands/Decrease'
+import Increase from '../../islands/Increase'
 import styles from './[page].module.scss'
 
+console.log(foo, bar)
 interface Post {
   title: string
 }
@@ -23,6 +25,10 @@ const posts = [
   { title: 'Post 8' },
   { title: 'Post 9' },
 ]
+
+function Horst() {
+  return <>Horst!</>
+}
 
 function paginate(
   items: Post[],
@@ -74,7 +80,9 @@ export default function Page(props: DynamicPageProps<Params, Props>) {
       <pre>{JSON.stringify(items, null, 2)}</pre>
       {prevPage && <a href={prevPage}>Prev</a>}
       {nextPage && <a href={nextPage}>Next</a>}
-      <Counter initialValue={10} clientLoad />
+      <Horst clientLoad />
+      <D initialValue={4711} clientLoad />
+      <Increase initialValue={0} clientLoad />
     </>
   )
 }

@@ -1,8 +1,19 @@
 import { resolveConfig } from '../config'
 import { debug, rmDir, timeSince, withSpinner } from '../utils'
 import { bundle } from './bundle'
+import { bundleIslands } from './islands'
 import { renderPages } from './render'
 import { writePages } from './write'
+
+export interface IslandDefinition {
+  id: string
+  script: string
+  placeholder: string
+  componentPath: string
+  entryFilename?: string
+}
+
+export type IslandsByPath = Record<string, IslandDefinition[]>
 
 // TODO: write sitemap after `pagesToRender` are available
 export async function build(root: string = process.cwd()) {
@@ -21,16 +32,24 @@ export async function build(root: string = process.cwd()) {
     async () => await bundle(siteConfig),
   )
 
-  const pagesToRender = await renderPages(siteConfig, bundleResult)
+  const { pagesToRender, islandsByPath } = await renderPages(
+    siteConfig,
+    bundleResult,
+  )
   pagesToRender.map(({ path, outputFilename }) =>
     debug.build(`rendering page ${path} to ${outputFilename}`),
   )
 
   await withSpinner(
-    'writing pages',
-    async () => await writePages(siteConfig, pagesToRender),
+    'building islands bundle',
+    async () => await bundleIslands(siteConfig, islandsByPath),
   )
 
-  rmDir(siteConfig.tempDir)
+  await withSpinner(
+    'writing pages',
+    async () => await writePages(siteConfig, pagesToRender, islandsByPath),
+  )
+
+  // rmDir(siteConfig.tempDir)
   console.info(`build complete in ${timeSince(startTime)}.`)
 }

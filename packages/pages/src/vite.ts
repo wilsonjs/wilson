@@ -1,27 +1,35 @@
 import { basename, dirname, join } from 'pathe'
-import { build } from 'vite'
+import { build, InlineConfig } from 'vite'
 import type { StaticPageExports } from '@wilson/types'
+import preact from '@preact/preset-vite'
+import { Options } from './types'
 
 const pageBuildsByPathCache = new Map<string, string>()
 
 /**
  * Performs an SSR build of a page with vite.
  */
-async function performViteBuild(
-  tempDir: string,
+export async function performViteBuild(
+  options: Options,
   input: string,
-  outputFilename: string,
+  outDir: string,
+  outputFilename?: string,
 ): Promise<void> {
-  await build({
+  const viteConfig: InlineConfig = {
     clearScreen: false,
     build: {
       emptyOutDir: false,
-      outDir: `${tempDir}/pages`,
-      rollupOptions: { input, output: { entryFileNames: outputFilename } },
+      outDir,
+      rollupOptions: {
+        input,
+        output: { entryFileNames: outputFilename },
+      },
       ssr: true,
     },
-    logLevel: 'silent',
-  })
+    plugins: [preact()],
+    logLevel: options.vite.logLevel ?? 'warn',
+  }
+  await build(viteConfig)
 }
 
 /**
@@ -65,9 +73,8 @@ export function clearPageBuild(absolutePath: string): boolean {
  * @returns Exports of the page
  */
 export async function getPageExports<T extends StaticPageExports>(
+  options: Options,
   absolutePath: string,
-  tempDir: string,
-  pagesDir: string,
 ): Promise<T> {
   let importPath = pageBuildsByPathCache.get(absolutePath)
   let cacheBustingImportPath: string
@@ -75,8 +82,13 @@ export async function getPageExports<T extends StaticPageExports>(
   if (importPath !== undefined) {
     cacheBustingImportPath = importPath
   } else {
-    const outputFilename = getOutputFilename(absolutePath, pagesDir)
-    await performViteBuild(tempDir, absolutePath, outputFilename)
+    const outputFilename = getOutputFilename(absolutePath, options.pagesDir)
+    await performViteBuild(
+      options,
+      absolutePath,
+      `${options.tempDir}/pages`,
+      outputFilename,
+    )
     importPath = join(process.cwd(), '.wilson/pages', outputFilename)
 
     // There is no import cache invalidation in nodejs, so we need to append

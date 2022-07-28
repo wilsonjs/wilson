@@ -39,6 +39,11 @@ export interface UserConfig {
    */
   layoutsDir?: string
   /**
+   * Specify the islands directory (relative to srcDir).
+   * @default 'islands'
+   */
+  islandsDir?: string
+  /**
    * Specify the directory where the app source is located (relative to project root).
    * @default 'src'
    */

@@ -46,3 +46,12 @@ export function timeSince(start: number): string {
   const diff = performance.now() - start
   return diff < 750 ? `${Math.round(diff)}ms` : `${(diff / 1000).toFixed(1)}s`
 }
+
+/**
+ * Returns the unique values of an array
+ * @param arr The array
+ * @returns New array with unique values
+ */
+export function uniq<T>(arr: Array<T>) {
+  return [...new Set(arr.filter((x) => x))]
+}

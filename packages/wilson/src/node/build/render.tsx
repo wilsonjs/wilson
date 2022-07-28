@@ -7,11 +7,12 @@ import { withSpinner } from '../utils'
 import type { bundle } from './bundle'
 import type { PageToRender } from './pages'
 import { getPagesToRender } from './pages'
+import { IslandDefinition, IslandsByPath } from './build'
 
 export async function renderPages(
   config: SiteConfig,
   { clientResult }: Awaited<ReturnType<typeof bundle>>,
-): Promise<PageToRender[]> {
+): Promise<{ pagesToRender: PageToRender[]; islandsByPath: IslandsByPath }> {
   const appPath = ['js', 'mjs', 'cjs']
     .map((ext) => join(config.tempDir, `app.${ext}`))
     .find(existsSync)
@@ -28,18 +29,22 @@ export async function renderPages(
     getPagesToRender,
   )
   const clientChunks = clientResult.output
+  const islandsByPath: IslandsByPath = {}
 
   await withSpinner('rendering pages', async () => {
-    for (const page of pagesToRender)
-      page.rendered = await renderPage(
+    for (const page of pagesToRender) {
+      const { rendered, islands } = await renderPage(
         config,
         clientChunks,
         page,
         rendertoString,
       )
+      page.rendered = rendered
+      islandsByPath[page.path] = islands
+    }
   })
 
-  return pagesToRender
+  return { pagesToRender, islandsByPath }
 }
 
 export async function renderPage(
@@ -47,22 +52,23 @@ export async function renderPage(
   clientChunks: RollupOutput['output'],
   page: PageToRender,
   rendertoString: RenderToStringFn,
-) {
-  const { html } = await rendertoString(page.path)
-  return `<!DOCTYPE html>
-<html>
-  <head>
-    ${stylesheetTagsFrom(config, clientChunks)}
-  </head>
-  <body>
-    <div id="app">${html}</div>
-  </body>
-</html>`
+): Promise<{ rendered: string; islands: IslandDefinition[] }> {
+  const { html, islands } = await rendertoString(page.path)
+  return {
+    rendered: /* html */ `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          ${stylesheetTagsFrom(config, clientChunks)}
+        </head>
+        <body>
+          <div id="app">${html}</div>
+        </body>
+      </html>
+    `,
+    islands,
+  }
 
-  //   // Remove comments from Vue renderer to allow plain text, RSS, or JSON output.
-  //   content = content.replace(commentsRegex, "");
-  //   // Skip HTML shell to allow Vue to render plain text, RSS, or JSON output.
-  //   if (!route.outputFilename.endsWith(".html")) return content;
   //   const { headTags, htmlAttrs, bodyAttrs } = renderHeadToString(head);
   //   return `<!DOCTYPE html>
   //   <html ${htmlAttrs}>
