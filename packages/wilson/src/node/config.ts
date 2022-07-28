@@ -3,7 +3,7 @@ import type { ConfigEnv, UserConfig as ViteOptions } from 'vite'
 import { loadConfigFromFile, mergeConfig as mergeViteConfig } from 'vite'
 import pc from 'picocolors'
 import { dirname, join, resolve } from 'pathe'
-import type { SiteConfig, UserConfig } from './types'
+import type { SiteConfig, UserConfig } from '@wilson/types'
 import { debug } from './utils'
 
 export function defineConfig(config: UserConfig) {
@@ -149,9 +149,10 @@ function siteConfigDefaults(
     configPath: resolve(root, 'wilson.config.ts'),
     debug: true,
     drafts,
-    layoutsDir: 'layouts',
     outDir: 'dist',
     pagesDir: 'pages',
+    layoutsDir: 'layouts',
+    islandsDir: 'islands',
     tempDir: '.wilson',
     prettyUrls: true,
     root,
@@ -196,6 +197,7 @@ export async function resolveConfig(
     outDir: resolve(root, siteConfig.outDir),
     tempDir: resolve(root, siteConfig.tempDir),
     layoutsDir: resolve(srcDir, siteConfig.layoutsDir),
+    islandsDir: resolve(srcDir, siteConfig.islandsDir),
   })
 
   return siteConfig

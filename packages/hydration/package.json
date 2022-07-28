@@ -1,0 +1,37 @@
+{
+  "name": "@wilson/hydration",
+  "type": "module",
+  "version": "1.0.0",
+  "author": "Christoph Werner <christoph@codepunkt.de>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codepunkt/wilson",
+    "directory": "packages/hydration"
+  },
+  "exports": {
+    ".": {
+      "require": "./src/hydration.cjs",
+      "import": "./dist/hydration.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "dist/hydration.js",
+  "types": "dist/hydration.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "dev": "npm run build -- --watch",
+    "build": "tsup src/hydration.ts",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "tsup": "^6.1.3"
+  },
+  "dependencies": {
+    "preact": "^10.10.0",
+    "vite": "3.0.0"
+  }
+}

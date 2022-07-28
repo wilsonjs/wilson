@@ -7,14 +7,14 @@
     "resolveJsonModule": true,
     "strict": true,
     "declaration": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "useUnknownInCatchVariables": false,
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "lib": ["ESNext", "DOM"],
-    "types": ["node", "vitest"]
+    "types": ["node", "vitest", "vite/client"]
   },
-  "include": ["src", "tests", "types"]
+  "include": ["src", "tests", "types", "client.d.ts"]
 }

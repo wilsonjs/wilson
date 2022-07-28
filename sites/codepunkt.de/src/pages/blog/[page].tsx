@@ -1,5 +1,6 @@
 import type { DynamicPageProps, GetRenderedPathsResult } from 'wilson'
-import Counter from '../../component/Counter'
+import Decrease from '../../islands/Decrease'
+import Increase from '../../islands/Increase'
 import styles from './[page].module.scss'
 
 interface Post {
@@ -74,7 +75,8 @@ export default function Page(props: DynamicPageProps<Params, Props>) {
       <pre>{JSON.stringify(items, null, 2)}</pre>
       {prevPage && <a href={prevPage}>Prev</a>}
       {nextPage && <a href={nextPage}>Next</a>}
-      <Counter initialValue={10} clientLoad />
+      <Decrease initialValue={4711} clientLoad />
+      <Increase initialValue={0} clientLoad />
     </>
   )
 }

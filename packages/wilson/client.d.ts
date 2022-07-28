@@ -2,7 +2,10 @@ import 'preact'
 import type { LazyHydrationAttributes } from './types/hydration'
 
 declare module 'preact' {
-  export namespace JSX {
-    export interface IntrinsicAttributes extends LazyHydrationAttributes {}
+  namespace JSX {
+    interface IntrinsicAttributes extends LazyHydrationAttributes {}
+    interface IntrinsicElements {
+      'wilson-island': preact.JSX.HTMLAttributes<HTMLElement>
+    }
   }
 }

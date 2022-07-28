@@ -5,6 +5,7 @@ import debug from 'debug'
 import { relative } from 'pathe'
 import pc from 'picocolors'
 import type { PluginOption, ViteDevServer } from 'vite'
+import inspect from 'vite-plugin-inspect'
 import { createServer } from './server'
 
 /**
@@ -65,16 +66,29 @@ function virtualClientEntrypoint(): PluginOption {
 
 /**
  *
- * @param siteConfig Site's configuration
+ * @param config Site's configuration
  * @returns Array of vite plugins used for wilson.
  */
-export default function wilsonPlugins(siteConfig: SiteConfig): PluginOption[] {
-  debug('wilson:config')(siteConfig)
+export default function wilsonPlugins(
+  config: SiteConfig,
+  skipDevelopment: boolean = false,
+): PluginOption[] {
+  debug('wilson:config')(config)
 
   return [
-    preact({ devtoolsInProd: true }),
-    pages(siteConfig),
-    siteConfig.mode === 'development' && devConfigWatch(siteConfig),
+    preact(
+      skipDevelopment
+        ? {}
+        : {
+            devtoolsInProd: true,
+            babel: {
+              plugins: ['@babel/plugin-transform-react-jsx-development'],
+            },
+          },
+    ),
+    pages(config),
+    config.mode === 'development' && inspect(),
+    config.mode === 'development' && devConfigWatch(config),
     virtualClientEntrypoint(),
   ].filter(Boolean)
 }

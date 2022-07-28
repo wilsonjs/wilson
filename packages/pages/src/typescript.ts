@@ -19,17 +19,16 @@ import { getPageExports } from './vite'
  */
 export async function getFrontmatter(
   absolutePath: string,
-  { tempDir, pagesDir }: Options,
+  options: Options,
 ): Promise<UserFrontmatter> {
   const { frontmatter } = await getPageExports<StaticPageExports>(
+    options,
     absolutePath,
-    tempDir,
-    pagesDir,
   )
   if (frontmatter !== undefined && !isObject(frontmatter)) {
     throw new Error(
       `page "${relative(
-        pagesDir,
+        options.pagesDir,
         absolutePath,
       )}" has frontmatter that is not an object`,
     )
@@ -44,9 +43,8 @@ export async function getRenderedPaths(
   route: string,
 ): Promise<RenderedPath[]> {
   const { getRenderedPaths } = await getPageExports<DynamicPageExports>(
+    options,
     absolutePath,
-    options.tempDir,
-    options.pagesDir,
   )
   if (getRenderedPaths === undefined)
     throw new Error(`dynamic page "${path}" has no getRenderedPaths() export`)
