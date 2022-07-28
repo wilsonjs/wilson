@@ -82,6 +82,9 @@ export default function wilsonPlugins(
         : {
             devtoolsInProd: true,
             babel: {
+              // required to have __source on VNode for ssr build, which
+              // is used in app.server.tsx to find the component source for
+              // interactive islands
               plugins: ['@babel/plugin-transform-react-jsx-development'],
             },
           },
