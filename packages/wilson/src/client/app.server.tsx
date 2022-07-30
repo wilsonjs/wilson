@@ -4,16 +4,6 @@ import render from 'preact-render-to-string'
 import { cloneElement, options } from 'preact'
 import type { RenderableProps, VNode } from 'preact'
 import type { LazyHydrationAttributes } from '../../types/hydration'
-import { readFileSync } from 'fs'
-import * as parser from '@babel/parser'
-import babelTraverse from '@babel/traverse'
-import type { ImportDefaultSpecifier } from '@babel/types'
-import { dirname, resolve } from 'pathe'
-
-// TODO: in prepareLazyHydrationHook, first AST-parse, then replace vnode.type
-// if a default import of an island has been found!
-// TODO: cache AST-parse results for same VNodeSource
-const traverse = (babelTraverse as any).default as typeof babelTraverse
 
 /**
  * Provides preact-router with the `urlToBeRendered`.
@@ -38,42 +28,10 @@ export type IslandsByPath = Record<string, IslandDefinition[]>
 let islands: IslandDefinition[] = []
 
 interface VNodeSource {
-  fileName: string
-  lineNumber: number
-  columnNumber: number
+  islandPath?: string
 }
 
-function createLazyHydrationWrapper(source: VNodeSource) {
-  let componentPath: string | undefined = undefined
-  const code = readFileSync(source.fileName, 'utf-8')
-  const ast = parser.parse(code, {
-    sourceType: 'module',
-    plugins: ['jsx', 'typescript'],
-  })
-  traverse(ast, {
-    JSXIdentifier(path) {
-      const lineMatches = path.node.loc?.start.line === source.lineNumber
-      const columnMatches = path.node.loc?.start.column === source.columnNumber
-      if (lineMatches && columnMatches) {
-        const jsxIdentifier = path.node.name
-        traverse(ast, {
-          ImportDeclaration(path) {
-            if (path.node.importKind === 'value') {
-              const defaultImport = path.node.specifiers.find(
-                ({ type }) => type === 'ImportDefaultSpecifier',
-              ) as ImportDefaultSpecifier | undefined
-              if (defaultImport && defaultImport.local.name === jsxIdentifier) {
-                componentPath =
-                  resolve(dirname(source.fileName), path.node.source.value) +
-                  '.tsx'
-              }
-            }
-          },
-        })
-      }
-    },
-  })
-
+function createLazyHydrationWrapper({ islandPath }: VNodeSource) {
   /**
    * Prepends a `text/hydration` script tag.
    */
@@ -82,18 +40,18 @@ function createLazyHydrationWrapper(source: VNodeSource) {
     ...props
   }: RenderableProps<{}>) {
     // didn't find path where the island was imported from as a default import
-    if (componentPath === undefined) {
+    if (islandPath === undefined) {
       return null
     }
 
     const no = islands.length + 1
     const island = {
-      componentPath,
+      componentPath: islandPath,
       id: `island-${no}`,
       placeholder: `island-hydration-${no}`,
       script: /* js */ `
         import { hydrateNow } from '@wilson/hydration';
-        import { default as component } from '${componentPath}';
+        import { default as component } from '${islandPath}';
         hydrateNow(component, 'island-${no}', ${JSON.stringify(props)}, {});
       `,
     }
@@ -123,7 +81,9 @@ async function prepareLazyHydrationHook(vnode: PotentiallyLazyHydratedVNode) {
     vnode.props.clientLoad &&
     !busy &&
     !vnode.wrapped &&
-    typeof vnode.type !== 'string'
+    typeof vnode.type !== 'string' &&
+    // components that have clientLoad, but don't have an islandPath in __source
+    {}.toString.call(vnode.__source) === '[object Object]'
   ) {
     // important because cloneElement calls options.vnode
     busy = true

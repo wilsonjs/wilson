@@ -55,7 +55,7 @@ async function bundleWithVite(
         : ['preact', 'preact-router', 'preact-render-to-string'],
       noExternal: ['wilson'],
     },
-    plugins: wilsonPlugins(siteConfig),
+    plugins: wilsonPlugins(siteConfig, ssr),
     build: {
       ssr,
       cssCodeSplit: htmlBuild,

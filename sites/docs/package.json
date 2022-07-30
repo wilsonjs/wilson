@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@preact/preset-vite": "^2.3.0",
+    "@wilson/babel-plugin": "workspace:^1.0.0",
     "@wilson/hydration": "workspace:^1.0.0",
     "fast-equals": "^4.0.1",
     "preact": "^10.10.0",

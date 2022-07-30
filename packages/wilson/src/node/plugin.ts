@@ -71,24 +71,32 @@ function virtualClientEntrypoint(): PluginOption {
  */
 export default function wilsonPlugins(
   config: SiteConfig,
-  skipDevelopment: boolean = false,
+  ssr: boolean = false,
 ): PluginOption[] {
   debug('wilson:config')(config)
 
   return [
-    preact(
-      skipDevelopment
-        ? {}
-        : {
-            devtoolsInProd: true,
-            babel: {
-              // required to have __source on VNode for ssr build, which
-              // is used in app.server.tsx to find the component source for
-              // interactive islands
-              plugins: ['@babel/plugin-transform-react-jsx-development'],
-            },
-          },
-    ),
+    preact({
+      devtoolsInProd: true,
+      babel: {
+        plugins: ssr
+          ? [
+              // adds __source to VNode
+              '@babel/plugin-transform-react-jsx-development',
+              // removes __source from every VNode that is not on a page or
+              // that has no partial hydration props like `clientLoad` or where
+              // the VNode is not imported as a default import from the islands
+              // directory. adds islandPath that is used in app.server.tsx to
+              // __source for every VNode in a page that has partial hydration
+              // props and is imported as default import from islands directory.
+              [
+                '@wilson',
+                { islandsDir: config.islandsDir, pagesDir: config.pagesDir },
+              ],
+            ]
+          : [],
+      },
+    }),
     pages(config),
     config.mode === 'development' && inspect(),
     config.mode === 'development' && devConfigWatch(config),

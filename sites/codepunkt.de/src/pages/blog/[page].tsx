@@ -1,6 +1,7 @@
 import type { DynamicPageProps, GetRenderedPathsResult } from 'wilson'
 import D, { foo, bar } from '../../islands/Decrease'
 import Increase from '../../islands/Increase'
+import Jupp from '../../components/Jupp'
 import styles from './[page].module.scss'
 
 console.log(foo, bar)
@@ -60,7 +61,7 @@ function paginate(
 }
 
 export function getRenderedPaths(): GetRenderedPathsResult<Params, Props>[] {
-  return paginate(posts, 6)
+  return paginate(posts, 12)
 }
 
 export const frontmatter = {
@@ -83,6 +84,7 @@ export default function Page(props: DynamicPageProps<Params, Props>) {
       <Horst clientLoad />
       <D initialValue={4711} clientLoad />
       <Increase initialValue={0} clientLoad />
+      <Jupp clientLoad />
     </>
   )
 }

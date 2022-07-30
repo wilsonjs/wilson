@@ -42,10 +42,12 @@
     "dev:node": "npm run build:node -- --watch"
   },
   "dependencies": {
+    "@babel/generator": "^7.18.9",
     "@babel/parser": "^7.18.9",
     "@babel/traverse": "^7.18.9",
     "@babel/types": "^7.18.9",
     "@preact/preset-vite": "^2.3.0",
+    "@wilson/babel-plugin": "workspace:^1.0.0",
     "@wilson/hydration": "workspace:^1.0.0",
     "@wilson/pages": "workspace:^1.0.0",
     "debug": "^4.3.4",
@@ -66,6 +68,7 @@
     "vite-plugin-inspect": "^0.6.0"
   },
   "devDependencies": {
+    "@types/babel__generator": "^7.6.4",
     "@types/babel__traverse": "^7.17.1",
     "@types/debug": "^4.1.7",
     "@types/minimist": "^1.2.2",

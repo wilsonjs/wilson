@@ -1,4 +1,5 @@
 packages:
+  - packages/babel-plugin
   - packages/hydration
   - packages/pages
   - packages/types
