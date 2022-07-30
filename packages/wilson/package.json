@@ -42,6 +42,9 @@
     "dev:node": "npm run build:node -- --watch"
   },
   "dependencies": {
+    "@babel/parser": "^7.18.9",
+    "@babel/traverse": "^7.18.9",
+    "@babel/types": "^7.18.9",
     "@preact/preset-vite": "^2.3.0",
     "@wilson/hydration": "workspace:^1.0.0",
     "@wilson/pages": "workspace:^1.0.0",
@@ -63,6 +66,7 @@
     "vite-plugin-inspect": "^0.6.0"
   },
   "devDependencies": {
+    "@types/babel__traverse": "^7.17.1",
     "@types/debug": "^4.1.7",
     "@types/minimist": "^1.2.2",
     "@types/node": "^18.0.0",
