@@ -18,7 +18,6 @@ export function hydrateNow(
   slots: Slots,
 ) {
   const el = findById(id)
-  console.log({ component, el, props, slots })
   if (el) {
     createIsland(component, el, props, slots)
     el.setAttribute('hydrated', '')
@@ -123,7 +122,7 @@ function createIsland(
  * Preact doesn't have an equivalent for createStaticVNode.
  */
 const IslandContent = (props: any) => {
-  return h('iles-content', {
+  return h('wilson-island-content', {
     dangerouslySetInnerHTML: { __html: props.content },
   })
 }

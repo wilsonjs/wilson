@@ -83,7 +83,13 @@ export default function Page(props: DynamicPageProps<Params, Props>) {
       {nextPage && <a href={nextPage}>Next</a>}
       <Horst clientLoad />
       <D initialValue={4711} clientLoad />
-      <Increase initialValue={0} clientLoad />
+      <Increase initialValue={0} clientLoad>
+        <h1 className={styles.headline}>
+          {fm.title || 'Blog'}
+          <br />
+          <small>Last modified at: {fm.meta.lastUpdated}</small>
+        </h1>
+      </Increase>
       <Jupp clientLoad />
     </>
   )

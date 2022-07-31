@@ -1,7 +1,7 @@
 import routes from 'virtual:wilson-routes'
 import { Router } from 'preact-router'
 import render from 'preact-render-to-string'
-import { cloneElement, options } from 'preact'
+import { cloneElement, ComponentChild, options, toChildArray } from 'preact'
 import type { RenderableProps, VNode } from 'preact'
 import type { LazyHydrationAttributes } from '../../types/hydration'
 
@@ -38,8 +38,11 @@ let islands: IslandDefinition[] = []
 function createLazyHydrationWrapper(islandPath: string) {
   return function LazyHydrationWrapper({
     children,
-    ...props
+    ...propsWithoutChildren
   }: RenderableProps<{}>) {
+    const islandChildren = ((children as ComponentChild[])[0] as VNode).props
+      .children
+    const defaultSlot = render(toChildArray(islandChildren)[0] as VNode)
     const no = islands.length + 1
     const island = {
       componentPath: islandPath,
@@ -48,7 +51,12 @@ function createLazyHydrationWrapper(islandPath: string) {
       script: /* js */ `
         import { hydrateNow } from '@wilson/hydration';
         import { default as component } from '${islandPath}';
-        hydrateNow(component, 'island-${no}', ${JSON.stringify(props)});
+        hydrateNow(
+          component,
+          'island-${no}',
+          ${JSON.stringify(propsWithoutChildren)},
+          {default:'${defaultSlot}'}
+        );
       `,
     }
     islands.push(island)
