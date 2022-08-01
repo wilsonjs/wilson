@@ -108,22 +108,41 @@ export function hydrateNow(
 // }
 
 function createIsland(
-  component: ComponentType,
+  Component: ComponentType,
   el: Element,
   props: Props,
-  slots: Slots | undefined,
+  { default: children, ...otherSlots }: Slots,
 ) {
-  const content = slots?.default
-  const children = content ? toChildArray(h(IslandContent, { content })) : null
-  render(h(component, props, children), el)
+  for (const [key, value] of Object.entries(otherSlots)) {
+    props[key] = h(StaticHtml, { value, name: key })
+  }
+  render(
+    h(
+      Component,
+      props,
+      children !== null ? h(StaticHtml, { value: children }) : children,
+    ),
+    el,
+  )
 }
 
 /**
- * Preact doesn't have an equivalent for createStaticVNode.
+ * Wilson passes `children` as a string of HTML, so we need
+ * a wrapper element to render that content as VNodes.
+ *
+ * As a bonus, we can signal to Preact that this subtree is
+ * entirely static and will never change via `shouldComponentUpdate`.
  */
-const IslandContent = (props: any) => {
-  return h('wilson-island-content', {
-    dangerouslySetInnerHTML: { __html: props.content },
-  })
+const StaticHtml = ({ value, name }: { value: string; name?: string }) => {
+  if (!value) return null
+  return h('wilson-slot', { name, dangerouslySetInnerHTML: { __html: value } })
 }
-IslandContent.shouldComponentUpdate = () => false
+
+/**
+ * This tells Preact to opt-out of re-rendering this subtree,
+ * In addition to being a performance optimization,
+ * this also allows other frameworks to attach to `children`.
+ *
+ * See https://preactjs.com/guide/v8/external-dom-mutations
+ */
+StaticHtml.shouldComponentUpdate = () => false

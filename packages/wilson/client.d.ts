@@ -6,6 +6,7 @@ declare module 'preact' {
     interface IntrinsicAttributes extends LazyHydrationAttributes {}
     interface IntrinsicElements {
       'wilson-island': preact.JSX.HTMLAttributes<HTMLElement>
+      'wilson-slot': preact.JSX.HTMLAttributes<HTMLElement>
     }
   }
 }

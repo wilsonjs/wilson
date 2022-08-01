@@ -1,10 +1,7 @@
 import type { DynamicPageProps, GetRenderedPathsResult } from 'wilson'
-import D, { foo, bar } from '../../islands/Decrease'
-import Increase from '../../islands/Increase'
-import Jupp from '../../components/Jupp'
+import Counter from '../../islands/Counter'
 import styles from './[page].module.scss'
 
-console.log(foo, bar)
 interface Post {
   title: string
 }
@@ -26,10 +23,6 @@ const posts = [
   { title: 'Post 8' },
   { title: 'Post 9' },
 ]
-
-function Horst() {
-  return <>Horst!</>
-}
 
 function paginate(
   items: Post[],
@@ -78,19 +71,16 @@ export default function Page(props: DynamicPageProps<Params, Props>) {
         <br />
         <small>Last modified at: {fm.meta.lastUpdated}</small>
       </h1>
-      <pre>{JSON.stringify(items, null, 2)}</pre>
+      <ol>
+        {items.map((item) => (
+          <li key={item.title}>{item.title}</li>
+        ))}
+      </ol>
       {prevPage && <a href={prevPage}>Prev</a>}
       {nextPage && <a href={nextPage}>Next</a>}
-      <Horst clientLoad />
-      <D initialValue={4711} clientLoad />
-      <Increase initialValue={0} clientLoad>
-        <h1 className={styles.headline}>
-          {fm.title || 'Blog'}
-          <br />
-          <small>Last modified at: {fm.meta.lastUpdated}</small>
-        </h1>
-      </Increase>
-      <Jupp clientLoad />
+      <Counter clientLoad>
+        <h1>Hello Island Children!</h1>
+      </Counter>
     </>
   )
 }

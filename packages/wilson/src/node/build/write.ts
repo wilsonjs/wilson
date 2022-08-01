@@ -4,12 +4,14 @@ import { dirname, join, resolve } from 'pathe'
 import type { PageToRender } from './pages'
 import glob from 'fast-glob'
 import { VIRTUAL_PREFIX } from './islands'
-import { IslandDefinition, IslandsByPath } from './build'
+import { IslandsByPath } from './build'
 import { Manifest } from 'vite'
 import { uniq } from '../utils'
 import { posix } from 'path'
 import MagicString from 'magic-string'
 import { init as initESLexer, parse as parseESModules } from 'es-module-lexer'
+import beautify from 'js-beautify'
+import { IslandDefinition } from 'src/client/app.server'
 
 export async function writePages(
   config: SiteConfig,
@@ -60,9 +62,19 @@ async function writePage(
     )
   }
 
-  page.rendered = content.replace(
-    '</head>',
-    `${stringifyScripts(config, manifest, preloadScripts)}</head>`,
+  page.rendered = beautify.html(
+    content.replace(
+      '</head>',
+      `<style>wilson-island,wilson-slot{display:contents;}</style>${stringifyScripts(
+        config,
+        manifest,
+        preloadScripts,
+      )}</head>`,
+    ),
+    {
+      indent_size: 2,
+      content_unformatted: ['script'],
+    },
   )
   const filename = resolve(config.outDir, page.outputFilename)
   await fs.mkdir(dirname(filename), { recursive: true })

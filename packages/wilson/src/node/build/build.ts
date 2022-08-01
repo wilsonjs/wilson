@@ -1,17 +1,10 @@
+import { IslandDefinition } from 'src/client/app.server'
 import { resolveConfig } from '../config'
 import { debug, rmDir, timeSince, withSpinner } from '../utils'
 import { bundle } from './bundle'
 import { bundleIslands } from './islands'
 import { renderPages } from './render'
 import { writePages } from './write'
-
-export interface IslandDefinition {
-  id: string
-  script: string
-  placeholder: string
-  componentPath: string
-  entryFilename?: string
-}
 
 export type IslandsByPath = Record<string, IslandDefinition[]>
 
