@@ -20,6 +20,7 @@ const partialHydrationProps = [
   'clientIdle',
   'clientLoad',
   'clientMedia',
+  'clientOnly',
   'clientVisible',
 ]
 

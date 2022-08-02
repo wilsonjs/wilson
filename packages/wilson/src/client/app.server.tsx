@@ -47,6 +47,7 @@ function getHydrationScript(
 
   switch (hydrationType) {
     case Hydrate.OnLoad:
+    case Hydrate.SkipPrerender:
       componentImportVariable = 'component'
       importStatements = /* js */ `
         import { ${hydrationFn} } from '@wilson/hydration';
@@ -131,7 +132,7 @@ function createLazyHydrationWrapper(vnode: IslandVNode, hydrationType: string) {
         <wilson-island
           id={island.id}
           dangerouslySetInnerHTML={{
-            __html: result,
+            __html: hydrationType === Hydrate.SkipPrerender ? '' : result,
           }}
         />
         <script type="text/hydration">/*{island.id}-hydration*/</script>
@@ -157,6 +158,7 @@ export enum Hydrate {
   WhenIdle = 'clientIdle',
   OnLoad = 'clientLoad',
   OnMediaQuery = 'clientMedia',
+  SkipPrerender = 'clientOnly',
   WhenVisible = 'clientVisible',
 }
 
@@ -164,6 +166,7 @@ const hydrationFns = {
   [Hydrate.WhenIdle]: hydrateWhenIdle.name,
   [Hydrate.OnLoad]: hydrateNow.name,
   [Hydrate.OnMediaQuery]: hydrateOnMediaQuery.name,
+  [Hydrate.SkipPrerender]: hydrateNow.name,
   [Hydrate.WhenVisible]: hydrateWhenVisible.name,
 }
 
