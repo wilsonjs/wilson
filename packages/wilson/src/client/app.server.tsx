@@ -4,6 +4,12 @@ import render from 'preact-render-to-string'
 import { Attributes, cloneElement, ComponentChild, options } from 'preact'
 import type { RenderableProps, VNode, JSX } from 'preact'
 import type { LazyHydrationAttributes } from '../../types/hydration'
+import {
+  hydrateNow,
+  hydrateOnMediaQuery,
+  hydrateWhenIdle,
+  hydrateWhenVisible,
+} from '@wilson/hydration'
 
 /**
  * Provides preact-router with the `urlToBeRendered`.
@@ -56,7 +62,7 @@ function clearIslands() {
 }
 
 function getHydrationScript(
-  hydrationType: keyof typeof hydrationFns,
+  hydrationType: Hydrate,
   islandId: number,
   islandPath: string,
   islandProps: Record<string, unknown>,
@@ -66,16 +72,16 @@ function getHydrationScript(
   let componentImportVariable = ''
 
   switch (hydrationType) {
-    case 'clientLoad':
+    case Hydrate.OnLoad:
       componentImportVariable = 'component'
       importStatements = /* js */ `
         import { ${hydrationFn} } from '@wilson/hydration';
         import { default as ${componentImportVariable} } from '${islandPath}';
         `
       break
-    case 'clientIdle':
-    case 'clientMedia':
-    case 'clientVisible':
+    case Hydrate.OnMediaQuery:
+    case Hydrate.WhenIdle:
+    case Hydrate.WhenVisible:
       componentImportVariable = 'componentFn'
       importStatements = /* js */ `
         import { ${hydrationFn} } from '@wilson/hydration';
@@ -138,7 +144,7 @@ function createLazyHydrationWrapper(vnode: IslandVNode, hydrationType: string) {
       componentPath: islandPath,
       id: `island-${no}`,
       hydrationScript: getHydrationScript(
-        hydrationType as keyof typeof hydrationFns,
+        hydrationType as Hydrate,
         no,
         islandPath,
         propsWithoutChildren as Record<string, any>,
@@ -173,17 +179,24 @@ interface IslandVNode<
 
 let busy = false
 
-export const hydrationFns = {
-  clientIdle: 'hydrateWhenIdle',
-  clientLoad: 'hydrateNow',
-  clientMedia: 'hydrateOnMediaQuery',
-  clientVisible: 'hydrateWhenVisible',
+export enum Hydrate {
+  WhenIdle = 'clientIdle',
+  OnLoad = 'clientLoad',
+  OnMediaQuery = 'clientMedia',
+  WhenVisible = 'clientVisible',
 }
 
-function getHydrationType(vnode: VNode): string | undefined {
+const hydrationFns = {
+  [Hydrate.WhenIdle]: hydrateWhenIdle.name,
+  [Hydrate.OnLoad]: hydrateNow.name,
+  [Hydrate.OnMediaQuery]: hydrateOnMediaQuery.name,
+  [Hydrate.WhenVisible]: hydrateWhenVisible.name,
+}
+
+function getHydrationType(vnode: VNode): Hydrate | undefined {
   return Object.keys(vnode.props).find((key) =>
     Object.keys(hydrationFns).includes(key),
-  )
+  ) as Hydrate | undefined
 }
 
 async function prepareLazyHydrationHook(vnode: IslandVNode) {
@@ -227,7 +240,7 @@ export interface ServerRenderResult {
    */
   html: string
   /**
-   * Islands that were found.
+   * Islands that were encountered when rendering the page.
    */
   islands: Island[]
 }
