@@ -5,7 +5,7 @@ import type { ComponentType } from 'preact'
  * Arbitrary component props
  */
 type Props = Record<string, unknown>
-type AsyncComponent = () => ComponentType
+type AsyncComponent = () => Promise<ComponentType>
 
 /**
  * Returns HTMLElement by id.
@@ -22,7 +22,6 @@ const findById = (id: string): HTMLElement | void =>
  * @param props Props to render the component with
  */
 export function hydrateNow(Component: ComponentType, id: string, props: Props) {
-  console.log('hydrateNow', { Component, id, props })
   const islandMount = findById(id)
   if (islandMount) {
     const slots = Array.from(islandMount.querySelectorAll('wilson-slot'))
@@ -49,9 +48,25 @@ async function resolveAndHydrate(
   id: string,
   props: Props,
 ) {
-  console.log('resolveAndHydrate', { componentFn, id, props })
   const component = await componentFn()
   hydrateNow(component, id, props)
+}
+
+/**
+ * Hydrates an interactive island as soon as the main thread is free.
+ * If `requestIdleCallback` isn't supported, it uses a small `setTimeout` delay
+ *
+ * @param componentFn Async function that resolves to the component to render
+ * @param id "id" attribute of the element to render the component into
+ * @param props Props to render the component with
+ */
+export function hydrateWhenIdle(
+  componentFn: AsyncComponent,
+  id: string,
+  props: Props,
+) {
+  const whenIdle = window.requestIdleCallback || setTimeout
+  whenIdle(() => resolveAndHydrate(componentFn, id, props))
 }
 
 /**
@@ -66,7 +81,6 @@ export function hydrateOnMediaQuery(
   id: string,
   props: Props,
 ) {
-  console.log('hydrateOnMediaQuery', { componentFn, id, props })
   const mediaQuery = matchMedia(props.clientMedia as string)
   delete props.clientMedia
 
@@ -92,7 +106,6 @@ export function hydrateWhenVisible(
   id: string,
   props: Props,
 ) {
-  console.log('hydrateWhenVisible', { componentFn, id, props })
   const islandMount = findById(id)
   if (islandMount) {
     // display style for wilson-island is set to "contents". we need to revert

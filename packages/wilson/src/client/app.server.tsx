@@ -73,6 +73,7 @@ function getHydrationScript(
         import { default as ${componentImportVariable} } from '${islandPath}';
         `
       break
+    case 'clientIdle':
     case 'clientMedia':
     case 'clientVisible':
       componentImportVariable = 'componentFn'
@@ -173,6 +174,7 @@ interface IslandVNode<
 let busy = false
 
 export const hydrationFns = {
+  clientIdle: 'hydrateWhenIdle',
   clientLoad: 'hydrateNow',
   clientMedia: 'hydrateOnMediaQuery',
   clientVisible: 'hydrateWhenVisible',

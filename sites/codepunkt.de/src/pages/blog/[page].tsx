@@ -79,7 +79,7 @@ export default function Page(props: DynamicPageProps<Params, Props>) {
       </ol>
       {prevPage && <a href={prevPage}>Prev</a>}
       {nextPage && <a href={nextPage}>Next</a>} */}
-      <Counter clientLoad>
+      <Counter clientIdle>
         <p style={{ height: 5000 }}>before nested island</p>
         <Clock clientVisible />
         <p>after nested island</p>
