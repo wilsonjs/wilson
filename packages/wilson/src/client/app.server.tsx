@@ -55,6 +55,43 @@ function clearIslands() {
   islands = []
 }
 
+function getHydrationScript(
+  hydrationType: keyof typeof hydrationFns,
+  islandId: number,
+  islandPath: string,
+  islandProps: Record<string, unknown>,
+): string {
+  const hydrationFn = hydrationFns[hydrationType]
+  let importStatements = ''
+  let componentImportVariable = ''
+
+  switch (hydrationType) {
+    case 'clientLoad':
+      componentImportVariable = 'component'
+      importStatements = /* js */ `
+        import { ${hydrationFn} } from '@wilson/hydration';
+        import { default as ${componentImportVariable} } from '${islandPath}';
+        `
+      break
+    case 'clientVisible':
+      componentImportVariable = 'componentFn'
+      importStatements = /* js */ `
+        import { ${hydrationFn} } from '@wilson/hydration';
+        const ${componentImportVariable} = async () => (await import('${islandPath}')).default;
+      `
+      break
+  }
+
+  return /* js */ `
+    ${importStatements}
+    ${hydrationFn}(
+      ${componentImportVariable},
+      'island-${islandId}',
+      ${JSON.stringify(islandProps)}
+    );
+  `
+}
+
 /**
  * Wraps island in a `<wilson-island>` element, wraps the island children
  * in a `<wilson-slot>` element and appends a `text/hydration` script tag
@@ -73,7 +110,7 @@ function clearIslands() {
  * completely messing up the resulting hydration. To prevent it, we cache the
  * rendered JSX.Element on the VNode and reuse it when available.
  */
-function createLazyHydrationWrapper(vnode: IslandVNode, islandPath: string) {
+function createLazyHydrationWrapper(vnode: IslandVNode, hydrationType: string) {
   return function LazyHydrationWrapper({
     children: [islandVnode],
     ...propsWithoutChildren
@@ -94,18 +131,16 @@ function createLazyHydrationWrapper(vnode: IslandVNode, islandPath: string) {
     }
 
     const no = islands.length + 1
+    const islandPath = vnode.__source?.islandPath!
     const island = {
       componentPath: islandPath,
       id: `island-${no}`,
-      hydrationScript: /* js */ `
-        import { hydrateNow } from '@wilson/hydration';
-        import { default as component } from '${islandPath}';
-        hydrateNow(
-          component,
-          'island-${no}',
-          ${JSON.stringify(propsWithoutChildren)}
-        );
-      `,
+      hydrationScript: getHydrationScript(
+        hydrationType as keyof typeof hydrationFns,
+        no,
+        islandPath,
+        propsWithoutChildren as Record<string, any>,
+      ),
     }
     islands.push(island)
 
@@ -135,29 +170,41 @@ interface IslandVNode<
 }
 
 let busy = false
-let counter = 0
+
+export const hydrationFns = {
+  clientLoad: 'hydrateNow',
+  clientVisible: 'hydrateWhenVisible',
+}
+
+function getHydrationType(vnode: VNode): string | undefined {
+  return Object.keys(vnode.props).find((key) =>
+    Object.keys(hydrationFns).includes(key),
+  )
+}
 
 async function prepareLazyHydrationHook(vnode: IslandVNode) {
   if (
-    vnode.props.clientLoad &&
+    // exclude components that have a lazy hydration prop, but don't have
+    // an islandPath in __source
+    !!vnode.__source &&
+    vnode.__source.islandPath &&
     !busy &&
     !vnode.wrapped &&
-    typeof vnode.type !== 'string' &&
-    // components that have clientLoad, but don't have an islandPath in __source
-    !!vnode.__source &&
-    vnode.__source.islandPath
+    typeof vnode.type !== 'string'
   ) {
-    // important because cloneElement calls options.vnode
-    busy = true
-    const clone = cloneElement(vnode, vnode.props) as IslandVNode
-    busy = false
-    clone.wrapped = true
-    vnode.type = createLazyHydrationWrapper(
-      vnode,
-      vnode.__source!.islandPath,
-    ) as (props: RenderableProps<{}>) => JSX.Element
-    vnode.props.children = [clone]
-    counter = counter + 1
+    const hydrationType = getHydrationType(vnode)
+    if (hydrationType) {
+      // important because cloneElement calls options.vnode
+      busy = true
+      const clone = cloneElement(vnode, vnode.props) as IslandVNode
+      busy = false
+      clone.wrapped = true
+      vnode.type = createLazyHydrationWrapper(
+        vnode,
+        hydrationType,
+      ) as IslandVNode['type']
+      vnode.props.children = [clone]
+    }
   }
 }
 

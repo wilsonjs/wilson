@@ -16,7 +16,7 @@ interface Options {
   pagesDir: string
 }
 
-const partialHydrationProps = ['clientLoad']
+const partialHydrationProps = ['clientLoad', 'clientVisible']
 
 function isPartialHydrationAttribute(
   attribute: JSXAttribute | JSXSpreadAttribute,

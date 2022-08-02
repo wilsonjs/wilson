@@ -7,17 +7,22 @@ export default function Counter({
   startValue,
 }: RenderableProps<{ startValue?: number }>) {
   const [count, setCount] = useState(startValue ?? 0)
-  const add = () => setCount((i) => i + 1)
-  const subtract = () => setCount((i) => i - 1)
+  const add = (a: number) => () => setCount((i) => i + a)
+  const subtract = (a: number) => () => setCount((i) => i - a)
 
   return (
-    <>
-      <div class={styles.counter}>
-        <button onClick={subtract}>-</button>
+    <div class={styles.wrapper}>
+      <div class={styles.grid}>
+        <button onClick={subtract(1)}>-1</button>
         <pre>{count}</pre>
-        <button onClick={add}>+</button>
+        <button onClick={add(1)}>+1</button>
       </div>
-      <div class={styles.counterMessage}>{children}</div>
-    </>
+      <div class={styles.children}>{children}</div>
+      <div class={styles.grid}>
+        <button onClick={subtract(10)}>-10</button>
+        <pre>{count}</pre>
+        <button onClick={add(10)}>+10</button>
+      </div>
+    </div>
   )
 }

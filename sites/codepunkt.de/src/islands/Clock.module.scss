@@ -1,0 +1,21 @@
+.clock {
+  border: 1px solid red;
+  background: #ffebeb;
+  margin: 1rem;
+  font-size: 2rem;
+  position: relative;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &::before {
+    content: 'islands/Clock';
+    position: absolute;
+    font-family: monospace;
+    font-size: 0.75rem;
+    top: 0;
+    left: 0;
+    padding: 0.2rem 0.5rem;
+    background: #f9d1d1;
+  }
+}

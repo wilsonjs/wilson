@@ -1,11 +1,47 @@
-.counter {
+.grid {
   display: grid;
   font-size: 2em;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin-top: 2em;
   place-items: center;
 }
 
-.counterMessage {
+.wrapper {
+  border: 1px solid blue;
+  background: #f9f9ff;
+  margin: 1rem;
+  margin-top: 3rem;
+  position: relative;
+  &::before {
+    content: 'islands/Counter';
+    position: absolute;
+    font-family: monospace;
+    font-size: 0.75rem;
+    top: 0;
+    left: 0;
+    padding: 0.2rem 0.5rem;
+    background: #dadaff;
+  }
+}
+
+.children {
   text-align: center;
+  border: 1px solid green;
+  background: #f1fff1;
+  margin: 1rem;
+  padding-top: 1rem;
+  position: relative;
+  &::before {
+    content: 'static children of islands/Counter';
+    position: absolute;
+    font-family: monospace;
+    font-size: 0.75rem;
+    top: 0;
+    left: 0;
+    padding: 0.2rem 0.5rem;
+    background: #c7f1c7;
+  }
+}
+
+:global(body) {
+  margin: 0;
 }

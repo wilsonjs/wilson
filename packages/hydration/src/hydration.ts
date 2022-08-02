@@ -1,7 +1,11 @@
-import { h, render, toChildArray } from 'preact'
+import { h, render } from 'preact'
 import type { ComponentType } from 'preact'
 
-import type { Props, Slots } from './types'
+/**
+ * Arbitrary component props
+ */
+type Props = Record<string, unknown>
+type AsyncComponent = () => ComponentType
 
 /**
  * Returns HTMLElement by id.
@@ -10,119 +14,79 @@ const findById = (id: string): HTMLElement | void =>
   document.getElementById(id) ||
   console.error(`Missing #${id}, could not mount island.`)
 
-// Public: Hydrates the component immediately.
-export function hydrateNow(component: ComponentType, id: string, props: Props) {
-  console.log('hydrateNow', { component, id, props })
+/**
+ * Hydrates an interactive island immediately.
+ *
+ * @param component Component to render
+ * @param id "id" attribute of the element to render the component into
+ * @param props Props to render the component with
+ */
+export function hydrateNow(Component: ComponentType, id: string, props: Props) {
+  console.log('hydrateNow', { Component, id, props })
   const islandMount = findById(id)
   if (islandMount) {
     const slots = Array.from(islandMount.querySelectorAll('wilson-slot'))
     const closestSlot = slots.find(
       (s) => s.closest('wilson-island') === islandMount,
     )
-    createIsland(component, islandMount, props, closestSlot)
+    const children = h(StaticHtml, {
+      value: closestSlot ? closestSlot.innerHTML : '',
+    })
+    render(h(Component, props, children), islandMount)
     islandMount.setAttribute('hydrated', '')
   }
 }
 
-// async function resolveAndHydrate(
-//   frameworkFn: AsyncFrameworkFn,
-//   componentFn: AsyncComponent,
-//   id: string,
-//   props: Props,
-//   slots: Slots,
-// ) {
-//   const [framework, component] = await Promise.all([
-//     frameworkFn(),
-//     componentFn(),
-//   ])
-//   hydrateNow(component, id, props, slots)
-// }
-
-// // Public: Hydrate this component as soon as the main thread is free.
-// // If `requestIdleCallback` isn't supported, it uses a small delay.
-// export function hydrateWhenIdle(
-//   framework: AsyncFrameworkFn,
-//   component: AsyncComponent,
-//   id: string,
-//   props: Props,
-//   slots: Slots,
-// ) {
-//   const whenIdle = window.requestIdleCallback || setTimeout
-//   const cancelIdle = window.cancelIdleCallback || clearTimeout
-
-//   const idleId: any = whenIdle(() =>
-//     resolveAndHydrate(framework, component, id, props, slots),
-//   )
-
-// }
-
-// // Public: Hydrate this component when the specified media query is matched.
-// export function hydrateOnMediaQuery(
-//   framework: AsyncFrameworkFn,
-//   component: AsyncComponent,
-//   id: string,
-//   props: Props,
-//   slots: Slots,
-// ) {
-//   const mediaQuery = matchMedia(props._mediaQuery as string)
-//   delete props._mediaQuery
-
-//   const onChange = (fn: any = null) => (mediaQuery.onchange = fn)
-
-//   const hydrate = () => {
-//     onChange()
-//     resolveAndHydrate(framework, component, id, props, slots)
-//   }
-
-//   mediaQuery.matches ? hydrate() : onChange(hydrate)
-
-// }
-
-// // Public: Hydrate this component when one of it's children becomes visible.
-// export function hydrateWhenVisible(
-//   framework: AsyncFrameworkFn,
-//   component: AsyncComponent,
-//   id: string,
-//   props: Props,
-//   slots: Slots,
-// ) {
-//   const el = findById(id)
-//   if (el) {
-//     // NOTE: Force detection of the element for non-Vue frameworks.
-//     if (import.meta.env.DEV) el.style.display = 'initial'
-
-//     const observer = new IntersectionObserver(([{ isIntersecting }]) => {
-//       if (isIntersecting) {
-//         stopObserver()
-
-//         // NOTE: Reset the display value.
-//         if (import.meta.env.DEV) el.style.display = ''
-
-//         resolveAndHydrate(framework, component, id, props, slots)
-//       }
-//     })
-//     const stopObserver = () => observer.disconnect()
-
-//     observer.observe(el)
-//   }
-// }
-
-function createIsland(
-  Component: ComponentType,
-  el: Element,
+/**
+ * Waits for async import of island component and then hydrates it.
+ *
+ * @param componentFn Async function that resolves to the component to render
+ * @param id "id" attribute of the element to render the component into
+ * @param props Props to render the component with
+ */
+async function resolveAndHydrate(
+  componentFn: AsyncComponent,
+  id: string,
   props: Props,
-  closestSlot?: Element,
 ) {
-  render(
-    h(
-      Component,
-      props,
-      h(StaticHtml, {
-        value: closestSlot ? closestSlot.innerHTML : '',
-      }),
-    ),
-    el,
-  )
+  console.log('resolveAndHydrate', { componentFn, id, props })
+  const component = await componentFn()
+  hydrateNow(component, id, props)
+}
+
+/**
+ * Hydrates an interactive island when it becomes visible.
+ *
+ * @param componentFn Async function that resolves to the component to render
+ * @param id "id" attribute of the element to render the component into
+ * @param props Props to render the component with
+ */
+export function hydrateWhenVisible(
+  componentFn: AsyncComponent,
+  id: string,
+  props: Props,
+) {
+  console.log('hydrateWhenVisible', { componentFn, id, props })
+  const islandMount = findById(id)
+  if (islandMount) {
+    // display style for wilson-island is set to "contents". we need to revert
+    // this as long as we want to do a detection with IntersectionObserver
+    islandMount.style.display = 'initial'
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        stopObserver()
+        // restore display style
+        islandMount.style.display = ''
+        resolveAndHydrate(componentFn, id, props)
+      }
+    })
+    const stopObserver = () => {
+      observer.disconnect()
+    }
+
+    observer.observe(islandMount)
+  }
 }
 
 /**
