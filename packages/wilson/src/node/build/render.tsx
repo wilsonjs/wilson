@@ -1,12 +1,8 @@
 import { existsSync } from 'fs'
-import type { SiteConfig } from '@wilson/types'
+import type { SiteConfig, Island, IslandsByPath } from '@wilson/types'
 import { join } from 'pathe'
 import type { RollupOutput } from 'rollup'
-import type {
-  Island,
-  IslandsByPath,
-  RenderToStringFn,
-} from 'src/client/app.server'
+import type { RenderToStringFn } from 'src/client/app.server'
 import { withSpinner } from '../utils'
 import type { bundle } from './bundle'
 import type { PageToRender } from './pages'

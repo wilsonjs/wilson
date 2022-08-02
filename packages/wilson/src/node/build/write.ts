@@ -1,5 +1,5 @@
 import { promises as fs } from 'fs'
-import type { SiteConfig } from '@wilson/types'
+import type { SiteConfig, Island, IslandsByPath } from '@wilson/types'
 import { dirname, join, resolve } from 'pathe'
 import type { PageToRender } from './pages'
 import glob from 'fast-glob'
@@ -10,7 +10,6 @@ import { posix } from 'path'
 import MagicString from 'magic-string'
 import { init as initESLexer, parse as parseESModules } from 'es-module-lexer'
 import beautify from 'js-beautify'
-import { Island, IslandsByPath } from 'src/client/app.server'
 
 export async function writePages(
   config: SiteConfig,

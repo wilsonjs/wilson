@@ -10,6 +10,7 @@ import {
   hydrateWhenIdle,
   hydrateWhenVisible,
 } from '@wilson/hydration'
+import type { Island } from '@wilson/types'
 
 /**
  * Provides preact-router with the `urlToBeRendered`.
@@ -21,33 +22,6 @@ function App({
 }>) {
   return <Router url={urlToBeRendered}>{routes}</Router>
 }
-
-/**
- * Representation of an interactive island
- */
-export interface Island {
-  /**
-   * Unique id
-   */
-  id: string
-  /**
-   * Script that is executed to hydrate the island
-   */
-  hydrationScript: string
-  /**
-   * Path to the island component
-   */
-  componentPath: string
-  /**
-   * The resulting island filename
-   */
-  entryFilename?: string
-}
-
-/**
- * Maps page paths to an array of island definitions.
- */
-export type IslandsByPath = Record<string, Island[]>
 
 /**
  * Stores all islands encountered in the current page's rendering

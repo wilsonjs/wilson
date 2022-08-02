@@ -145,6 +145,33 @@ export interface Page {
 }
 
 /**
+ * Representation of an interactive island
+ */
+export interface Island {
+  /**
+   * Unique id
+   */
+  id: string
+  /**
+   * Script that is executed to hydrate the island
+   */
+  hydrationScript: string
+  /**
+   * Path to the island component
+   */
+  componentPath: string
+  /**
+   * The resulting island filename
+   */
+  entryFilename?: string
+}
+
+/**
+ * Maps page paths to an array of island definitions.
+ */
+export type IslandsByPath = Record<string, Island[]>
+
+/**
  * The definition of a route in Wilson, used to render pages.
  *
  * By default most routes would be inferred from files in the `pagesDir`, but a

@@ -1,10 +1,9 @@
 /* eslint-disable no-restricted-syntax */
 import { build as viteBuild, mergeConfig as mergeViteConfig } from 'vite'
 import type { UserConfig as ViteUserConfig, Plugin } from 'vite'
-import type { SiteConfig } from '@wilson/types'
+import type { SiteConfig, IslandsByPath } from '@wilson/types'
 import { extendManualChunks } from './chunks'
 import wilsonPlugins from '../plugin'
-import { IslandsByPath } from 'src/client/app.server'
 
 export const VIRTUAL_PREFIX = 'wilson_island_'
 
