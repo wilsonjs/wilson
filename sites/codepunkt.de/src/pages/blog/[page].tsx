@@ -81,7 +81,7 @@ export default function Page(props: DynamicPageProps<Params, Props>) {
       {nextPage && <a href={nextPage}>Next</a>} */}
       <Counter clientLoad>
         <p style={{ height: 5000 }}>before nested island</p>
-        <Clock clientLoad />
+        <Clock clientVisible />
         <p>after nested island</p>
       </Counter>
     </>

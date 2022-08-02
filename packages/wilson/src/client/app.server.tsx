@@ -73,12 +73,13 @@ function getHydrationScript(
         import { default as ${componentImportVariable} } from '${islandPath}';
         `
       break
+    case 'clientMedia':
     case 'clientVisible':
       componentImportVariable = 'componentFn'
       importStatements = /* js */ `
         import { ${hydrationFn} } from '@wilson/hydration';
         const ${componentImportVariable} = async () => (await import('${islandPath}')).default;
-      `
+        `
       break
   }
 
@@ -173,6 +174,7 @@ let busy = false
 
 export const hydrationFns = {
   clientLoad: 'hydrateNow',
+  clientMedia: 'hydrateOnMediaQuery',
   clientVisible: 'hydrateWhenVisible',
 }
 
@@ -188,13 +190,16 @@ async function prepareLazyHydrationHook(vnode: IslandVNode) {
     // an islandPath in __source
     !!vnode.__source &&
     vnode.__source.islandPath &&
+    // don't hook into a vnode when busy (vnode just cloned)
     !busy &&
+    // don't hook into a vnode that was already wrapped
     !vnode.wrapped &&
     typeof vnode.type !== 'string'
   ) {
     const hydrationType = getHydrationType(vnode)
     if (hydrationType) {
-      // important because cloneElement calls options.vnode
+      // the "busy-dance" is performed because cloneElement calls options.vnode
+      // and we'd run into an endless clone/hook/clone/hook loop otherwise
       busy = true
       const clone = cloneElement(vnode, vnode.props) as IslandVNode
       busy = false

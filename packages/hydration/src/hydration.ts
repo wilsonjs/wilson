@@ -55,6 +55,32 @@ async function resolveAndHydrate(
 }
 
 /**
+ * Hydrates an interactive island when it matches a given media query.
+ *
+ * @param componentFn Async function that resolves to the component to render
+ * @param id "id" attribute of the element to render the component into
+ * @param props Props to render the component with
+ */
+export function hydrateOnMediaQuery(
+  componentFn: AsyncComponent,
+  id: string,
+  props: Props,
+) {
+  console.log('hydrateOnMediaQuery', { componentFn, id, props })
+  const mediaQuery = matchMedia(props.clientMedia as string)
+  delete props.clientMedia
+
+  const onChange = (fn: any = null) => (mediaQuery.onchange = fn)
+
+  const hydrate = () => {
+    onChange()
+    resolveAndHydrate(componentFn, id, props)
+  }
+
+  mediaQuery.matches ? hydrate() : onChange(hydrate)
+}
+
+/**
  * Hydrates an interactive island when it becomes visible.
  *
  * @param componentFn Async function that resolves to the component to render
