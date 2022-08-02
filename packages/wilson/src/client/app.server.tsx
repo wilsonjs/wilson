@@ -80,11 +80,18 @@ function createLazyHydrationWrapper(vnode: IslandVNode, islandPath: string) {
   }: Readonly<Attributes & { children: ComponentChild[] }>) {
     if (vnode.renderCache) return vnode.renderCache
 
-    const islandChildren = render(<>{(islandVnode as VNode).props.children}</>)
-    const result = render(<>{islandVnode}</>).replace(
-      islandChildren,
-      `<wilson-slot>${islandChildren}</wilson-slot>`,
+    const renderedIsland = render(<>{islandVnode}</>)
+    const renderedChildren = render(
+      <>{(islandVnode as VNode).props.children}</>,
     )
+
+    let result = renderedIsland
+    if (renderedChildren !== '') {
+      result = result.replace(
+        renderedChildren,
+        `<wilson-slot>${renderedChildren}</wilson-slot>`,
+      )
+    }
 
     const no = islands.length + 1
     const island = {
