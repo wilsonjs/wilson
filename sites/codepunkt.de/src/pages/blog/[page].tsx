@@ -1,5 +1,6 @@
 import type { DynamicPageProps, GetRenderedPathsResult } from 'wilson'
 import Counter from '../../islands/Counter'
+import Timer from '../../islands/Timer'
 import styles from './[page].module.scss'
 
 interface Post {
@@ -66,7 +67,7 @@ export default function Page(props: DynamicPageProps<Params, Props>) {
 
   return (
     <>
-      <h1 className={styles.headline}>
+      {/* <h1 className={styles.headline}>
         {fm.title || 'Blog'}
         <br />
         <small>Last modified at: {fm.meta.lastUpdated}</small>
@@ -77,9 +78,15 @@ export default function Page(props: DynamicPageProps<Params, Props>) {
         ))}
       </ol>
       {prevPage && <a href={prevPage}>Prev</a>}
-      {nextPage && <a href={nextPage}>Next</a>}
+      {nextPage && <a href={nextPage}>Next</a>} */}
       <Counter clientLoad>
-        <h1>Hello Island Children!</h1>
+        <h1>Before nested Island</h1>
+        <Counter clientLoad startValue={4711}>
+          wat before timer
+          <Timer clientLoad />
+          wat after timer
+        </Counter>
+        <h1>After nested Island</h1>
       </Counter>
     </>
   )

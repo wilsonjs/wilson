@@ -1,8 +1,8 @@
 import routes from 'virtual:wilson-routes'
 import { Router } from 'preact-router'
 import render from 'preact-render-to-string'
-import { cloneElement, ComponentChild, options, toChildArray } from 'preact'
-import type { RenderableProps, VNode } from 'preact'
+import { Attributes, cloneElement, ComponentChild, options } from 'preact'
+import type { RenderableProps, VNode, JSX } from 'preact'
 import type { LazyHydrationAttributes } from '../../types/hydration'
 
 /**
@@ -16,57 +16,106 @@ function App({
   return <Router url={urlToBeRendered}>{routes}</Router>
 }
 
-export interface IslandDefinition {
+/**
+ * Representation of an interactive island
+ */
+export interface Island {
+  /**
+   * Unique id
+   */
   id: string
-  script: string
-  placeholder: string
+  /**
+   * Script that is executed to hydrate the island
+   */
+  hydrationScript: string
+  /**
+   * Path to the island component
+   */
   componentPath: string
+  /**
+   * The resulting island filename
+   */
   entryFilename?: string
 }
-export type IslandsByPath = Record<string, IslandDefinition[]>
-
-let islands: IslandDefinition[] = []
 
 /**
- * Wraps island in a `wilson-island` web component and prepends a
- * `text/hydration` script tag with a placeholder for hydration code.
- *
- * Also constructs an `island` object that is used to replace the
- * placeholder script tag with the real code performing the partial,
- * possibly lazy hydration.
+ * Maps page paths to an array of island definitions.
  */
-function createLazyHydrationWrapper(islandPath: string) {
+export type IslandsByPath = Record<string, Island[]>
+
+/**
+ * Stores all islands encountered in the current page's rendering
+ */
+let islands: Island[] = []
+
+/**
+ * Empties the island list.
+ */
+function clearIslands() {
+  islands = []
+}
+
+/**
+ * Wraps island in a `<wilson-island>` element, wraps the island children
+ * in a `<wilson-slot>` element and appends a `text/hydration` script tag
+ * with a placeholder for hydration code to the `<wilson-island>`.
+ *
+ * Constructs an `Island` object that is used to replace the
+ * placeholder script with the real code performing the partial hydration when
+ * the resulting pages are written to disk.
+ *
+ * When interactive islands are nested in one another, the LazyHydrationWrapper
+ * component is rendered not only when it's own VNode is encountered, but also
+ * when a parent island is rendering itself and it's island children to wrap
+ * them into `<wilson-slot>`.
+ *
+ * This leads to additional island being created,
+ * completely messing up the resulting hydration. To prevent it, we cache the
+ * rendered JSX.Element on the VNode and reuse it when available.
+ */
+function createLazyHydrationWrapper(vnode: IslandVNode, islandPath: string) {
   return function LazyHydrationWrapper({
-    children,
+    children: [islandVnode],
     ...propsWithoutChildren
-  }: RenderableProps<{}>) {
-    const islandChildren = ((children as ComponentChild[])[0] as VNode).props
-      .children
-    const defaultSlot = render(toChildArray(islandChildren)[0] as VNode)
+  }: Readonly<Attributes & { children: ComponentChild[] }>) {
+    if (vnode.renderCache) return vnode.renderCache
+
+    const islandChildren = render(<>{(islandVnode as VNode).props.children}</>)
+    const result = render(<>{islandVnode}</>).replace(
+      islandChildren,
+      `<wilson-slot>${islandChildren}</wilson-slot>`,
+    )
+
     const no = islands.length + 1
     const island = {
       componentPath: islandPath,
       id: `island-${no}`,
-      placeholder: `island-hydration-${no}`,
-      script: /* js */ `
+      hydrationScript: /* js */ `
         import { hydrateNow } from '@wilson/hydration';
         import { default as component } from '${islandPath}';
         hydrateNow(
           component,
           'island-${no}',
-          ${JSON.stringify(propsWithoutChildren)},
-          {default:'${defaultSlot}'}
+          ${JSON.stringify(propsWithoutChildren)}
         );
       `,
     }
     islands.push(island)
 
-    return (
+    const element = (
       <>
-        <wilson-island id={island.id}>{children}</wilson-island>
-        <script type="text/hydration">/*{island.placeholder}*/</script>
+        <wilson-island
+          id={island.id}
+          dangerouslySetInnerHTML={{
+            __html: result,
+          }}
+        />
+        <script type="text/hydration">/*{island.id}-hydration*/</script>
       </>
     )
+
+    vnode.renderCache = element
+    return element
   }
 }
 
@@ -74,6 +123,7 @@ interface IslandVNode<
   T extends LazyHydrationAttributes = LazyHydrationAttributes,
 > extends VNode<T> {
   wrapped?: true
+  renderCache?: JSX.Element
   __source?: { islandPath?: string }
 }
 
@@ -95,7 +145,10 @@ async function prepareLazyHydrationHook(vnode: IslandVNode) {
     const clone = cloneElement(vnode, vnode.props) as IslandVNode
     busy = false
     clone.wrapped = true
-    vnode.type = createLazyHydrationWrapper(vnode.__source!.islandPath)
+    vnode.type = createLazyHydrationWrapper(
+      vnode,
+      vnode.__source!.islandPath,
+    ) as (props: RenderableProps<{}>) => JSX.Element
     vnode.props.children = [clone]
     counter = counter + 1
   }
@@ -115,7 +168,7 @@ export interface ServerRenderResult {
   /**
    * Islands that were found.
    */
-  islands: IslandDefinition[]
+  islands: Island[]
 }
 
 export type RenderToStringFn = (
@@ -125,7 +178,7 @@ export type RenderToStringFn = (
 export default async function renderToString(
   urlToBeRendered: string,
 ): Promise<ServerRenderResult> {
-  islands = []
+  clearIslands()
   const html = render(<App urlToBeRendered={urlToBeRendered} />)
   return { html, islands }
 }

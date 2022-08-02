@@ -11,16 +11,16 @@ const findById = (id: string): HTMLElement | void =>
   console.error(`Missing #${id}, could not mount island.`)
 
 // Public: Hydrates the component immediately.
-export function hydrateNow(
-  component: ComponentType,
-  id: string,
-  props: Props,
-  slots: Slots,
-) {
-  const el = findById(id)
-  if (el) {
-    createIsland(component, el, props, slots)
-    el.setAttribute('hydrated', '')
+export function hydrateNow(component: ComponentType, id: string, props: Props) {
+  console.log('hydrateNow', { component, id, props })
+  const islandMount = findById(id)
+  if (islandMount) {
+    const slots = Array.from(islandMount.querySelectorAll('wilson-slot'))
+    const closestSlot = slots.find(
+      (s) => s.closest('wilson-island') === islandMount,
+    )
+    createIsland(component, islandMount, props, closestSlot)
+    islandMount.setAttribute('hydrated', '')
   }
 }
 
@@ -111,16 +111,15 @@ function createIsland(
   Component: ComponentType,
   el: Element,
   props: Props,
-  { default: children, ...otherSlots }: Slots,
+  closestSlot?: Element,
 ) {
-  for (const [key, value] of Object.entries(otherSlots)) {
-    props[key] = h(StaticHtml, { value, name: key })
-  }
   render(
     h(
       Component,
       props,
-      children !== null ? h(StaticHtml, { value: children }) : children,
+      h(StaticHtml, {
+        value: closestSlot ? closestSlot.innerHTML : '',
+      }),
     ),
     el,
   )

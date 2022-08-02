@@ -3,8 +3,8 @@ import { build as viteBuild, mergeConfig as mergeViteConfig } from 'vite'
 import type { UserConfig as ViteUserConfig, Plugin } from 'vite'
 import type { SiteConfig } from '@wilson/types'
 import { extendManualChunks } from './chunks'
-import type { IslandsByPath } from './build'
 import wilsonPlugins from '../plugin'
+import { IslandsByPath } from 'src/client/app.server'
 
 export const VIRTUAL_PREFIX = 'wilson_island_'
 
@@ -18,7 +18,7 @@ export async function bundleIslands(
   for (const path in islandsByPath) {
     islandsByPath[path].forEach((island) => {
       island.entryFilename = `${path.replace(/\//g, '_')}_${island.id}`
-      entrypoints[island.entryFilename] = island.script
+      entrypoints[island.entryFilename] = island.hydrationScript
       islandComponents[island.componentPath] = island.componentPath
     })
   }

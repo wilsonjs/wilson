@@ -1,12 +1,9 @@
-import { IslandDefinition } from 'src/client/app.server'
 import { resolveConfig } from '../config'
 import { debug, rmDir, timeSince, withSpinner } from '../utils'
 import { bundle } from './bundle'
 import { bundleIslands } from './islands'
 import { renderPages } from './render'
 import { writePages } from './write'
-
-export type IslandsByPath = Record<string, IslandDefinition[]>
 
 // TODO: write sitemap after `pagesToRender` are available
 export async function build(root: string = process.cwd()) {

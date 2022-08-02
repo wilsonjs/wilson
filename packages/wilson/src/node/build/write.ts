@@ -4,14 +4,13 @@ import { dirname, join, resolve } from 'pathe'
 import type { PageToRender } from './pages'
 import glob from 'fast-glob'
 import { VIRTUAL_PREFIX } from './islands'
-import { IslandsByPath } from './build'
 import { Manifest } from 'vite'
 import { uniq } from '../utils'
 import { posix } from 'path'
 import MagicString from 'magic-string'
 import { init as initESLexer, parse as parseESModules } from 'es-module-lexer'
 import beautify from 'js-beautify'
-import { IslandDefinition } from 'src/client/app.server'
+import { Island, IslandsByPath } from 'src/client/app.server'
 
 export async function writePages(
   config: SiteConfig,
@@ -37,7 +36,7 @@ async function writePage(
   config: SiteConfig,
   page: PageToRender,
   manifest: Manifest,
-  islands: IslandDefinition[],
+  islands: Island[],
 ): Promise<void> {
   let content = page.rendered
   const preloadScripts: string[] = []
@@ -55,7 +54,7 @@ async function writePage(
     const code = await fs.readFile(filename, 'utf-8')
     const rebasedCode = await rebaseImportsToAssetsDir(config, code)
     content = content.replace(
-      `<script type="text/hydration">/*${island.placeholder}*/</script>`,
+      `<script type="text/hydration">/*${island.id}-hydration*/</script>`,
       // TODO: Remove additional script tag once Firefox is fixed
       // https://bugzilla.mozilla.org/show_bug.cgi?id=1737882
       `<script></script><script type="module" async>${rebasedCode}</script>`,
