@@ -13,6 +13,7 @@ import { dirname, resolve } from 'path/posix'
 
 interface Options {
   islandsDir: string
+  layoutsDir: string
   pagesDir: string
 }
 
@@ -87,13 +88,14 @@ function addIslandPathAttribute(
   )
 }
 
-export default declare((api, { islandsDir, pagesDir }: Options) => {
+export default declare((api, { islandsDir, layoutsDir, pagesDir }: Options) => {
   return {
     name: 'wat',
     visitor: {
       Program(programPath, state) {
         const fileName = state.file.opts.filename!
-        const isWilsonPage = fileName.startsWith(pagesDir)
+        const isPageOrLayout =
+          fileName.startsWith(pagesDir) || fileName.startsWith(layoutsDir)
 
         programPath.traverse({
           JSXOpeningElement(path) {
@@ -103,9 +105,9 @@ export default declare((api, { islandsDir, pagesDir }: Options) => {
 
             // delete __self and __source attributes added by
             // @babel/plugin-transform-react-jsx-development for
-            // JSXOpeningElements that are not on a wilson page or don't have
-            // partial hydration attributes.
-            if (!isWilsonPage || !hasPartialHydrationAttribute) {
+            // JSXOpeningElements that are not on a wilson page or layout or
+            // don't have partial hydration attributes.
+            if (!isPageOrLayout || !hasPartialHydrationAttribute) {
               return removeDevelopmentAttributes(path.node)
             }
 

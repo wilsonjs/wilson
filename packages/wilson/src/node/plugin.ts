@@ -91,7 +91,11 @@ export default function wilsonPlugins(
               // props and is imported as default import from islands directory.
               [
                 '@wilson',
-                { islandsDir: config.islandsDir, pagesDir: config.pagesDir },
+                {
+                  islandsDir: config.islandsDir,
+                  layoutsDir: config.layoutsDir,
+                  pagesDir: config.pagesDir,
+                },
               ],
             ]
           : [],
