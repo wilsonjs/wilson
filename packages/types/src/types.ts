@@ -178,6 +178,7 @@ export type IslandsByPath = Record<string, Island[]>
  * user can provide custom routes using the `extendRoutes` hook.
  */
 export type Route = Pick<Page, 'componentName' | 'importPath' | 'route'>
+
 //  * Additional paths for the page, that behave like a copy of the route.
 // /**
 //  * When building the site, each path will be rendered separately.
@@ -190,7 +191,7 @@ export interface UserFrontmatter {
 
 export interface PageFrontmatter extends Record<string, any> {
   meta: PageMeta
-  // layout: false | string
+  layout: string | undefined
   // route: {
   //   name?: string
   //   path?: string

@@ -5,6 +5,8 @@ import type { Options } from './types'
 import { getFrontmatter as getTsxFrontmatter } from './typescript'
 import { isObject } from './utils'
 
+// TODO: extendFrontmatter, for example to switch the layout
+// of a 404 page inserted with extendRoutes away from default
 async function getMdFrontmatter(
   _absolutePath: string,
   _options: Options,
@@ -31,7 +33,13 @@ async function prepareFrontmatter(
   anyFrontmatter: UserFrontmatter,
   options: Options,
 ): Promise<PageFrontmatter> {
-  const { meta: originalMeta, layout, ...frontmatter } = anyFrontmatter
+  const {
+    meta: originalMeta,
+    layout: fmLayout,
+    ...frontmatter
+  } = anyFrontmatter
+  const layout: string | undefined =
+    typeof fmLayout === 'string' ? fmLayout : undefined
   const meta = {
     filename: relative(options.root, absolutePath),
     lastUpdated: (await fs.stat(absolutePath)).mtime,

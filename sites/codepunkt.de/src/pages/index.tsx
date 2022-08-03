@@ -1,3 +1,7 @@
+export const frontmatter = {
+  layout: 'index',
+}
+
 export default function IndexPage() {
   return (
     <>

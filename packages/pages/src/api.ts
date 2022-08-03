@@ -10,22 +10,6 @@ import { parseFrontmatter } from './frontmatter'
 
 const pageByPath = new Map<string, Page>()
 
-/**
- * Returns one or all pages.
- *
- * @param absolutePath The absolute path to the page
- * @returns An array of pages when no path is given, or the page when a path is given.
- */
-export async function getPages(absolutePath?: undefined): Promise<Page[]>
-export async function getPages(absolutePath: string): Promise<Page | undefined>
-export async function getPages(
-  absolutePath: string | undefined,
-): Promise<Page[] | Page | undefined> {
-  return absolutePath === undefined
-    ? (Array.from(pageByPath.values()) as Page[])
-    : pageByPath.get(absolutePath)
-}
-
 export function createApi(options: Options) {
   const { pageExtensions, pagesDir, root, srcDir } = options
   let addedAllPages: Promise<void>
@@ -196,6 +180,13 @@ export function getSortedPages(): Page[] {
 }
 
 /**
+ * Returns all pages as an array.
+ */
+export function getPages(): Page[] {
+  return Array.from(pageByPath.values()) as Page[]
+}
+
+/**
  * Returns the page for the given importPath.
  * @param importPath page importPath, e.g. `src/pages/blog/[page].tsx`
  */
@@ -203,6 +194,16 @@ export function getPageByImportPath(importPath: string): Page | undefined {
   return Array.from(pageByPath.values()).find(
     (page) => page.importPath === importPath,
   )
+}
+
+/**
+ * Returns the page for the given absolutePath.
+ * @param absolutePath page absolutePath, e.g. `/home/user/wilson-site/src/pages/index.tsx`
+ */
+export async function getPageByAbsolutePath(
+  absolutePath: string,
+): Promise<Page | undefined> {
+  return pageByPath.get(absolutePath)
 }
 
 /**

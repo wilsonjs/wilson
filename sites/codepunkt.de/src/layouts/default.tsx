@@ -1,10 +1,6 @@
-import type { ComponentChildren } from 'preact'
+import type { RenderableProps } from 'preact'
 
-export default function DefaultLayout({
-  children,
-}: {
-  children: ComponentChildren
-}) {
+export default function DefaultLayout({ children }: RenderableProps<{}>) {
   return (
     <>
       <header>

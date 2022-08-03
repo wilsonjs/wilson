@@ -8,19 +8,32 @@ import { debug } from './utils'
 type ExtendRoutes = Options['extendRoutes']
 
 /**
+ * Returns import statement source code for the given page, e.g.
+ * `import BlogIndex from './src/pages/blog/index.tsx';`
+ */
+function getPageImportCode({ componentName, importPath }: Route): string {
+  return `import ${componentName} from '${importPath}';`
+}
+
+/**
  * Returns import statement source code for the given route, e.g.
  * `import BlogIndex from './src/pages/blog/index.tsx';`
  */
-function getRouteImportCode({ componentName, importPath }: Route): string {
-  return `import ${componentName} from '${importPath}';`
+function getLayoutImportCode({ componentName, importPath }: Route): string {
+  const page = getPageByImportPath(importPath)
+  const layout = (page ? page.frontmatter.layout : 'default') ?? 'default'
+  return `import ${componentName}Layout from './src/layouts/${layout}';`
 }
 
 /**
  * Returns displayName assignment source code for the given route, e.g.
  * `BlogIndex.displayName = 'BlogIndex';`
  */
-function getRouteDisplayNameCode({ componentName }: Route): string {
-  return `${componentName}.displayName = '${componentName}';`
+function getPageAttributesCode({ componentName }: Route): string {
+  return `
+    ${componentName}.displayName = '${componentName}';
+    ${componentName}.Layout = ${componentName}Layout;
+  `
 }
 
 /**
@@ -74,11 +87,9 @@ function getSpecificRouteProps(routes: Route[]): {
   }, {})
 }
 
-// TODO: comment this function
 /**
- *
- * @param routes
- * @returns
+ * Returns an object that maps route paths to page frontmatter
+ * @param routes An array of routes
  */
 function getFrontmatterByPath(routes: Route[]): {
   [route: string]: PageFrontmatter
@@ -119,17 +130,21 @@ export async function generateRoutesModule(
   const frontMatterByPath = getFrontmatterByPath(routes)
 
   const code = /* js */ `
-    import { h } from 'preact';
+    import { h, Fragment } from 'preact';
     import { shallowEqual } from 'fast-equals';
-    ${routes.map(getRouteImportCode).join('\n')}\n
-    ${routes.map(getRouteDisplayNameCode).join('\n')}\n
+    ${routes.map(getPageImportCode).join('\n')}\n
+    ${routes.map(getLayoutImportCode).join('\n')}\n
+    ${routes.map(getPageAttributesCode).join('\n')}\n
     const specificMatchProps = ${JSON.stringify(specificMatchProps, null, 2)};
     const frontMatterByPath = ${JSON.stringify(frontMatterByPath, null, 2)};
 
     const PageWrapper = ({ path, element, matches, url, ...rest }) => {
       const frontmatter = frontMatterByPath[path] ?? {};
       const specific = specificMatchProps[path]?.find(({ matches: m }) => shallowEqual(m, matches))
-      return h(element, { params: matches, path, url, frontmatter, ...(specific ? specific.props : {}) });
+      const pageProps = { params: matches, path, url, frontmatter, ...(specific ? specific.props : {}) }
+      return h(element.Layout, pageProps, [
+        h(element, pageProps)
+      ]);
     }
 
     export default [
