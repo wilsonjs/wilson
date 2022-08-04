@@ -1,5 +1,5 @@
-import { defineConfig } from 'wilson'
+import { UserConfig } from 'wilson'
 
-export default defineConfig({
+export default {
   siteUrl: 'https://wilsonjs.com/',
-})
+} as UserConfig

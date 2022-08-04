@@ -6,10 +6,6 @@ import { dirname, join, resolve } from 'pathe'
 import type { SiteConfig, UserConfig } from '@wilson/types'
 import { debug } from './utils'
 
-export function defineConfig(config: UserConfig) {
-  return config
-}
-
 function isObject(value: unknown): value is Record<string, any> {
   return Object.prototype.toString.call(value) === '[object Object]'
 }

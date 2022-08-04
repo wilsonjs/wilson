@@ -1,7 +1,7 @@
-export { defineConfig } from './config'
 export type {
   StaticPageProps,
   DynamicPageProps,
   GetRenderedPathsResult,
   PageFrontmatter,
+  UserConfig,
 } from '@wilson/types'
