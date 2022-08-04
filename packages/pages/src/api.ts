@@ -200,9 +200,7 @@ export function getPageByImportPath(importPath: string): Page | undefined {
  * Returns the page for the given absolutePath.
  * @param absolutePath page absolutePath, e.g. `/home/user/wilson-site/src/pages/index.tsx`
  */
-export async function getPageByAbsolutePath(
-  absolutePath: string,
-): Promise<Page | undefined> {
+export function getPageByAbsolutePath(absolutePath: string): Page | undefined {
   return pageByPath.get(absolutePath)
 }
 
