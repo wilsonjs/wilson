@@ -33,11 +33,15 @@ async function prepareFrontmatter(
   anyFrontmatter: UserFrontmatter,
   options: Options,
 ): Promise<PageFrontmatter> {
+  const extendedFrontmatter = await options.extendFrontmatter(
+    anyFrontmatter,
+    relative(options.root, absolutePath),
+  )
   const {
     meta: originalMeta,
     layout: fmLayout,
     ...frontmatter
-  } = anyFrontmatter
+  } = extendedFrontmatter ?? {}
   const layout: string | undefined =
     typeof fmLayout === 'string' ? fmLayout : undefined
   const meta = {

@@ -69,6 +69,13 @@ export interface UserConfig {
    * Used to access and optionally modify the generated routes.
    */
   extendRoutes?: (routes: Route[]) => Awaitable<Route[] | void>
+  /**
+   * Used to access and optionally modify page's frontmatter.
+   */
+  extendFrontmatter?: (
+    frontmatter: UserFrontmatter,
+    filename: string,
+  ) => Awaitable<UserFrontmatter | void>
 }
 
 /**

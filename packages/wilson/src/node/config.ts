@@ -160,6 +160,7 @@ function siteConfigDefaults(
     srcDir,
     pageExtensions: ['.md', '.tsx'],
     vite: viteConfigDefaults(root),
+    extendFrontmatter() {},
     extendRoutes(routes) {
       if (isDevelopmentMode) {
         return [
