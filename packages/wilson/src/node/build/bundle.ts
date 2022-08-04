@@ -22,22 +22,7 @@ type Entrypoints = Record<string, string>
 export async function bundle(siteConfig: SiteConfig) {
   const clientResult = await bundleWithVite(siteConfig, { ssr: false })
   const serverResult = await bundleWithVite(siteConfig, { ssr: true })
-  await bundleHtmlEntrypoints(siteConfig)
   return { clientResult, serverResult }
-}
-
-async function bundleHtmlEntrypoints(siteConfig: SiteConfig) {
-  const entrypoints = glob.sync(resolve(siteConfig.pagesDir, './**/*.html'), {
-    cwd: siteConfig.root,
-    ignore: ['node_modules/**'],
-  })
-
-  if (entrypoints.length > 0) {
-    await bundleWithVite(siteConfig, {
-      htmlBuild: true,
-      ssr: false,
-    })
-  }
 }
 
 async function bundleWithVite(
