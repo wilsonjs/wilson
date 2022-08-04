@@ -11,7 +11,7 @@ import {
 } from './types'
 import { generateDataModule, generateRoutesModule } from './virtual'
 
-export { getPages } from './api'
+export { getPages, getPageByAbsolutePath, getPageByImportPath } from './api'
 
 // TODO: allow dynamic params inside a path segment, e.g. src/pages/blog/page-[pageNo]
 // might need to switch to preact-iso router for this, preact-router doesn't seem to
