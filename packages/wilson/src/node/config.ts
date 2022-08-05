@@ -158,8 +158,11 @@ function siteConfigDefaults(
     srcDir,
     pageExtensions: ['.md', '.tsx'],
     site: defaultSiteMeta,
+    defaultContentLanguage: 'en',
     vite: viteConfigDefaults(root),
-    extendFrontmatter() {},
+    extendFrontmatter(userFrontmatter) {
+      return userFrontmatter
+    },
     extendRoutes(routes) {
       if (isDevelopmentMode) {
         return [

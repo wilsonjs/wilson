@@ -52,14 +52,15 @@ export async function renderPage(
   page: PageToRender,
   rendertoString: RenderToStringFn,
 ): Promise<{ rendered: string; islands: Island[] }> {
-  const { html, islands } = await rendertoString(page.path)
+  const { html, islands, head } = await rendertoString(page.path)
+  // TODO: links, scripts and meta
   return {
     rendered: /* html */ `
       <!DOCTYPE html>
-      <html>
+      <html lang="${head.lang ?? config.defaultContentLanguage}">
         <head>
           ${stylesheetTagsFrom(config, clientChunks)}
-          <title>${config.site.title}</title>
+          <title>${head.title ?? config.site.title}</title>
         </head>
         <body>
           <div id="site">${html}</div>

@@ -1,8 +1,6 @@
-import routes from 'virtual:wilson-routes'
-import { Router } from 'preact-router'
 import render from 'preact-render-to-string'
 import { Attributes, cloneElement, ComponentChild, options } from 'preact'
-import type { RenderableProps, VNode, JSX } from 'preact'
+import type { VNode, JSX } from 'preact'
 import type { LazyHydrationAttributes } from '../../types/hydration'
 import {
   hydrateNow,
@@ -11,17 +9,8 @@ import {
   hydrateWhenVisible,
 } from '@wilson/hydration'
 import type { Island } from '@wilson/types'
-
-/**
- * Provides preact-router with the `urlToBeRendered`.
- */
-function App({
-  urlToBeRendered,
-}: RenderableProps<{
-  urlToBeRendered: string
-}>) {
-  return <Router url={urlToBeRendered}>{routes}</Router>
-}
+import { toStatic } from 'hoofd/preact'
+import App from './components/app'
 
 /**
  * Stores all islands encountered in the current page's rendering
@@ -220,6 +209,14 @@ export interface ServerRenderResult {
    * Islands that were encountered when rendering the page.
    */
   islands: Island[]
+  /**
+   * Information collected about <head>
+   */
+  head: {
+    lang: string
+    title: string
+    metas: { keyword: string; content: string }[]
+  }
 }
 
 export type RenderToStringFn = (
@@ -230,6 +227,7 @@ export default async function renderToString(
   urlToBeRendered: string,
 ): Promise<ServerRenderResult> {
   clearIslands()
-  const html = render(<App urlToBeRendered={urlToBeRendered} />)
-  return { html, islands }
+  const html = await render(<App urlToBeRendered={urlToBeRendered} />)
+  const head = toStatic() as unknown as ServerRenderResult['head']
+  return { html, islands, head }
 }

@@ -69,6 +69,10 @@ export interface UserConfig {
     description: string
   }
   /**
+   * Default content language. Defaults to 'en'.
+   */
+  defaultContentLanguage?: string
+  /**
    * File extensions that are allowed as pages.
    */
   pageExtensions?: string[]

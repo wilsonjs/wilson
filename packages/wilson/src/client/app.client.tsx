@@ -1,11 +1,8 @@
-import routes from 'virtual:wilson-routes'
 import { render } from 'preact'
-import { Router } from 'preact-router'
 import 'preact/debug'
+import App from './components/app'
 
-export default function App() {
-  return <Router>{routes}</Router>
-}
+export default App
 
 if (!import.meta.env.SSR)
   render(<App />, document.getElementById('site') as HTMLElement)

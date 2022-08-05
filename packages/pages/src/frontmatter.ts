@@ -30,17 +30,17 @@ async function extractFrontmatter(
 
 async function prepareFrontmatter(
   absolutePath: string,
-  anyFrontmatter: UserFrontmatter,
+  userFrontmatter: UserFrontmatter,
   options: Options,
 ): Promise<PageFrontmatter> {
   const extendedFrontmatter = await options.extendFrontmatter(
-    anyFrontmatter,
+    userFrontmatter,
     relative(options.root, absolutePath),
   )
   const {
     meta: originalMeta,
     layout: fmLayout,
-    ...frontmatter
+    ...rest
   } = extendedFrontmatter ?? {}
   const layout: string | undefined =
     typeof fmLayout === 'string' ? fmLayout : undefined
@@ -49,7 +49,8 @@ async function prepareFrontmatter(
     lastUpdated: (await fs.stat(absolutePath)).mtime,
     ...(isObject(originalMeta) ? originalMeta : {}),
   }
-  return { layout, meta, ...frontmatter }
+  const frontmatter = { layout, meta, ...rest }
+  return frontmatter
 }
 
 export async function parseFrontmatter(

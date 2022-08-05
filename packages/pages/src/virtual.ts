@@ -122,16 +122,15 @@ function debugCodeForModule(code: string, module: string): void {
  * @param extendRoutes User-configurable function to access and optionally modify routes
  * @returns Source code for routes module.
  */
-export async function generateRoutesModule(
-  extendRoutes: ExtendRoutes,
-): Promise<string> {
-  const routes = await getRoutes(extendRoutes)
+export async function generateRoutesModule(options: Options): Promise<string> {
+  const routes = await getRoutes(options.extendRoutes)
   const specificMatchProps = getSpecificRouteProps(routes)
   const frontMatterByPath = getFrontmatterByPath(routes)
 
   const code = /* js */ `
     import { h, Fragment } from 'preact';
     import { shallowEqual } from 'fast-equals';
+    import { useLang, useTitle } from 'hoofd/preact';
     ${routes.map(getPageImportCode).join('\n')}\n
     ${routes.map(getLayoutImportCode).join('\n')}\n
     ${routes.map(getPageAttributesCode).join('\n')}\n
@@ -142,6 +141,7 @@ export async function generateRoutesModule(
       const frontmatter = frontMatterByPath[path] ?? {};
       const specific = specificMatchProps[path]?.find(({ matches: m }) => shallowEqual(m, matches))
       const pageProps = { params: matches, path, url, frontmatter, ...(specific ? specific.props : {}) }
+      useTitle(frontmatter.title ?? '${options.site.title}');
       return h(element.Layout, pageProps, [
         h(element, pageProps)
       ]);
