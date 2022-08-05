@@ -3,7 +3,7 @@ import { extname, relative } from 'pathe'
 import type { PageFrontmatter, UserFrontmatter } from '@wilson/types'
 import type { Options } from './types'
 import { getFrontmatter as getTsxFrontmatter } from './typescript'
-import { isObject } from './utils'
+import { isObject } from '@wilson/utils'
 
 // TODO: extendFrontmatter, for example to switch the layout
 // of a 404 page inserted with extendRoutes away from default

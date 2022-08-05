@@ -60,6 +60,7 @@ importers:
       '@types/fs-extra': ^9.0.13
       '@types/node': ^18.0.0
       '@wilson/types': workspace:^1.0.0
+      '@wilson/utils': workspace:^1.0.0
       debug: ^4.3.4
       deep-equal: ^2.0.5
       esbuild: ^0.14.49
@@ -73,6 +74,7 @@ importers:
       vite: 3.0.0
     dependencies:
       '@preact/preset-vite': 2.3.0_preact@10.10.0+vite@3.0.0
+      '@wilson/utils': link:../utils
       debug: 4.3.4
       deep-equal: 2.0.5
       esbuild: 0.14.51
@@ -126,6 +128,7 @@ importers:
       '@wilson/hydration': workspace:^1.0.0
       '@wilson/pages': workspace:^1.0.0
       '@wilson/types': workspace:^1.0.0
+      '@wilson/utils': workspace:^1.0.0
       debug: ^4.3.4
       es-module-lexer: ^1.0.0
       fast-equals: ^4.0.1
@@ -156,6 +159,7 @@ importers:
       '@wilson/babel-plugin': link:../babel-plugin
       '@wilson/hydration': link:../hydration
       '@wilson/pages': link:../pages
+      '@wilson/utils': link:../utils
       debug: 4.3.4
       es-module-lexer: 1.0.1
       fast-equals: 4.0.1

@@ -5,15 +5,11 @@ import pc from 'picocolors'
 import { dirname, join, resolve } from 'pathe'
 import type { SiteConfig, UserConfig } from '@wilson/types'
 import { debug } from './utils'
+import { isObject } from '@wilson/utils'
 
 const defaultSiteMeta = {
   title: 'Welcome to Wilson!',
   description: '',
-}
-
-// TODO: abstract this `isObject` and the one from @wilson/pages into @wilson/utils
-function isObject(value: unknown): value is Record<string, any> {
-  return Object.prototype.toString.call(value) === '[object Object]'
 }
 
 function mergeConfig<T = Record<string, any>>(

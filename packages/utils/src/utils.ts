@@ -1,4 +1,16 @@
 /**
+ * Check if variable is an object
+ * @param maybeObject Variable that might be an object
+ */
+export function isObject(maybeObject: any): maybeObject is object {
+  return (
+    maybeObject !== null &&
+    typeof maybeObject === 'object' &&
+    !Array.isArray(maybeObject)
+  )
+}
+
+/**
  * Remove false, undefined and null from array.
  *
  * @param arr The array to remove from

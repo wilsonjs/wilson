@@ -6,7 +6,7 @@ import type {
 } from '@wilson/types'
 import { relative } from 'pathe'
 import type { Options } from './types'
-import { isObject } from './utils'
+import { isObject } from '@wilson/utils'
 import { getPageExports } from './vite'
 
 /**
