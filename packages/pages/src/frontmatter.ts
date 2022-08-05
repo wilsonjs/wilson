@@ -4,15 +4,13 @@ import type { PageFrontmatter, UserFrontmatter } from '@wilson/types'
 import type { Options } from './types'
 import { getFrontmatter as getTsxFrontmatter } from './typescript'
 import { isObject } from '@wilson/utils'
+import { parseFrontmatter as parseMarkdownFrontmatter } from '@wilson/markdown'
 
-// TODO: extendFrontmatter, for example to switch the layout
-// of a 404 page inserted with extendRoutes away from default
 async function getMdFrontmatter(
-  _absolutePath: string,
-  _options: Options,
+  absolutePath: string,
 ): Promise<UserFrontmatter> {
-  // something something graymatter
-  return {}
+  const code = await fs.readFile(absolutePath, 'utf-8')
+  return parseMarkdownFrontmatter(code).frontmatter
 }
 
 async function extractFrontmatter(
@@ -23,7 +21,7 @@ async function extractFrontmatter(
     case '.tsx':
       return await getTsxFrontmatter(absolutePath, options)
     case '.md':
-      return await getMdFrontmatter(absolutePath, options)
+      return await getMdFrontmatter(absolutePath)
   }
   return {}
 }

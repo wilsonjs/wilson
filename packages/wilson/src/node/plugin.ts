@@ -5,8 +5,10 @@ import debug from 'debug'
 import { relative } from 'pathe'
 import pc from 'picocolors'
 import type { PluginOption, ViteDevServer } from 'vite'
+import type { TransformResult } from 'rollup'
 import inspect from 'vite-plugin-inspect'
 import { configureMiddleware, createServer } from './server'
+import { parseFrontmatter, processMarkdown } from '@wilson/markdown'
 
 /**
  * Watches wilson config and restarts dev server when it changes.
@@ -63,6 +65,32 @@ function virtualClientEntrypoint(): PluginOption {
 }
 
 /**
+ * Markdown plugin
+ * @param siteConfig Site configuration
+ * @returns Plugin
+ */
+function markdown(): PluginOption {
+  return {
+    name: 'wilson:markdown',
+    enforce: 'pre',
+
+    async transform(code: string, id: string): Promise<TransformResult> {
+      if (!id.endsWith('.md')) return null
+      const { markdown } = parseFrontmatter(code)
+      const vfile = await processMarkdown(markdown)
+
+      const jsx = (vfile.value as string)
+        .replace(/^<div>/, '<>')
+        .replace(/<\/div>$/, '</>')
+
+      return /* tsx */ `
+        export default function Page() { return ${jsx} }
+      `
+    },
+  }
+}
+
+/**
  * Configures an HTML fallback middleware for vite's dev server.
  * @param siteConfig Site configuration
  * @returns Plugin
@@ -91,7 +119,9 @@ export default function wilsonPlugins(
   debug('wilson:config')(config)
 
   return [
+    markdown(),
     preact({
+      include: [/\.[tj]sx?$/, /\.md$/],
       devtoolsInProd: true,
       babel: {
         plugins: ssr
@@ -117,9 +147,9 @@ export default function wilsonPlugins(
       },
     }),
     pages(config),
-    config.mode === 'development' && inspect(),
-    config.mode === 'development' && htmlFallback(config),
-    config.mode === 'development' && devConfigWatch(config),
+    ...(config.mode === 'development'
+      ? [inspect(), htmlFallback(config), devConfigWatch(config)]
+      : []),
     virtualClientEntrypoint(),
   ].filter(Boolean)
 }

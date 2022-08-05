@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@preact/preset-vite": "^2.3.0",
+    "@wilson/markdown": "workspace:^1.0.0",
     "@wilson/utils": "workspace:^1.0.0",
     "debug": "^4.3.4",
     "deep-equal": "^2.0.5",
