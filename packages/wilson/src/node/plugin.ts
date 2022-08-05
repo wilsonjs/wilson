@@ -5,10 +5,9 @@ import debug from 'debug'
 import { relative } from 'pathe'
 import pc from 'picocolors'
 import type { PluginOption, ViteDevServer } from 'vite'
-import type { TransformResult } from 'rollup'
 import inspect from 'vite-plugin-inspect'
 import { configureMiddleware, createServer } from './server'
-import { parseFrontmatter, processMarkdown } from '@wilson/markdown'
+import markdown from '@wilson/markdown'
 
 /**
  * Watches wilson config and restarts dev server when it changes.
@@ -60,32 +59,6 @@ function virtualClientEntrypoint(): PluginOption {
     async load(id) {
       if (id === RESOLVED_VIRTUAL_MODULE_ID)
         return 'import "wilson/dist/client/app.client.js";'
-    },
-  }
-}
-
-/**
- * Markdown plugin
- * @param siteConfig Site configuration
- * @returns Plugin
- */
-function markdown(): PluginOption {
-  return {
-    name: 'wilson:markdown',
-    enforce: 'pre',
-
-    async transform(code: string, id: string): Promise<TransformResult> {
-      if (!id.endsWith('.md')) return null
-      const { markdown } = parseFrontmatter(code)
-      const vfile = await processMarkdown(markdown)
-
-      const jsx = (vfile.value as string)
-        .replace(/^<div>/, '<>')
-        .replace(/<\/div>$/, '</>')
-
-      return /* tsx */ `
-        export default function Page() { return ${jsx} }
-      `
     },
   }
 }

@@ -6,7 +6,8 @@ import type { Node } from 'unist'
 import remarkStringify from 'remark-stringify'
 import rehypeRaw from 'rehype-raw'
 import { unified, Processor } from 'unified'
-import type { VFile } from 'vfile'
+import type { PluginOption } from 'vite'
+import type { TransformResult } from 'rollup'
 // @ts-ignore
 import toJsx from '@mapbox/hast-util-to-jsx'
 
@@ -53,7 +54,13 @@ export function parseFrontmatter(markdownCode: string): FrontmatterParseResult {
   return { markdown, frontmatter }
 }
 
-export async function processMarkdown(markdownCode: string): Promise<VFile> {
+/**
+ * Converts markdown to JSX
+ * @param markdownCode
+ */
+export async function processMarkdown(
+  markdownCode: string,
+): Promise<{ jsx: string }> {
   const processor = unified()
     .use(remarkParse)
     // apply plugins that change MDAST
@@ -66,5 +73,31 @@ export async function processMarkdown(markdownCode: string): Promise<VFile> {
     })
 
   const vfile = await processor.process(markdownCode)
-  return vfile
+  const jsx = (vfile.value as string)
+    .replace(/^<div>/, '<>')
+    .replace(/<\/div>$/, '</>')
+
+  return { jsx }
+}
+
+/**
+ * Wilson markdown plugin
+ * @returns Plugin
+ */
+export default function markdownPlugin(): PluginOption {
+  return {
+    name: 'wilson:markdown',
+    enforce: 'pre',
+
+    async transform(code: string, id: string): Promise<TransformResult> {
+      if (!id.endsWith('.md')) return null
+
+      const { markdown } = parseFrontmatter(code)
+      const { jsx } = await processMarkdown(markdown)
+
+      return /* tsx */ `
+        export default function Page() { return ${jsx} }
+      `
+    },
+  }
 }
