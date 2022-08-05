@@ -6,6 +6,12 @@ import { dirname, join, resolve } from 'pathe'
 import type { SiteConfig, UserConfig } from '@wilson/types'
 import { debug } from './utils'
 
+const defaultSiteMeta = {
+  title: 'Welcome to Wilson!',
+  description: '',
+}
+
+// TODO: abstract this `isObject` and the one from @wilson/pages into @wilson/utils
 function isObject(value: unknown): value is Record<string, any> {
   return Object.prototype.toString.call(value) === '[object Object]'
 }
@@ -81,7 +87,7 @@ async function loadUserConfigFile(
   } catch (error) {
     if (error instanceof Error && error.message.includes('Could not resolve')) {
       debug.config('no wilson.config.ts file found.')
-      return {}
+      return { site: defaultSiteMeta }
     }
     throw error
   }
@@ -155,6 +161,7 @@ function siteConfigDefaults(
     siteUrl: '',
     srcDir,
     pageExtensions: ['.md', '.tsx'],
+    site: defaultSiteMeta,
     vite: viteConfigDefaults(root),
     extendFrontmatter() {},
     extendRoutes(routes) {

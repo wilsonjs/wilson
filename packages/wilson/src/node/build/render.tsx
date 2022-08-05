@@ -59,9 +59,10 @@ export async function renderPage(
       <html>
         <head>
           ${stylesheetTagsFrom(config, clientChunks)}
+          <title>${config.site.title}</title>
         </head>
         <body>
-          <div id="app">${html}</div>
+          <div id="site">${html}</div>
         </body>
       </html>
     `,
@@ -77,7 +78,6 @@ export async function renderPage(
   //       ${await scriptTagsFrom(config, islandsByPath[route.path])}
   //     </head>
   //     <body ${bodyAttrs}>
-  //       <div id="app">${content}</div>
   //     </body>
   //   </html>`;
 }

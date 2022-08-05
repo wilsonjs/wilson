@@ -62,6 +62,13 @@ export interface UserConfig {
    */
   drafts?: boolean
   /**
+   * Provide site-wide meta information.
+   */
+  site: {
+    title: string
+    description: string
+  }
+  /**
    * File extensions that are allowed as pages.
    */
   pageExtensions?: string[]

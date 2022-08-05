@@ -1,7 +1,6 @@
 import { fileURLToPath } from 'url'
 import type { SiteConfig } from '@wilson/types'
-import { dirname, join, resolve } from 'pathe'
-import glob from 'fast-glob'
+import { dirname, join } from 'pathe'
 import type { UserConfig as ViteUserConfig } from 'vite'
 import { build, mergeConfig } from 'vite'
 import type { RollupOutput } from 'rollup'
@@ -12,12 +11,11 @@ export const DIST_CLIENT_PATH = join(_dirname, '../client')
 export const CLIENT_APP_PATH = join(DIST_CLIENT_PATH, 'app.client.js')
 export const SERVER_APP_PATH = join(DIST_CLIENT_PATH, 'app.server.js')
 
-// Internal: Currently SSG supports a single stylesheet for all pages.
+type Entrypoints = Record<string, string>
+
 function resolveEntrypoints(ssr: boolean): Entrypoints {
   return { app: ssr ? SERVER_APP_PATH : CLIENT_APP_PATH }
 }
-
-type Entrypoints = Record<string, string>
 
 export async function bundle(siteConfig: SiteConfig) {
   const clientResult = await bundleWithVite(siteConfig, { ssr: false })

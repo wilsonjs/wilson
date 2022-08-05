@@ -8,4 +8,4 @@ export default function App() {
 }
 
 if (!import.meta.env.SSR)
-  render(<App />, document.getElementById('root') as HTMLElement)
+  render(<App />, document.getElementById('site') as HTMLElement)

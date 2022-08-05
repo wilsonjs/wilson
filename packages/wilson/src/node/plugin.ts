@@ -6,12 +6,11 @@ import { relative } from 'pathe'
 import pc from 'picocolors'
 import type { PluginOption, ViteDevServer } from 'vite'
 import inspect from 'vite-plugin-inspect'
-import { createServer } from './server'
+import { configureMiddleware, createServer } from './server'
 
 /**
  * Watches wilson config and restarts dev server when it changes.
- *
- * @param siteConfig Site's configuration
+ * @param siteConfig Site configuration
  * @returns Plugin
  */
 function devConfigWatch(siteConfig: SiteConfig): PluginOption {
@@ -45,7 +44,6 @@ function devConfigWatch(siteConfig: SiteConfig): PluginOption {
 
 /**
  * Provides the client entrypoint as a virtual module.
- *
  * @returns Plugin
  */
 function virtualClientEntrypoint(): PluginOption {
@@ -60,6 +58,23 @@ function virtualClientEntrypoint(): PluginOption {
     async load(id) {
       if (id === RESOLVED_VIRTUAL_MODULE_ID)
         return 'import "wilson/dist/client/app.client.js";'
+    },
+  }
+}
+
+/**
+ * Configures an HTML fallback middleware for vite's dev server.
+ * @param siteConfig Site configuration
+ * @returns Plugin
+ */
+function htmlFallback(config: SiteConfig): PluginOption {
+  let server
+
+  return {
+    name: 'wilson:html-fallback',
+    configureServer(devServer) {
+      server = devServer
+      return configureMiddleware(config, server)
     },
   }
 }
@@ -103,6 +118,7 @@ export default function wilsonPlugins(
     }),
     pages(config),
     config.mode === 'development' && inspect(),
+    config.mode === 'development' && htmlFallback(config),
     config.mode === 'development' && devConfigWatch(config),
     virtualClientEntrypoint(),
   ].filter(Boolean)
