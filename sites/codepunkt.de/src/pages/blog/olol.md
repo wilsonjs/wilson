@@ -1,5 +1,5 @@
 ---
-title: Wat
+title: Olol
 ---
 
 # Hello world

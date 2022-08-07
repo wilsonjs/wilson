@@ -1,6 +1,6 @@
 import preact from '@preact/preset-vite'
 import type { SiteConfig } from '@wilson/types'
-import pages from '@wilson/pages'
+import pages, { documents } from '@wilson/pages'
 import debug from 'debug'
 import { relative } from 'pathe'
 import pc from 'picocolors'
@@ -85,6 +85,7 @@ function htmlFallback(config: SiteConfig): PluginOption {
  * @param config Site's configuration
  * @returns Array of vite plugins used for wilson.
  */
+// TODO: do we need vite appType 'spa'? https://vitejs.dev/config/shared-options.html#apptype
 export default function wilsonPlugins(
   config: SiteConfig,
   ssr: boolean = false,
@@ -120,6 +121,7 @@ export default function wilsonPlugins(
       },
     }),
     pages(config),
+    documents(config),
     ...(config.mode === 'development'
       ? [inspect(), htmlFallback(config), devConfigWatch(config)]
       : []),

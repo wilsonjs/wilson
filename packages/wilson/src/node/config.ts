@@ -103,7 +103,12 @@ function viteConfigDefaults(root: string): ViteOptions {
     root,
     clearScreen: false,
     resolve: {
-      // TODO: add aliases, for example ~/ for resolve(root, srcDir)
+      alias: [
+        {
+          find: /^[~@]\//,
+          replacement: `${resolve(root, 'src')}/`,
+        },
+      ],
     },
     server: {
       fs: { allow: [root, DIST_CLIENT_PATH] },

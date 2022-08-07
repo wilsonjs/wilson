@@ -1,6 +1,5 @@
 import type { DynamicPageProps, GetRenderedPathsResult } from 'wilson'
-import Counter from '../../islands/Counter'
-import Clock from '../../islands/Clock'
+import { getPages } from 'wilson'
 import styles from './[page].module.scss'
 
 interface Post {
@@ -13,41 +12,29 @@ interface Props {
 }
 type Params = 'page'
 
-const posts = [
-  { title: 'Post 1' },
-  { title: 'Post 2' },
-  { title: 'Post 3' },
-  { title: 'Post 4' },
-  { title: 'Post 5' },
-  { title: 'Post 6' },
-  { title: 'Post 7' },
-  { title: 'Post 8' },
-  { title: 'Post 9' },
-]
-
 function paginate(
-  items: Post[],
+  items: any[],
   pageSize = 10,
+  pageNumberToPath?: (pageNumber: number) => string,
 ): GetRenderedPathsResult<Params, Props>[] {
+  const toPath = pageNumberToPath ?? ((no) => (no === 1 ? '' : `page-${no}`))
+
   const pagesCount = Math.max(1, Math.ceil(items.length / pageSize))
-  function numberToPath(pageNumber: number): string {
-    return pageNumber === 1 ? '' : `page-${pageNumber}`
-  }
+
   return Array.from({ length: pagesCount }, (_, i) => i + 1).map(
     (pageNumber) => {
       const firstItem = (pageNumber - 1) * pageSize
+      console.log(items.slice(firstItem, firstItem + pageSize))
       return {
-        params: { page: numberToPath(pageNumber) },
+        params: { page: toPath(pageNumber) },
         props: {
           items: items.slice(firstItem, firstItem + pageSize),
           nextPage:
             pageNumber !== pagesCount
-              ? `/blog/${numberToPath(pageNumber + 1)}`
+              ? `/blog/${toPath(pageNumber + 1)}`
               : undefined,
           prevPage:
-            pageNumber === 1
-              ? undefined
-              : `/blog/${numberToPath(pageNumber - 1)}`,
+            pageNumber === 1 ? undefined : `/blog/${toPath(pageNumber - 1)}`,
         },
       }
     },
@@ -55,7 +42,7 @@ function paginate(
 }
 
 export function getRenderedPaths(): GetRenderedPathsResult<Params, Props>[] {
-  return paginate(posts, 12)
+  return paginate(getPages('blog'), 2)
 }
 
 export const frontmatter = {
@@ -64,10 +51,9 @@ export const frontmatter = {
 
 export default function Page(props: DynamicPageProps<Params, Props>) {
   const { frontmatter: fm, items, prevPage, nextPage } = props
-
   return (
     <>
-      {/* <h1 className={styles.headline}>
+      <h1 className={styles.headline}>
         {fm.title || 'Blog'}
         <br />
         <small>Last modified at: {fm.meta.lastUpdated}</small>
@@ -78,12 +64,7 @@ export default function Page(props: DynamicPageProps<Params, Props>) {
         ))}
       </ol>
       {prevPage && <a href={prevPage}>Prev</a>}
-      {nextPage && <a href={nextPage}>Next</a>} */}
-      <Counter clientIdle>
-        <p style={{ height: 5000 }}>before nested island</p>
-        <Clock clientVisible />
-        <p>after nested island</p>
-      </Counter>
+      {nextPage && <a href={nextPage}>Next</a>}
     </>
   )
 }
