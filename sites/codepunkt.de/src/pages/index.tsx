@@ -1,11 +1,11 @@
 export const frontmatter = {
-  layout: 'index',
+  title: 'Home',
 }
 
 export default function IndexPage() {
   return (
     <>
-      <h1>Welcome to my blog</h1>
+      <h1>Hey, my name is Christoph!</h1>
       <a href="/blog">To the articles</a>
     </>
   )

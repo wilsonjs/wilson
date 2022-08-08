@@ -1,89 +1,36 @@
-import type { DynamicPageProps, GetRenderedPathsResult } from 'wilson'
-import Counter from '../../islands/Counter'
-import Clock from '../../islands/Clock'
+import type { Document, PropsWithPagination, GetRenderedPathsFn } from 'wilson'
+import { getDocuments } from 'wilson'
 import styles from './[page].module.scss'
 
-interface Post {
-  title: string
-}
-interface Props {
-  items: Post[]
-  nextPage?: string
-  prevPage?: string
-}
-type Params = 'page'
-
-const posts = [
-  { title: 'Post 1' },
-  { title: 'Post 2' },
-  { title: 'Post 3' },
-  { title: 'Post 4' },
-  { title: 'Post 5' },
-  { title: 'Post 6' },
-  { title: 'Post 7' },
-  { title: 'Post 8' },
-  { title: 'Post 9' },
-]
-
-function paginate(
-  items: Post[],
-  pageSize = 10,
-): GetRenderedPathsResult<Params, Props>[] {
-  const pagesCount = Math.max(1, Math.ceil(items.length / pageSize))
-  function numberToPath(pageNumber: number): string {
-    return pageNumber === 1 ? '' : `page-${pageNumber}`
-  }
-  return Array.from({ length: pagesCount }, (_, i) => i + 1).map(
-    (pageNumber) => {
-      const firstItem = (pageNumber - 1) * pageSize
-      return {
-        params: { page: numberToPath(pageNumber) },
-        props: {
-          items: items.slice(firstItem, firstItem + pageSize),
-          nextPage:
-            pageNumber !== pagesCount
-              ? `/blog/${numberToPath(pageNumber + 1)}`
-              : undefined,
-          prevPage:
-            pageNumber === 1
-              ? undefined
-              : `/blog/${numberToPath(pageNumber - 1)}`,
-        },
-      }
-    },
-  )
+export const getRenderedPaths: GetRenderedPathsFn = async ({ paginate }) => {
+  return paginate(getDocuments('blog'), {
+    pageSize: 3,
+    format: (no) => `page-${no}`,
+  })
 }
 
-export function getRenderedPaths(): GetRenderedPathsResult<Params, Props>[] {
-  return paginate(posts, 12)
-}
-
-export const frontmatter = {
-  title: 'Blog',
-}
-
-export default function Page(props: DynamicPageProps<Params, Props>) {
-  const { frontmatter: fm, items, prevPage, nextPage } = props
-
+export default function Page({
+  frontmatter,
+  items,
+  prevPage,
+  nextPage,
+}: PropsWithPagination<Document>) {
   return (
     <>
-      {/* <h1 className={styles.headline}>
-        {fm.title || 'Blog'}
+      <h1 className={styles.headline}>
+        Blog
         <br />
-        <small>Last modified at: {fm.meta.lastUpdated}</small>
+        <small>Last modified: {frontmatter.meta.lastUpdated}</small>
       </h1>
       <ol>
         {items.map((item) => (
-          <li key={item.title}>{item.title}</li>
+          <li key={item.frontmatter.title}>
+            <a href={item.href}>{item.frontmatter.title}</a>
+          </li>
         ))}
       </ol>
       {prevPage && <a href={prevPage}>Prev</a>}
-      {nextPage && <a href={nextPage}>Next</a>} */}
-      <Counter clientIdle>
-        <p style={{ height: 5000 }}>before nested island</p>
-        <Clock clientVisible />
-        <p>after nested island</p>
-      </Counter>
+      {nextPage && <a href={nextPage}>Next</a>}
     </>
   )
 }

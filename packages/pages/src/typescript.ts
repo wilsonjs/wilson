@@ -1,5 +1,6 @@
 import type {
   DynamicPageExports,
+  PaginationHelper,
   RenderedPath,
   StaticPageExports,
   UserFrontmatter,
@@ -36,6 +37,31 @@ export async function getFrontmatter(
   return frontmatter ?? {}
 }
 
+const paginate: PaginationHelper = (items, options = {}) => {
+  const format = options.format ?? ((no) => String(no))
+  const pageSize = options.pageSize || 10
+  const toPath = (no: number) => (no === 1 ? '' : format(no))
+  const pagesCount = Math.max(1, Math.ceil(items.length / pageSize))
+
+  return Array.from({ length: pagesCount }, (_, i) => i + 1).map(
+    (pageNumber) => {
+      const firstItem = (pageNumber - 1) * pageSize
+      return {
+        params: { page: toPath(pageNumber) },
+        props: {
+          items: items.slice(firstItem, firstItem + pageSize),
+          nextPage:
+            pageNumber !== pagesCount
+              ? `/blog/${toPath(pageNumber + 1)}`
+              : undefined,
+          prevPage:
+            pageNumber === 1 ? undefined : `/blog/${toPath(pageNumber - 1)}`,
+        },
+      }
+    },
+  )
+}
+
 export async function getRenderedPaths(
   options: Options,
   absolutePath: string,
@@ -49,7 +75,7 @@ export async function getRenderedPaths(
   if (getRenderedPaths === undefined)
     throw new Error(`dynamic page "${path}" has no getRenderedPaths() export`)
 
-  const renderedPaths = getRenderedPaths()
+  const renderedPaths = await getRenderedPaths({ paginate })
   if (!Array.isArray(renderedPaths))
     throw new Error(
       `getRenderedPaths() of dynamic page "${path}" must return an array`,

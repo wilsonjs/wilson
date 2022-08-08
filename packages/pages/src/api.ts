@@ -197,6 +197,21 @@ export function getPageByImportPath(importPath: string): Page | undefined {
 }
 
 /**
+ * Find the first page that satisfies the provided predicate function.
+ * @param predicate Function that is executed on each page, called with the
+ * page and an array of all pages. Must return a truthy value to indicate a
+ * matching page has been found.
+ * @returns The first page that satisfies the provided testing function
+ */
+export function findPage(
+  predicate: (page: Page, pages: Page[]) => boolean,
+): Page | undefined {
+  return Array.from(pageByPath.values()).find((page, _, pages) =>
+    predicate(page, pages),
+  )
+}
+
+/**
  * Returns the page for the given absolutePath.
  * @param absolutePath page absolutePath, e.g. `/home/user/wilson-site/src/pages/index.tsx`
  */

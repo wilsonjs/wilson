@@ -3,6 +3,7 @@ import { build, InlineConfig } from 'vite'
 import type { StaticPageExports } from '@wilson/types'
 import preact from '@preact/preset-vite'
 import { Options } from './types'
+import { documents } from './pages'
 
 const pageBuildsByPathCache = new Map<string, string>()
 
@@ -26,7 +27,7 @@ export async function performViteBuild(
       },
       ssr: true,
     },
-    plugins: [preact()],
+    plugins: [documents(options), preact()],
     logLevel: options.vite.logLevel ?? 'warn',
   }
   await build(viteConfig)

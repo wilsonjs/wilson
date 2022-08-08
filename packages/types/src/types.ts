@@ -162,6 +162,12 @@ export interface Page {
   frontmatter: PageFrontmatter
 }
 
+export interface Document {
+  href: string
+  path: string
+  frontmatter: PageFrontmatter
+}
+
 /**
  * Representation of an interactive island
  */
@@ -208,7 +214,11 @@ export interface UserFrontmatter {
 }
 
 export interface PageFrontmatter extends Record<string, any> {
-  meta: PageMeta
+  meta: {
+    filename: string
+    lastUpdated: Date
+    [key: string]: any
+  }
   layout: string | undefined
   // route: {
   //   name?: string
@@ -218,33 +228,51 @@ export interface PageFrontmatter extends Record<string, any> {
   // }
 }
 
-export interface PageMeta extends Record<string, any> {
-  filename: string
-  lastUpdated: Date
-}
-
 export interface StaticPageExports {
   default: FunctionComponent
   frontmatter?: UserFrontmatter
 }
 
+interface PaginationProps<T = any> {
+  nextPage?: string
+  prevPage?: string
+  items: T[]
+}
+
+type PaginationHelperResult<T = any> = Array<{
+  params: { page: string }
+  props?: PaginationProps<T>
+}>
+
+export type PaginationHelper<T = any> = (
+  items: T[],
+  options: {
+    pageSize?: number
+    format?: (pageNumber: number) => string
+  },
+) => PaginationHelperResult<T>
+
+export type PropsWithPagination<T> = RenderableProps<
+  BaseProps & PaginationProps<T>
+>
+
 export interface DynamicPageExports extends StaticPageExports {
-  getRenderedPaths: () => GetRenderedPathsResult[]
+  getRenderedPaths: GetRenderedPathsFn
 }
 
 export type GetRenderedPathsResult<
   Params extends string = string,
   Props extends Record<string, any> = Record<string, any>,
-> = SpecificParams<Params> & InjectedProps<Props>
+> = { params: Record<Params, string>; props?: Props }
 
 export type RenderedPath = GetRenderedPathsResult & { url: string }
 
+export type GetRenderedPathsFn = (helpers: {
+  paginate: PaginationHelper
+}) => Awaitable<GetRenderedPathsResult[]>
+
 interface SpecificParams<in Params extends string> {
   params: Record<Params, string>
-}
-
-interface InjectedProps<out Props extends Record<string, any>> {
-  props?: Props
 }
 
 interface BaseProps {
