@@ -1,5 +1,5 @@
 import type { Plugin, PluginOption, ViteDevServer } from 'vite'
-import type { SiteConfig } from '@wilson/types'
+import type { SiteConfig, Document } from '@wilson/types'
 import type { Options, PagesApi } from './types'
 import { createApi, findPage } from './api'
 import { handleHMR } from './hmr'
@@ -21,7 +21,7 @@ export {
   getPageByImportPath,
 } from './api'
 
-// TODO: allow dynamic params inside a path segment, e.g. src/pages/blog/page-[pageNo]
+// TODO allow dynamic params inside a path segment, e.g. src/pages/blog/page-[pageNo]
 // might need to switch to preact-iso router for this, preact-router doesn't seem to
 // support it
 export default function WilsonPages(siteConfig: SiteConfig): Plugin {
@@ -64,8 +64,8 @@ export default function WilsonPages(siteConfig: SiteConfig): Plugin {
   }
 }
 
-// TODO: extract to own package?
-// TODO: is this also required as plugin in packages/wilson?
+// TODO extract to own package?
+// TODO fix hot module reloading
 interface DocumentModule {
   pattern: string
   hasDocument: (path: string) => boolean
@@ -77,22 +77,22 @@ function parseQueryParams(url: string) {
   return { path: url.slice(0, index), query }
 }
 const fileCanUseDocuments = /(\.tsx)$/
-const definitionRegex = /(function|const|let|var)[\s\n]+\bgetPages\b/
-const usageRegex = /\bgetPages[\s\n]*\(([^)]*)\)/g
-const PAGES_MODULE_ID = 'virtual:wilson-pages'
+const definitionRegex = /(function|const|let|var)[\s\n]+\bgetDocuments\b/
+const usageRegex = /\bgetDocuments[\s\n]*\(([^)]*)\)/g
+const DOCUMENTS_MODULE_ID = 'virtual:wilson-documents'
 export function documents(config: SiteConfig): PluginOption {
   let server: ViteDevServer
   const modulesById: Record<string, DocumentModule> = Object.create(null)
   return {
-    name: 'wilson:pages',
+    name: 'wilson:documents',
     configureServer(devServer) {
       server = devServer
     },
     resolveId(id) {
-      if (id.startsWith(PAGES_MODULE_ID)) return id
+      if (id.startsWith(DOCUMENTS_MODULE_ID)) return id
     },
     async load(id) {
-      if (!id.startsWith(PAGES_MODULE_ID)) return
+      if (!id.startsWith(DOCUMENTS_MODULE_ID)) return
 
       const rawPath = parseQueryParams(id).query.pattern
       const path = relative(config.root, join('src', 'pages', rawPath))
@@ -107,17 +107,22 @@ export function documents(config: SiteConfig): PluginOption {
       }
 
       const files = await glob(pattern, { cwd: config.root })
-      const pages = files.map(
-        (file) => findPage((page) => page.rootPath === file)!,
-      )
+      const documents: Document[] = files.map((file) => {
+        const page = findPage((page) => page.rootPath === file)!
+        return {
+          frontmatter: page.frontmatter,
+          path: page.rootPath,
+          href: `/${page.route}`,
+        } as Document
+      })
 
       return /* js */ `
-        export default ${JSON.stringify(pages)}
+        export default ${JSON.stringify(documents)}
       `
     },
     async transform(code, id) {
       // ensure vite keeps track of files with the documents pattern that are added or removed.
-      if (server && id.startsWith(PAGES_MODULE_ID)) {
+      if (server && id.startsWith(DOCUMENTS_MODULE_ID)) {
         ;(server as any)._importGlobMap.set(id, [
           resolve(config.root, modulesById[id].pattern),
         ])
@@ -135,7 +140,7 @@ export function documents(config: SiteConfig): PluginOption {
         if (paths.length) {
           const imports = paths.map(
             ([id, path]) =>
-              `import ${id} from '${PAGES_MODULE_ID}?pattern=${path}'`,
+              `import ${id} from '${DOCUMENTS_MODULE_ID}?pattern=${path}'`,
           )
           return `${imports.join(';')};${code}`
         }

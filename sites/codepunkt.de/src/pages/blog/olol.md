@@ -1,5 +1,6 @@
 ---
 title: Olol
+layout: markdown
 ---
 
 # Hello world

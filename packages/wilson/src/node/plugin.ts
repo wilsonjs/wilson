@@ -85,7 +85,7 @@ function htmlFallback(config: SiteConfig): PluginOption {
  * @param config Site's configuration
  * @returns Array of vite plugins used for wilson.
  */
-// TODO: do we need vite appType 'spa'? https://vitejs.dev/config/shared-options.html#apptype
+// TODO do we need vite appType 'spa'? https://vitejs.dev/config/shared-options.html#apptype
 export default function wilsonPlugins(
   config: SiteConfig,
   ssr: boolean = false,

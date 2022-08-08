@@ -1,5 +1,6 @@
 ---
 title: AAaaa
+layout: markdown
 ---
 
 # Hello world

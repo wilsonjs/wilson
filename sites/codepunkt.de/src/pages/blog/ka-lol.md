@@ -1,5 +1,6 @@
 ---
 title: kA lol
+layout: markdown
 ---
 
 # Hello world

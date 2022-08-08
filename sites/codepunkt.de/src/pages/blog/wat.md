@@ -1,5 +1,6 @@
 ---
 title: Wat
+layout: markdown
 ---
 
 # Hello world
