@@ -36,8 +36,6 @@ export default function WilsonPages(siteConfig: SiteConfig): Plugin {
     configResolved() {
       options = siteConfig
       api ||= createApi(options)
-      // @ts-ignore
-      siteConfig.pagesApi = api
     },
     async configureServer(server) {
       options.server = server

@@ -35,6 +35,7 @@ function devConfigWatch(siteConfig: SiteConfig): PluginOption {
 
   return {
     name: 'wilson:dev-config-watch',
+    apply: 'serve',
     configureServer: (server) => {
       server.watcher.add(siteConfig.configPath)
       server.watcher.on('add', handleChange.bind(null, server))
@@ -73,6 +74,7 @@ function htmlFallback(config: SiteConfig): PluginOption {
 
   return {
     name: 'wilson:html-fallback',
+    apply: 'serve',
     configureServer(devServer) {
       server = devServer
       return configureMiddleware(config, server)
@@ -108,23 +110,16 @@ export default function wilsonPlugins(
               // directory. adds islandPath that is used in app.server.tsx to
               // __source for every VNode in a page that has partial hydration
               // props and is imported as default import from islands directory.
-              [
-                '@wilson',
-                {
-                  islandsDir: config.islandsDir,
-                  layoutsDir: config.layoutsDir,
-                  pagesDir: config.pagesDir,
-                },
-              ],
+              ['@wilson', config],
             ]
           : [],
       },
     }),
     pages(config),
     documents(config),
-    ...(config.mode === 'development'
-      ? [inspect(), htmlFallback(config), devConfigWatch(config)]
-      : []),
+    htmlFallback(config),
+    devConfigWatch(config),
+    inspect(),
     virtualClientEntrypoint(),
   ].filter(Boolean)
 }
