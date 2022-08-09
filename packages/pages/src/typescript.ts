@@ -2,11 +2,11 @@ import type {
   DynamicPageExports,
   PaginationHelper,
   RenderedPath,
+  SiteConfig,
   StaticPageExports,
   UserFrontmatter,
 } from '@wilson/types'
 import { relative } from 'pathe'
-import type { Options } from './types'
 import { isObject } from '@wilson/utils'
 import { getPageExports } from './vite'
 
@@ -20,16 +20,16 @@ import { getPageExports } from './vite'
  */
 export async function getFrontmatter(
   absolutePath: string,
-  options: Options,
+  config: SiteConfig,
 ): Promise<UserFrontmatter> {
   const { frontmatter } = await getPageExports<StaticPageExports>(
-    options,
+    config,
     absolutePath,
   )
   if (frontmatter !== undefined && !isObject(frontmatter)) {
     throw new Error(
       `page "${relative(
-        options.pagesDir,
+        config.pagesDir,
         absolutePath,
       )}" has frontmatter that is not an object`,
     )
@@ -63,19 +63,19 @@ const paginate: PaginationHelper = (items, options = {}) => {
 }
 
 export async function getRenderedPaths(
-  options: Options,
+  config: SiteConfig,
   absolutePath: string,
   path: string,
   route: string,
 ): Promise<RenderedPath[]> {
-  const { getRenderedPaths } = await getPageExports<DynamicPageExports>(
-    options,
+  const { getRenderedPaths: get } = await getPageExports<DynamicPageExports>(
+    config,
     absolutePath,
   )
-  if (getRenderedPaths === undefined)
+  if (get === undefined)
     throw new Error(`dynamic page "${path}" has no getRenderedPaths() export`)
 
-  const renderedPaths = await getRenderedPaths({ paginate })
+  const renderedPaths = await get({ paginate })
   if (!Array.isArray(renderedPaths))
     throw new Error(
       `getRenderedPaths() of dynamic page "${path}" must return an array`,

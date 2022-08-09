@@ -1,5 +1,6 @@
 packages:
   - packages/babel-plugin
+  - packages/documents
   - packages/hydration
   - packages/markdown
   - packages/pages

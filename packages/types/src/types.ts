@@ -1,4 +1,4 @@
-import type { UserConfig as ViteOptions } from 'vite'
+import type { UserConfig as ViteOptions, Plugin } from 'vite'
 import type { FunctionComponent, RenderableProps } from 'preact'
 
 export type Awaitable<T> = T | Promise<T>
@@ -116,6 +116,12 @@ export interface SiteConfig extends Required<UserConfig> {
    * The mode the app is running in, typically `development` or `production`.
    */
   mode: string
+  namedPlugins: NamedPlugins
+}
+
+export interface NamedPlugins {
+  documents: Plugin
+  pages: Plugin
 }
 
 export interface Page {

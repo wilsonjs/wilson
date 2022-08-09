@@ -1,13 +1,15 @@
 import type { ModuleGraph, Plugin, ViteDevServer } from 'vite'
 import { debug, slash } from './utils'
-import type { Awaitable, PagesApi } from './types'
+import type { PagesApi } from './types'
 import { RESOLVED_DATA_MODULE_ID, RESOLVED_ROUTES_MODULE_ID } from './types'
+import { Awaitable, SiteConfig } from '@wilson/types'
 
 type ClearRoutesFn = () => void
 
 export function handleHMR(
   api: PagesApi,
   server: ViteDevServer,
+  config: SiteConfig,
   clearRoutes: ClearRoutesFn,
 ): Plugin['handleHotUpdate'] {
   onPage('add', async (path) => {
@@ -26,6 +28,12 @@ export function handleHMR(
     const path = slash(file)
     if (api.isPage(path)) {
       const { changed, needsReload } = await api.updatePage(path)
+      // TODO which other pages do we need to update!?
+      const dependents: string[] =
+        config.namedPlugins.documents.api.getDependents(file)
+      for (const dependent of dependents) {
+        await api.updatePage(dependent)
+      }
       if (changed) debug.hmr('change', path)
       if (needsReload) fullReload(server, clearRoutes)
     }

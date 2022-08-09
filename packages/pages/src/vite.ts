@@ -1,9 +1,7 @@
 import { basename, dirname, join } from 'pathe'
 import { build, InlineConfig } from 'vite'
-import type { StaticPageExports } from '@wilson/types'
+import type { SiteConfig, StaticPageExports } from '@wilson/types'
 import preact from '@preact/preset-vite'
-import { Options } from './types'
-import { documents } from './pages'
 
 const pageBuildsByPathCache = new Map<string, string>()
 
@@ -11,7 +9,7 @@ const pageBuildsByPathCache = new Map<string, string>()
  * Performs an SSR build of a page with vite.
  */
 export async function performViteBuild(
-  options: Options,
+  config: SiteConfig,
   input: string,
   outDir: string,
   outputFilename?: string,
@@ -27,8 +25,8 @@ export async function performViteBuild(
       },
       ssr: true,
     },
-    plugins: [documents(options), preact()],
-    logLevel: options.vite.logLevel ?? 'warn',
+    plugins: [config.namedPlugins.documents, preact()],
+    logLevel: config.vite.logLevel ?? 'warn',
   }
   await build(viteConfig)
 }
@@ -74,7 +72,7 @@ export function clearPageBuild(absolutePath: string): boolean {
  * @returns Exports of the page
  */
 export async function getPageExports<T extends StaticPageExports>(
-  options: Options,
+  config: SiteConfig,
   absolutePath: string,
 ): Promise<T> {
   let importPath = pageBuildsByPathCache.get(absolutePath)
@@ -83,11 +81,11 @@ export async function getPageExports<T extends StaticPageExports>(
   if (importPath !== undefined) {
     cacheBustingImportPath = importPath
   } else {
-    const outputFilename = getOutputFilename(absolutePath, options.pagesDir)
+    const outputFilename = getOutputFilename(absolutePath, config.pagesDir)
     await performViteBuild(
-      options,
+      config,
       absolutePath,
-      `${options.tempDir}/pages`,
+      `${config.tempDir}/pages`,
       outputFilename,
     )
     importPath = join(process.cwd(), '.wilson/pages', outputFilename)

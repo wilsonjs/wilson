@@ -1,7 +1,10 @@
 import { promises as fs } from 'fs'
 import { extname, relative } from 'pathe'
-import type { PageFrontmatter, UserFrontmatter } from '@wilson/types'
-import type { Options } from './types'
+import type {
+  PageFrontmatter,
+  SiteConfig,
+  UserFrontmatter,
+} from '@wilson/types'
 import { getFrontmatter as getTsxFrontmatter } from './typescript'
 import { isObject } from '@wilson/utils'
 import { parseFrontmatter as parseMarkdownFrontmatter } from '@wilson/markdown'
@@ -15,11 +18,11 @@ async function getMdFrontmatter(
 
 async function extractFrontmatter(
   absolutePath: string,
-  options: Options,
+  config: SiteConfig,
 ): Promise<UserFrontmatter> {
   switch (extname(absolutePath)) {
     case '.tsx':
-      return await getTsxFrontmatter(absolutePath, options)
+      return await getTsxFrontmatter(absolutePath, config)
     case '.md':
       return await getMdFrontmatter(absolutePath)
   }
@@ -29,11 +32,11 @@ async function extractFrontmatter(
 async function prepareFrontmatter(
   absolutePath: string,
   userFrontmatter: UserFrontmatter,
-  options: Options,
+  config: SiteConfig,
 ): Promise<PageFrontmatter> {
-  const extendedFrontmatter = await options.extendFrontmatter(
+  const extendedFrontmatter = await config.extendFrontmatter(
     userFrontmatter,
-    relative(options.root, absolutePath),
+    relative(config.root, absolutePath),
   )
   const {
     meta: originalMeta,
@@ -43,7 +46,7 @@ async function prepareFrontmatter(
   const layout: string | undefined =
     typeof fmLayout === 'string' ? fmLayout : undefined
   const meta = {
-    filename: relative(options.root, absolutePath),
+    filename: relative(config.root, absolutePath),
     lastUpdated: (await fs.stat(absolutePath)).mtime,
     ...(isObject(originalMeta) ? originalMeta : {}),
   }
@@ -53,8 +56,8 @@ async function prepareFrontmatter(
 
 export async function parseFrontmatter(
   absolutePath: string,
-  options: Options,
+  config: SiteConfig,
 ): Promise<PageFrontmatter> {
-  const anyFrontmatter = await extractFrontmatter(absolutePath, options)
-  return await prepareFrontmatter(absolutePath, anyFrontmatter, options)
+  const anyFrontmatter = await extractFrontmatter(absolutePath, config)
+  return await prepareFrontmatter(absolutePath, anyFrontmatter, config)
 }

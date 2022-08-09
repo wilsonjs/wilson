@@ -1,8 +1,7 @@
 import glob from 'fast-glob'
 import deepEqual from 'deep-equal'
 import { extname, relative, resolve } from 'pathe'
-import type { Page } from '@wilson/types'
-import type { Options } from './types'
+import type { Page, SiteConfig } from '@wilson/types'
 import { debug, slash } from './utils'
 import { clearPageBuild } from './vite'
 import { getRenderedPaths } from './typescript'
@@ -10,8 +9,8 @@ import { parseFrontmatter } from './frontmatter'
 
 const pageByPath = new Map<string, Page>()
 
-export function createApi(options: Options) {
-  const { pageExtensions, pagesDir, root, srcDir } = options
+export function createApi(config: SiteConfig) {
+  const { pageExtensions, pagesDir, root, srcDir } = config
   let addedAllPages: Promise<void>
 
   const extensionsRE = new RegExp(`(${pageExtensions.join('|')})$`)
@@ -75,9 +74,9 @@ export function createApi(options: Options) {
       this.errorOnDisallowedCharacters(path)
       const { route, isDynamic } = this.extractRouteInfo(path)
       const renderedPaths = isDynamic
-        ? await getRenderedPaths(options, absolutePath, path, route)
+        ? await getRenderedPaths(config, absolutePath, path, route)
         : [{ params: {}, url: route }]
-      const frontmatter = await parseFrontmatter(absolutePath, options)
+      const frontmatter = await parseFrontmatter(absolutePath, config)
       const rootPath = relative(root, absolutePath)
       const page: Page = {
         path,

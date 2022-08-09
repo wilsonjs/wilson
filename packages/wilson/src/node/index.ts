@@ -12,8 +12,6 @@ export type {
   GetRenderedPathsFn,
 } from '@wilson/types'
 
-export { useTitle } from 'hoofd/preact'
-
 /**
  * Used to access all files that are under the page directory or match a given
  * pattern.

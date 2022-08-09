@@ -1,11 +1,15 @@
-import type { PageFrontmatter, RenderedPath, Route } from '@wilson/types'
+import type {
+  PageFrontmatter,
+  RenderedPath,
+  Route,
+  SiteConfig,
+} from '@wilson/types'
 import pc from 'picocolors'
 import { getPageByImportPath, getSortedPages } from './api'
-import type { Options } from './types'
 import { DATA_MODULE_ID, ROUTES_MODULE_ID } from './types'
 import { debug } from './utils'
 
-type ExtendRoutes = Options['extendRoutes']
+type ExtendRoutes = SiteConfig['extendRoutes']
 
 /**
  * Returns import statement source code for the given page, e.g.
@@ -122,8 +126,10 @@ function debugCodeForModule(code: string, module: string): void {
  * @param extendRoutes User-configurable function to access and optionally modify routes
  * @returns Source code for routes module.
  */
-export async function generateRoutesModule(options: Options): Promise<string> {
-  const routes = await getRoutes(options.extendRoutes)
+export async function generateRoutesModule(
+  config: SiteConfig,
+): Promise<string> {
+  const routes = await getRoutes(config.extendRoutes)
   const specificMatchProps = getSpecificRouteProps(routes)
   const frontMatterByPath = getFrontmatterByPath(routes)
 
@@ -141,7 +147,7 @@ export async function generateRoutesModule(options: Options): Promise<string> {
       const frontmatter = frontMatterByPath[path] ?? {};
       const specific = specificMatchProps[path]?.find(({ matches: m }) => shallowEqual(m, matches))
       const pageProps = { params: matches, path, url, frontmatter, ...(specific ? specific.props : {}) }
-      useTitle(frontmatter.title ?? '${options.site.title}');
+      useTitle(frontmatter.title ?? '${config.site.title}');
       return h(element.Layout, pageProps, [
         h(element, pageProps)
       ]);
