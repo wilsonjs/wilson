@@ -99,7 +99,7 @@ export default function wilsonPlugins(
   debug('wilson:config')(config)
 
   return [
-    markdown(),
+    markdown(config),
     preact({
       include: [/\.[tj]sx?$/, /\.md$/],
       devtoolsInProd: true,

@@ -104,9 +104,16 @@ importers:
   packages/markdown:
     specifiers:
       '@mapbox/hast-util-to-jsx': ^2.0.0
+      '@types/debug': ^4.1.7
+      '@types/prettier': ^2.7.0
       '@types/unist': ^2.0.6
+      '@wilson/types': workspace:^1.0.0
+      '@wilson/utils': workspace:^1.0.0
+      debug: ^4.3.4
       gray-matter: ^4.0.3
       node-cache: ^5.1.2
+      pathe: ^0.3.2
+      prettier: ^2.7.1
       rehype-raw: ^6.1.1
       remark-parse: ^10.0.1
       remark-rehype: ^10.1.0
@@ -117,15 +124,22 @@ importers:
       vite: 3.0.5
     dependencies:
       '@mapbox/hast-util-to-jsx': 2.0.0
+      '@wilson/utils': link:../utils
+      debug: 4.3.4
       gray-matter: 4.0.3
       node-cache: 5.1.2
+      pathe: 0.3.2
+      prettier: 2.7.1
       rehype-raw: 6.1.1
       remark-parse: 10.0.1
       remark-rehype: 10.1.0
       remark-stringify: 10.0.2
       unified: 10.1.2
     devDependencies:
+      '@types/debug': 4.1.7
+      '@types/prettier': 2.7.0
       '@types/unist': 2.0.6
+      '@wilson/types': link:../types
       rollup: 2.77.2
       tsup: 6.2.1
       vite: 3.0.5
@@ -951,6 +965,10 @@ packages:
   /@types/parse5/6.0.3:
     resolution: {integrity: sha512-SuT16Q1K51EAVPz1K29DJ/sXjhSQ0zjvsypYJ6tlwVsRV9jwW5Adq2ch8Dq8kDBCkYnELS7N7VNCSB5nC56t/g==}
     dev: false
+
+  /@types/prettier/2.7.0:
+    resolution: {integrity: sha512-RI1L7N4JnW5gQw2spvL7Sllfuf1SaHdrZpCHiBlCXjIlufi1SMNnbu2teze3/QE67Fg2tBlH7W+mi4hVNk4p0A==}
+    dev: true
 
   /@types/prop-types/15.7.5:
     resolution: {integrity: sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==}
@@ -4035,7 +4053,6 @@ packages:
     resolution: {integrity: sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==}
     engines: {node: '>=10.13.0'}
     hasBin: true
-    dev: true
 
   /pretty-format/3.8.0:
     resolution: {integrity: sha512-WuxUnVtlWL1OfZFQFuqvnvs6MiAGk9UNsBostyBOB0Is9wb5uRESevA6rnl/rkksXaGX3GzZhPup5d6Vp1nFew==}

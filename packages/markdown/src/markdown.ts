@@ -10,19 +10,22 @@ import type { PluginOption } from 'vite'
 import type { TransformResult } from 'rollup'
 // @ts-ignore
 import toJsx from '@mapbox/hast-util-to-jsx'
+import debug from 'debug'
+import type {
+  PageFrontmatter,
+  SiteConfig,
+  UserFrontmatter,
+} from '@wilson/types'
+import { dirname, relative } from 'pathe'
+import { promises as fs } from 'fs'
+import { isObject } from '@wilson/utils'
+import { format } from 'prettier'
 
-/**
- * Result of parsing frontmatter from markdown source code.
- */
+/** Result of parsing frontmatter from markdown source code */
 type FrontmatterParseResult = {
-  /**
-   * Markdown source code without the parsed frontmatter.
-   */
+  /** Markdown source code without the parsed frontmatter */
   markdown: string
-  /**
-   * The parsed frontmatter data.
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  /** The parsed frontmatter data */
   frontmatter: Record<string, any>
 }
 
@@ -74,30 +77,108 @@ export async function processMarkdown(
 
   const vfile = await processor.process(markdownCode)
   const jsx = (vfile.value as string)
-    .replace(/^<div>/, '<>')
-    .replace(/<\/div>$/, '</>')
+    .replace(/^<div>/, '')
+    .replace(/<\/div>$/, '')
 
   return { jsx }
 }
 
 /**
  * Wilson markdown plugin
- * @returns Plugin
  */
-export default function markdownPlugin(): PluginOption {
+export default function markdownPlugin(config: SiteConfig): PluginOption {
   return {
     name: 'wilson:markdown',
     enforce: 'pre',
 
     async transform(code: string, id: string): Promise<TransformResult> {
-      if (!id.endsWith('.md')) return null
+      if (!id.endsWith('.md')) {
+        return null
+      }
 
-      const { markdown } = parseFrontmatter(code)
+      const { markdown, frontmatter: userFrontmatter } = parseFrontmatter(code)
       const { jsx } = await processMarkdown(markdown)
+      const frontmatter = await prepareFrontmatter(id, userFrontmatter, config)
+      const layout = frontmatter.layout ?? 'default'
+      const layoutPath = `${config.layoutsDir}/${layout}.tsx`
+      const path = getRoute(relative(config.pagesDir, id))
+      const componentName = createComponentName(path)
 
-      return /* tsx */ `
-        export default function Page() { return ${jsx} }
+      const newCode = /* tsx */ `
+        import { useTitle } from 'hoofd/preact';
+        import Layout from '${layoutPath}';
+
+        export const path = '${path}';
+        export const frontmatter = ${JSON.stringify(frontmatter)};
+        const props = { frontmatter, path };
+
+        function Title() {
+          useTitle(frontmatter.title);
+          return null;
+        };
+
+        export default function ${componentName}Page({ url, params: matches }) {
+          return <Layout url={url} {...props}>
+            {frontmatter.title && <Title />}
+            ${jsx}
+          </Layout>;
+        };
       `
+
+      return format(newCode, { filepath: 'markdown.tsx' })
     },
   }
+}
+
+async function prepareFrontmatter(
+  absolutePath: string,
+  userFrontmatter: UserFrontmatter,
+  config: SiteConfig,
+): Promise<PageFrontmatter> {
+  const extendedFrontmatter = await config.extendFrontmatter(
+    userFrontmatter,
+    relative(config.root, absolutePath),
+  )
+  const {
+    meta: originalMeta,
+    layout: fmLayout,
+    ...rest
+  } = extendedFrontmatter ?? {}
+  const layout: string | undefined =
+    typeof fmLayout === 'string' ? fmLayout : undefined
+  const meta = {
+    filename: relative(config.root, absolutePath),
+    lastUpdated: (await fs.stat(absolutePath)).mtime,
+    ...(isObject(originalMeta) ? originalMeta : {}),
+  }
+  const frontmatter = { layout, meta, ...rest }
+  return frontmatter
+}
+
+function getRoute(relativePath: string) {
+  const reactRouterLike = relativePath
+    .split('/')
+    .filter((x) => x)
+    .map((s) => s.toLowerCase())
+    .join('/')
+  const route = reactRouterLike
+    .slice(0, reactRouterLike.lastIndexOf('.'))
+    .replace(/index$/, '')
+    .replace(/^\/|\/$/g, '')
+    .replace(/(:[^/]+)$/, '$1?')
+  return route === '' ? '/' : route
+}
+
+function createComponentName(path: string) {
+  const withoutExtension = path.slice(0, path.lastIndexOf('.'))
+  const pascalCased = withoutExtension
+    .split('/')
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join('')
+  const variablesReplaced = pascalCased.replace(/\[([^\]]+)\]/g, '$$$1')
+  const onlyAllowedChars = variablesReplaced.replace(/[^a-z0-9$_]/gi, '')
+  return onlyAllowedChars.replace(
+    /\$(.{1})/g,
+    (s: string) => s.charAt(0) + s.charAt(1).toUpperCase(),
+  )
 }

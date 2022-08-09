@@ -129,7 +129,9 @@ function debugCodeForModule(code: string, module: string): void {
 export async function generateRoutesModule(
   config: SiteConfig,
 ): Promise<string> {
-  const routes = await getRoutes(config.extendRoutes)
+  const routes = (await getRoutes(config.extendRoutes)).filter(
+    ({ importPath }) => importPath.endsWith('.tsx'),
+  )
   const specificMatchProps = getSpecificRouteProps(routes)
   const frontMatterByPath = getFrontmatterByPath(routes)
 
