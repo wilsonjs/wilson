@@ -1,3 +1,11 @@
+import { relative } from 'pathe'
+import fs from 'fs'
+import type {
+  SiteConfig,
+  UserFrontmatter,
+  PageFrontmatter,
+} from '@wilson/types'
+
 /**
  * Check if variable is an object
  * @param maybeObject Variable that might be an object
@@ -72,4 +80,93 @@ export function createDualUseDestructurable<
   })
 
   return clone as T & A
+}
+
+/**
+ * Enriches user frontmatter with meta data and anything added by `extendFrontmatter`.
+ *
+ * @param userFrontmatter User frontmatter
+ * @param absolutePagePath Absolute path to page file
+ * @param config Site configuration
+ *
+ * @returns Page frontmatter
+ */
+export async function userToPageFrontmatter(
+  userFrontmatter: UserFrontmatter,
+  absolutePagePath: string,
+  { root, extendFrontmatter }: SiteConfig,
+): Promise<PageFrontmatter> {
+  const filename = relative(root, absolutePagePath)
+
+  const {
+    meta: originalMeta,
+    layout: fmLayout,
+    ...rest
+  } = (await extendFrontmatter(userFrontmatter, filename)) ?? {}
+
+  const layout: string = typeof fmLayout === 'string' ? fmLayout : 'default'
+
+  const meta = {
+    filename,
+    lastUpdated: fs.statSync(absolutePagePath).mtime,
+    ...(isObject(originalMeta) ? originalMeta : {}),
+  }
+
+  return { layout, meta, ...rest }
+}
+
+/**
+ * Returns preact-router route path for a given page.
+ * @param relativePagePath Relative path to the page
+ */
+export function getRouteForPage(relativePagePath: string) {
+  const reactRouterLike = relativePagePath
+    .split('/')
+    .filter((x) => x)
+    .map((segment) =>
+      isDynamicPagePath(segment)
+        ? segment.replace(/\[([^\]]+)\]/g, ':$1')
+        : segment.toLowerCase(),
+    )
+    .join('/')
+
+  const route = reactRouterLike
+    .slice(0, reactRouterLike.lastIndexOf('.'))
+    .replace(/index$/, '')
+    .replace(/^\/|\/$/g, '')
+    .replace(/(:[^/]+)$/, '$1?')
+
+  return route === '' ? '/' : route
+}
+
+/**
+ * Returns if a path has dynamic parts.
+ *
+ * As an example, `foo/bar` is not dynamic while `blog/[page]` is.
+ */
+export function isDynamicPagePath(path: string) {
+  return /\[[^\]]+\]/.test(path)
+}
+
+/**
+ * Create a component name based on a preact-router route path.
+ * @param path Preact-router route path
+ * @returns Component name string
+ */
+export function createComponentName(path: string) {
+  const withoutExtension = path.slice(0, path.lastIndexOf('.') + 1)
+  const pascalCased = withoutExtension
+    .split('/')
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join('')
+  const variablesReplaced = pascalCased.replace(
+    /\[([^\]]+)\]/g,
+    (_, match: string) =>
+      `Dynamic${match.charAt(0).toUpperCase() + match.slice(1)}`,
+  )
+  const onlyAllowedChars = variablesReplaced.replace(/[^a-z0-9$_]/gi, '')
+  return onlyAllowedChars.replace(
+    /\$(.{1})/g,
+    (s: string) => s.charAt(0) + s.charAt(1).toUpperCase(),
+  )
 }

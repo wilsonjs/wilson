@@ -6,6 +6,7 @@ import { debug, slash } from './utils'
 import { clearPageBuild } from './vite'
 import { getRenderedPaths } from './typescript'
 import { parseFrontmatter } from './frontmatter'
+import { getRouteForPage, isDynamicPagePath } from '@wilson/utils'
 
 const pageByPath = new Map<string, Page>()
 
@@ -72,7 +73,8 @@ export function createApi(config: SiteConfig) {
     async addPage(absolutePath: string) {
       const path = relative(pagesDir, absolutePath)
       this.errorOnDisallowedCharacters(path)
-      const { route, isDynamic } = this.extractRouteInfo(path)
+      const route = getRouteForPage(path)
+      const isDynamic = isDynamicPagePath(path)
       const renderedPaths = isDynamic
         ? await getRenderedPaths(config, absolutePath, path, route)
         : [{ params: {}, url: route }]
@@ -132,29 +134,6 @@ export function createApi(config: SiteConfig) {
         /\$(.{1})/g,
         (s: string) => s.charAt(0) + s.charAt(1).toUpperCase(),
       )
-    },
-    isDynamicPath(segment: string) {
-      return /\[[^\]]+\]/.test(segment)
-    },
-    extractRouteInfo(relativePath: string) {
-      const isDynamic = this.isDynamicPath(relativePath)
-      const reactRouterLike = relativePath
-        .split('/')
-        .filter((x) => x)
-        .map((segment) =>
-          this.isDynamicPath(segment)
-            ? segment.replace(/\[([^\]]+)\]/g, ':$1')
-            : segment.toLowerCase(),
-        )
-        .join('/')
-      let route = reactRouterLike
-        .slice(0, reactRouterLike.lastIndexOf('.'))
-        .replace(/index$/, '')
-        .replace(/^\/|\/$/g, '')
-        .replace(/(:[^/]+)$/, '$1?')
-
-      if (route === '') route = '/'
-      return { route, isDynamic }
     },
   }
 }

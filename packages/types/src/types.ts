@@ -225,7 +225,7 @@ export interface PageFrontmatter extends Record<string, any> {
     lastUpdated: Date
     [key: string]: any
   }
-  layout: string | undefined
+  layout: string
   // route: {
   //   name?: string
   //   path?: string
@@ -245,18 +245,17 @@ interface PaginationProps<T = any> {
   items: T[]
 }
 
-type PaginationHelperResult<T = any> = Array<{
-  params: { page: string }
-  props?: PaginationProps<T>
-}>
-
 export type PaginationHelper<T = any> = (
   items: T[],
   options: {
     pageSize?: number
+    param?: string
     format?: (pageNumber: number) => string
   },
-) => PaginationHelperResult<T>
+) => Array<{
+  params: Record<string, string>
+  props?: PaginationProps<T>
+}>
 
 export type PropsWithPagination<T> = RenderableProps<
   BaseProps & PaginationProps<T>

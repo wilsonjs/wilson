@@ -25,7 +25,7 @@ function getPageImportCode({ componentName, importPath }: Route): string {
  */
 function getLayoutImportCode({ componentName, importPath }: Route): string {
   const page = getPageByImportPath(importPath)
-  const layout = (page ? page.frontmatter.layout : 'default') ?? 'default'
+  const layout = page!.frontmatter.layout
   return `import ${componentName}Layout from './src/layouts/${layout}';`
 }
 

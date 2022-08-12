@@ -5,6 +5,7 @@ import { join, relative } from 'pathe'
 import glob from 'fast-glob'
 import { isPage } from '@wilson/utils'
 import createDebug from 'debug'
+import { format } from 'prettier'
 
 const debug = createDebug('wilson:documents')
 
@@ -85,7 +86,9 @@ export default function DocumentsPlugin(config: SiteConfig): Plugin {
 
       return {
         id,
-        code: await generateDocumentsModule(pattern, config),
+        code: format(await generateDocumentsModule(pattern, config), {
+          filepath: 'documents.tsx',
+        }),
       }
     },
     async transform(code, id) {

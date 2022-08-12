@@ -1,7 +1,6 @@
 import type { ComponentType, RenderableProps } from 'preact'
 import Router from 'preact-router'
 import Meta from './meta'
-import routes from 'virtual:wilson-routes'
 
 interface Page {
   default: ComponentType
@@ -11,8 +10,8 @@ interface Page {
 type AppProps = RenderableProps<{ urlToBeRendered?: string }>
 
 export default function App({ urlToBeRendered }: AppProps) {
-  const markdownPages: Record<string, Page> = import.meta.glob(
-    '/src/pages/**/*.md',
+  const pages: Record<string, Page> = import.meta.glob(
+    '/src/pages/**/*.{md,tsx}',
     { eager: true },
   )
 
@@ -20,12 +19,9 @@ export default function App({ urlToBeRendered }: AppProps) {
     <>
       <Meta />
       <Router url={urlToBeRendered}>
-        {Object.entries(markdownPages).map(
-          ([file, { path, default: Page }]) => {
-            return <Page path={path} />
-          },
-        )}
-        {routes}
+        {Object.entries(pages).map(([file, { path, default: Page }]) => {
+          return <Page path={path} />
+        })}
       </Router>
     </>
   )

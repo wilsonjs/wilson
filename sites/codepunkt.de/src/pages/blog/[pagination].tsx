@@ -1,6 +1,6 @@
 import type { Document, PropsWithPagination, GetRenderedPathsFn } from 'wilson'
 import { getDocuments } from 'wilson'
-import styles from './[page].module.scss'
+import styles from './[pagination].module.scss'
 
 export const getRenderedPaths: GetRenderedPathsFn = async ({ paginate }) => {
   return paginate(getDocuments('blog'), {
@@ -22,7 +22,7 @@ export default function Page({
         <br />
         <small>Last modified: {frontmatter.meta.lastUpdated}</small>
       </h1>
-      <ol>
+      {/* <ol>
         {items.map((item) => (
           <li key={item.frontmatter.title}>
             <a href={item.href}>{item.frontmatter.title}</a>
@@ -30,7 +30,7 @@ export default function Page({
         ))}
       </ol>
       {prevPage && <a href={prevPage}>Prev</a>}
-      {nextPage && <a href={nextPage}>Next</a>}
+      {nextPage && <a href={nextPage}>Next</a>} */}
     </>
   )
 }

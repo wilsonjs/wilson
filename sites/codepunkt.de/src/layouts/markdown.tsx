@@ -1,7 +1,7 @@
 import type { StaticPageProps } from 'wilson'
 import DefaultLayout from './default'
 
-export default function IndexLayout(props: StaticPageProps) {
+export default function MarkdownLayout(props: StaticPageProps) {
   return (
     <>
       <DefaultLayout>

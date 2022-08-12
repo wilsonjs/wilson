@@ -5,17 +5,20 @@ import pages from '@wilson/pages'
 import debug from 'debug'
 import { relative } from 'pathe'
 import pc from 'picocolors'
-import type { PluginOption, ViteDevServer } from 'vite'
+import type { Plugin, PluginOption, ViteDevServer } from 'vite'
 import inspect from 'vite-plugin-inspect'
 import { configureMiddleware, createServer } from './server'
 import markdown from '@wilson/markdown'
+import tsxPath from './vite-plugins/tsx-path'
+import tsxWrap from './vite-plugins/tsx-wrap'
+import tsxFrontmatter from './vite-plugins/tsx-frontmatter'
 
 /**
  * Watches wilson config and restarts dev server when it changes.
  * @param siteConfig Site configuration
  * @returns Plugin
  */
-function devConfigWatch(siteConfig: SiteConfig): PluginOption {
+function devConfigWatch(siteConfig: SiteConfig): Plugin {
   async function handleChange(server: ViteDevServer, path: string) {
     if (path !== siteConfig.configPath) return
     restartServer(server)
@@ -49,7 +52,7 @@ function devConfigWatch(siteConfig: SiteConfig): PluginOption {
  * Provides the client entrypoint as a virtual module.
  * @returns Plugin
  */
-function virtualClientEntrypoint(): PluginOption {
+function virtualClientEntrypoint(): Plugin {
   const VIRTUAL_MODULE_ID = '/@virtual:wilson-client'
   const RESOLVED_VIRTUAL_MODULE_ID = `\0${VIRTUAL_MODULE_ID}`
 
@@ -70,7 +73,7 @@ function virtualClientEntrypoint(): PluginOption {
  * @param siteConfig Site configuration
  * @returns Plugin
  */
-function htmlFallback(config: SiteConfig): PluginOption {
+function htmlFallback(config: SiteConfig): Plugin {
   let server
 
   return {
@@ -88,7 +91,6 @@ function htmlFallback(config: SiteConfig): PluginOption {
  * @param config Site's configuration
  * @returns Array of vite plugins used for wilson.
  */
-// TODO do we need vite appType 'spa'? https://vitejs.dev/config/shared-options.html#apptype
 export default function wilsonPlugins(
   config: SiteConfig,
   ssr: boolean = false,
@@ -100,6 +102,9 @@ export default function wilsonPlugins(
 
   return [
     markdown(config),
+    tsxPath(config),
+    tsxFrontmatter(config),
+    tsxWrap(config),
     preact({
       include: [/\.[tj]sx?$/, /\.md$/],
       devtoolsInProd: true,

@@ -6,8 +6,9 @@
   "author": "Christoph Werner <christoph@codepunkt.de>",
   "type": "module",
   "scripts": {
-    "dev": "DEBUG=wilson:documents wilson --open",
-    "build": "DEBUG=wilson:documents wilson build",
+    "dev": "clear && wilson --open",
+    "devdebug": "clear && DEBUG=wilson:pages:virtual wilson --open",
+    "build": "wilson build",
     "preview": "wilson preview --open --port 3050",
     "now": "npm run build && npm run preview",
     "lint": "eslint . --ext .ts,.js,.tsx,.jsx,.html"

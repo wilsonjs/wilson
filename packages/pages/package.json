@@ -52,6 +52,7 @@
     "@types/node": "^18.0.0",
     "@wilson/types": "workspace:^1.0.0",
     "preact": "^10.10.0",
+    "rollup": "^2.75.7",
     "tsup": "^6.1.3"
   }
 }

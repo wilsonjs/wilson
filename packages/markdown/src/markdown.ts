@@ -10,16 +10,14 @@ import type { PluginOption } from 'vite'
 import type { TransformResult } from 'rollup'
 // @ts-ignore
 import toJsx from '@mapbox/hast-util-to-jsx'
-import debug from 'debug'
-import type {
-  PageFrontmatter,
-  SiteConfig,
-  UserFrontmatter,
-} from '@wilson/types'
-import { dirname, relative } from 'pathe'
-import { promises as fs } from 'fs'
-import { isObject } from '@wilson/utils'
+import type { SiteConfig } from '@wilson/types'
+import { relative } from 'pathe'
 import { format } from 'prettier'
+import {
+  createComponentName,
+  getRouteForPage,
+  userToPageFrontmatter,
+} from '@wilson/utils'
 
 /** Result of parsing frontmatter from markdown source code */
 type FrontmatterParseResult = {
@@ -98,18 +96,22 @@ export default function markdownPlugin(config: SiteConfig): PluginOption {
 
       const { markdown, frontmatter: userFrontmatter } = parseFrontmatter(code)
       const { jsx } = await processMarkdown(markdown)
-      const frontmatter = await prepareFrontmatter(id, userFrontmatter, config)
-      const layout = frontmatter.layout ?? 'default'
+      const frontmatter = await userToPageFrontmatter(
+        userFrontmatter,
+        id,
+        config,
+      )
+      const layout = frontmatter.layout
       const layoutPath = `${config.layoutsDir}/${layout}.tsx`
-      const path = getRoute(relative(config.pagesDir, id))
-      const componentName = createComponentName(path)
+      const path = getRouteForPage(relative(config.pagesDir, id))
+      const componentName = createComponentName(relative(config.pagesDir, id))
 
       const newCode = /* tsx */ `
         import { useTitle } from 'hoofd/preact';
         import Layout from '${layoutPath}';
 
-        export const path = '${path}';
-        export const frontmatter = ${JSON.stringify(frontmatter)};
+        export const path = '${path}';                             // done
+        export const frontmatter = ${JSON.stringify(frontmatter)}; // done
         const props = { frontmatter, path };
 
         function Title() {
@@ -128,57 +130,4 @@ export default function markdownPlugin(config: SiteConfig): PluginOption {
       return format(newCode, { filepath: 'markdown.tsx' })
     },
   }
-}
-
-async function prepareFrontmatter(
-  absolutePath: string,
-  userFrontmatter: UserFrontmatter,
-  config: SiteConfig,
-): Promise<PageFrontmatter> {
-  const extendedFrontmatter = await config.extendFrontmatter(
-    userFrontmatter,
-    relative(config.root, absolutePath),
-  )
-  const {
-    meta: originalMeta,
-    layout: fmLayout,
-    ...rest
-  } = extendedFrontmatter ?? {}
-  const layout: string | undefined =
-    typeof fmLayout === 'string' ? fmLayout : undefined
-  const meta = {
-    filename: relative(config.root, absolutePath),
-    lastUpdated: (await fs.stat(absolutePath)).mtime,
-    ...(isObject(originalMeta) ? originalMeta : {}),
-  }
-  const frontmatter = { layout, meta, ...rest }
-  return frontmatter
-}
-
-function getRoute(relativePath: string) {
-  const reactRouterLike = relativePath
-    .split('/')
-    .filter((x) => x)
-    .map((s) => s.toLowerCase())
-    .join('/')
-  const route = reactRouterLike
-    .slice(0, reactRouterLike.lastIndexOf('.'))
-    .replace(/index$/, '')
-    .replace(/^\/|\/$/g, '')
-    .replace(/(:[^/]+)$/, '$1?')
-  return route === '' ? '/' : route
-}
-
-function createComponentName(path: string) {
-  const withoutExtension = path.slice(0, path.lastIndexOf('.'))
-  const pascalCased = withoutExtension
-    .split('/')
-    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
-    .join('')
-  const variablesReplaced = pascalCased.replace(/\[([^\]]+)\]/g, '$$$1')
-  const onlyAllowedChars = variablesReplaced.replace(/[^a-z0-9$_]/gi, '')
-  return onlyAllowedChars.replace(
-    /\$(.{1})/g,
-    (s: string) => s.charAt(0) + s.charAt(1).toUpperCase(),
-  )
 }
