@@ -168,12 +168,6 @@ export interface Page {
   frontmatter: PageFrontmatter
 }
 
-export interface Document {
-  href: string
-  path: string
-  frontmatter: PageFrontmatter
-}
-
 /**
  * Representation of an interactive island
  */
@@ -236,7 +230,13 @@ export interface PageFrontmatter extends Record<string, any> {
 
 export interface StaticPageExports {
   default: FunctionComponent
-  frontmatter?: UserFrontmatter
+  path: string
+  frontmatter: PageFrontmatter
+}
+
+export interface Document {
+  href: string
+  frontmatter: PageFrontmatter
 }
 
 interface PaginationProps<T = any> {
@@ -244,6 +244,8 @@ interface PaginationProps<T = any> {
   prevPage?: string
   items: T[]
 }
+
+type DocumentHelper = (path: string) => StaticPageExports[]
 
 export type PaginationHelper<T = any> = (
   items: T[],
@@ -273,6 +275,7 @@ export type GetRenderedPathsResult<
 export type RenderedPath = GetRenderedPathsResult & { url: string }
 
 export type GetRenderedPathsFn = (helpers: {
+  getPages: DocumentHelper
   paginate: PaginationHelper
 }) => Awaitable<GetRenderedPathsResult[]>
 

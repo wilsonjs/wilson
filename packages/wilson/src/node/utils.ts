@@ -23,11 +23,15 @@ export function rmDir(dir: string): void {
  * @param fn Async function
  * @returns Result of the async function
  */
-export async function withSpinner<T>(message: string, fn: () => Promise<T>) {
+export async function withSpinner<T>(
+  message: string,
+  fn: (...rest: any[]) => Promise<T>,
+  ...rest: any[]
+) {
   const spinner = newSpinner(message).start()
   const startTime = performance.now()
   try {
-    const result = await fn()
+    const result = await fn(...rest)
     spinner.succeed()
     console.info(`  done in ${timeSince(startTime)}\n`)
     return result

@@ -1,8 +1,8 @@
 import { render } from 'preact'
 import 'preact/debug'
-import App from './components/app'
+import Router from './components/router'
 
-export default App
+export default Router
 
 if (!import.meta.env.SSR)
-  render(<App />, document.getElementById('site') as HTMLElement)
+  render(<Router />, document.getElementById('site') as HTMLElement)

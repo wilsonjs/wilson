@@ -1,5 +1,6 @@
-import type { RenderedPath } from '@wilson/types'
-import { getPages } from '@wilson/pages'
+import type { RenderedPath, SiteConfig } from '@wilson/types'
+import glob from 'fast-glob'
+import { join, relative } from 'pathe'
 
 /**
  * A page that is about to be rendered to a static .html file.
@@ -37,8 +38,17 @@ function toPageToRender({ url: path }: RenderedPath): PageToRender {
  * Will have single entries for static pages, and multiple entries for dynamic pages
  * depending on the return values of their `getRenderedPaths` implementation.
  */
-export async function getPagesToRender(): Promise<PageToRender[]> {
-  return (await getPages())
-    .map((page) => page.renderedPaths.map(toPageToRender))
-    .flat()
+export async function getPagesToRender({
+  pagesDir,
+}: SiteConfig): Promise<PageToRender[]> {
+  const files = await glob(join(pagesDir, `**/*.{md,tsx}`))
+  const mapped = files.map((file) => ({
+    outputFilename: pathToFilename(relative(pagesDir, file)),
+    rendered: '',
+  }))
+  console.log({ pagesDir, files, mapped })
+  return []
+  // return (await getPages())
+  //   .map((page) => page.renderedPaths.map(toPageToRender))
+  //   .flat()
 }

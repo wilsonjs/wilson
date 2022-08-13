@@ -48,6 +48,7 @@ async function bundleWithVite(
       emptyOutDir: false,
       outDir: ssr ? siteConfig.tempDir : siteConfig.outDir,
       sourcemap: false,
+      target: 'esnext',
       rollupOptions: {
         input: entrypoints,
         preserveEntrySignatures: htmlBuild ? undefined : 'allow-extension',

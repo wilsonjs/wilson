@@ -1,10 +1,25 @@
-import type { Document, PropsWithPagination, GetRenderedPathsFn } from 'wilson'
-import { getDocuments } from 'wilson'
+import { Document, PropsWithPagination, GetRenderedPathsFn } from 'wilson'
 import styles from './[pagination].module.scss'
 
-export const getRenderedPaths: GetRenderedPathsFn = async ({ paginate }) => {
-  return paginate(getDocuments('blog'), {
+export const getRenderedPaths: GetRenderedPathsFn = async ({
+  getPages,
+  paginate,
+}) => {
+  // const pages = getPages('blog')
+  const pages = Object.values(
+    import.meta.glob<{
+      path: string
+      frontmatter: {}
+    }>('/src/pages/blog/**/*.md', {
+      eager: true,
+    }),
+  ).map(({ path, frontmatter }) => ({
+    frontmatter,
+    href: `/${path}`,
+  }))
+  return paginate(pages, {
     pageSize: 3,
+    param: 'pagination',
     format: (no) => `page-${no}`,
   })
 }
@@ -22,7 +37,7 @@ export default function Page({
         <br />
         <small>Last modified: {frontmatter.meta.lastUpdated}</small>
       </h1>
-      {/* <ol>
+      <ol>
         {items.map((item) => (
           <li key={item.frontmatter.title}>
             <a href={item.href}>{item.frontmatter.title}</a>
@@ -30,7 +45,7 @@ export default function Page({
         ))}
       </ol>
       {prevPage && <a href={prevPage}>Prev</a>}
-      {nextPage && <a href={nextPage}>Next</a>} */}
+      {nextPage && <a href={nextPage}>Next</a>}
     </>
   )
 }

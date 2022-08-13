@@ -10,7 +10,7 @@ import {
 } from '@wilson/hydration'
 import type { Island } from '@wilson/types'
 import { toStatic } from 'hoofd/preact'
-import App from './components/app'
+import Router from './components/router'
 
 /**
  * Stores all islands encountered in the current page's rendering
@@ -227,7 +227,7 @@ export default async function renderToString(
   urlToBeRendered: string,
 ): Promise<ServerRenderResult> {
   clearIslands()
-  const html = await render(<App urlToBeRendered={urlToBeRendered} />)
+  const html = await render(<Router urlToBeRendered={urlToBeRendered} />)
   const head = toStatic() as unknown as ServerRenderResult['head']
   return { html, islands, head }
 }

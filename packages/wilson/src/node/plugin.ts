@@ -95,8 +95,8 @@ export default function wilsonPlugins(
   config: SiteConfig,
   ssr: boolean = false,
 ): PluginOption[] {
-  config.namedPlugins.documents ??= documents(config)
-  config.namedPlugins.pages ??= pages(config)
+  // config.namedPlugins.documents ??= documents(config)
+  // config.namedPlugins.pages ??= pages(config)
 
   debug('wilson:config')(config)
 
@@ -124,8 +124,8 @@ export default function wilsonPlugins(
           : [],
       },
     }),
-    config.namedPlugins.pages,
-    config.namedPlugins.documents,
+    // config.namedPlugins.pages,
+    // config.namedPlugins.documents,
     htmlFallback(config),
     devConfigWatch(config),
     inspect(),

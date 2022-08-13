@@ -26,6 +26,7 @@ export async function build(root: string = process.cwd()) {
     siteConfig,
     bundleResult,
   )
+  console.log({ pagesToRender, islandsByPath })
   pagesToRender.map(({ path, outputFilename }) =>
     debug.build(`rendering page ${path} to ${outputFilename}`),
   )

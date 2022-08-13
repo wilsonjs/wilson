@@ -1,4 +1,4 @@
-import type { Document } from '@wilson/types'
+import type { Document, PaginationHelper, UserFrontmatter } from '@wilson/types'
 
 export type {
   StaticPageProps,
@@ -29,4 +29,38 @@ export type {
  */
 export function getDocuments(pattern?: string): Document[] {
   return []
+}
+
+interface PaginateOptions {
+  pageSize?: number
+  param?: string
+  format?: (pageNumber: number) => string
+}
+
+// TODO write comment
+// TODO auto-adapt default param 'page' for pages with one dynamic parameter
+export const paginate: PaginationHelper = (items, options) => {
+  const format = options.format ?? ((no) => String(no))
+  const pageSize = options.pageSize ?? 10
+  const param = options.param ?? 'page'
+  const toPath = (no: number) => (no === 1 ? '' : format(no))
+  const pagesCount = Math.max(1, Math.ceil(items.length / pageSize))
+
+  return Array.from({ length: pagesCount }, (val, i) => i + 1).map(
+    (pageNumber) => {
+      const firstItem = (pageNumber - 1) * pageSize
+      return {
+        params: { [param]: toPath(pageNumber) },
+        props: {
+          items: items.slice(firstItem, firstItem + pageSize),
+          nextPage:
+            pageNumber !== pagesCount
+              ? '/blog/' + toPath(pageNumber + 1)
+              : undefined,
+          prevPage:
+            pageNumber === 1 ? undefined : '/blog/' + toPath(pageNumber - 1),
+        },
+      }
+    },
+  )
 }

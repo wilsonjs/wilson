@@ -28,12 +28,13 @@ export function handleHMR(
     const path = slash(file)
     if (api.isPage(path)) {
       const { changed, needsReload } = await api.updatePage(path)
-      // TODO which other pages do we need to update!?
+
       const dependents: string[] =
         config.namedPlugins.documents.api.getDependents(file)
       for (const dependent of dependents) {
         await api.updatePage(dependent)
       }
+
       if (changed) debug.hmr('change', path)
       if (needsReload) fullReload(server, clearRoutes)
     }

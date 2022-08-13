@@ -26,6 +26,7 @@ export async function renderPages(
   const pagesToRender = await withSpinner(
     'resolving static paths',
     getPagesToRender,
+    config,
   )
   const clientChunks = clientResult.output
   const islandsByPath: IslandsByPath = {}

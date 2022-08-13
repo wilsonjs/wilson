@@ -3,11 +3,12 @@ import { TransformResult } from 'rollup'
 import { relative } from 'pathe'
 import template from '@babel/template'
 import type { Plugin } from 'vite'
-import type { SiteConfig } from '@wilson/types'
+import type { GetRenderedPathsFn, SiteConfig } from '@wilson/types'
 import types from '@babel/types'
 import parse from './util/parse'
 import format from './util/format'
 import { traverse } from './util/babel-import'
+import path from 'path'
 
 export default function tsxWrapPlugin(config: SiteConfig): Plugin {
   return {
@@ -19,21 +20,48 @@ export default function tsxWrapPlugin(config: SiteConfig): Plugin {
         return null
       }
 
-      // if (
-      //   id !==
-      //   '/home/christoph/projects/wilson2/sites/codepunkt.de/src/pages/islands.tsx'
-      // ) {
-      //   return null
-      // }
-
-      const componentName = createComponentName(relative(config.pagesDir, id))
+      const relativeId = relative(config.pagesDir, id)
+      const componentName = createComponentName(relativeId)
+      const dynamicParameterMatches = [...relativeId.matchAll(/\[([^\]]+)\]/g)]
+      const isDynamic = dynamicParameterMatches.length > 0
 
       const ast = parse(code)
 
       let fc: types.FunctionDeclaration | undefined = undefined
 
       // TODO check that OriginalPage has no binding in global scope
+      // TODO if isDynamic, check that getRenderedPaths is exported
       traverse(ast, {
+        Program(path) {
+          if (isDynamic) {
+            if (path.scope.hasOwnBinding('getRenderedPaths')) {
+              const binding = path.scope.getOwnBinding('getRenderedPaths')
+              if (
+                binding &&
+                // types.isVariableDeclarator(binding.path.node) &&
+                // types.isObjectExpression(binding.path.node.init) &&
+                binding.referencePaths.some((path) =>
+                  types.isExportNamedDeclaration(path),
+                )
+              ) {
+                if (types.isVariableDeclarator(binding.path.node)) {
+                  console.log(binding.path.node)
+                } else if (types.isFunctionDeclaration(binding.path.node)) {
+                  console.log(
+                    binding.path
+                      .getScope(binding.path.scope)
+                      .getBinding('getPages'),
+                  )
+                } else {
+                  throw new Error('wat 1')
+                }
+                // console.log(binding.path.node.init.type)
+                return
+              }
+            }
+            throw new Error('wat 3 pages must have getRenderedPaths Export')
+          }
+        },
         ExportDefaultDeclaration(path) {
           if (types.isFunctionDeclaration(path.node.declaration)) {
             fc = path.node.declaration
@@ -72,11 +100,19 @@ export default function tsxWrapPlugin(config: SiteConfig): Plugin {
             }
 
             path.node.declaration = template.smart(
-              /* js */ `
-                function ${componentName}Page({ ...rest }) {
-                  const props = { frontmatter, ...rest }
+              `
+                function ${componentName}Page({ matches, ...rest }) {
+                  ${
+                    isDynamic
+                      ? `
+                        const renderedPath = renderedPaths.find(({ params }) => shallowEqual(params, matches))
+                        const props = { frontmatter, matches, ...renderedPath.props, ...rest }
+                      `
+                      : `const props = { frontmatter, matches, ...rest }`
+                  }
+                  function Title() { useTitle(frontmatter.title); return null; };
                   return <Layout {...props}>
-                    {frontmatter.title && <>has title</>}
+                    {frontmatter.title && <Title />}
                     <OriginalPage {...props} />
                   </Layout>;
                 }
@@ -91,13 +127,31 @@ export default function tsxWrapPlugin(config: SiteConfig): Plugin {
         },
       })
 
+      ast.program.body = [
+        template.statement(`import { useTitle } from 'hoofd/preact';`)(),
+        ...(isDynamic
+          ? template.statements(`
+              import { paginate } from 'wilson';
+              import { shallowEqual } from 'fast-equals';
+            `)()
+          : []),
+        ...ast.program.body,
+        ...(isDynamic
+          ? [
+              template.statement(
+                `const renderedPaths = await getRenderedPaths({ getPages: (path) => {
+                  return [];
+                }, paginate });`,
+              )(),
+            ]
+          : []),
+      ]
+
       if (fc) {
         ast.program.body.push(fc)
       }
 
-      const result = format(ast)
-      console.log(result)
-      return result
+      return format(ast)
     },
   }
 }
