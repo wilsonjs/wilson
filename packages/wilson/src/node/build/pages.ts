@@ -1,6 +1,7 @@
 import type { RenderedPath, SiteConfig } from '@wilson/types'
+import { isDynamicPagePath } from '@wilson/utils'
 import glob from 'fast-glob'
-import { join, relative } from 'pathe'
+import { basename, dirname, join, relative } from 'pathe'
 
 /**
  * A page that is about to be rendered to a static .html file.
@@ -26,10 +27,11 @@ function pathToFilename(path: string) {
 }
 
 /**
- * Converts a RenderedPath to a PageToRender.
+ * Replaces opening bracket on start of given string and
+ * closing bracket on end of given string with underscores.
  */
-function toPageToRender({ url: path }: RenderedPath): PageToRender {
-  return { path, outputFilename: pathToFilename(path), rendered: '' }
+function replaceBrackets(string: string): string {
+  return string.replace(/^\[/, '_').replace(/\]$/, '_')
 }
 
 /**
@@ -42,12 +44,20 @@ export async function getPagesToRender({
   pagesDir,
 }: SiteConfig): Promise<PageToRender[]> {
   const files = await glob(join(pagesDir, `**/*.{md,tsx}`))
-  const mapped = files.map((file) => ({
-    outputFilename: pathToFilename(relative(pagesDir, file)),
-    rendered: '',
-  }))
-  console.log({ pagesDir, files, mapped })
-  return []
+  return files
+    .map((file) => {
+      const path = relative(pagesDir, file.replace(/\.[^.]+$/, ''))
+      const outputFilename = pathToFilename(path)
+      return {
+        path: path === 'index' ? '/' : path,
+        outputFilename,
+        rendered: '',
+      }
+    })
+    .filter((page) => {
+      console.log(page)
+      return !isDynamicPagePath(page.path)
+    })
   // return (await getPages())
   //   .map((page) => page.renderedPaths.map(toPageToRender))
   //   .flat()
