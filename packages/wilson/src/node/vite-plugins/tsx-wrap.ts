@@ -45,13 +45,13 @@ export default function tsxWrapPlugin(config: SiteConfig): Plugin {
                 )
               ) {
                 if (types.isVariableDeclarator(binding.path.node)) {
-                  console.log(binding.path.node)
+                  // console.log(binding.path.node)
                 } else if (types.isFunctionDeclaration(binding.path.node)) {
-                  console.log(
-                    binding.path
-                      .getScope(binding.path.scope)
-                      .getBinding('getPages'),
-                  )
+                  // console.log(
+                  //   binding.path
+                  //     .getScope(binding.path.scope)
+                  //     .getBinding('getPages'),
+                  // )
                 } else {
                   throw new Error('wat 1')
                 }
