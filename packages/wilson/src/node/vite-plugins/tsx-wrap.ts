@@ -3,7 +3,7 @@ import { TransformResult } from 'rollup'
 import { relative } from 'pathe'
 import template from '@babel/template'
 import type { Plugin } from 'vite'
-import type { GetRenderedPathsFn, SiteConfig } from '@wilson/types'
+import type { GetStaticPaths, SiteConfig } from '@wilson/types'
 import types from '@babel/types'
 import parse from './util/parse'
 import format from './util/format'
@@ -33,38 +33,38 @@ export default function tsxWrapPlugin(config: SiteConfig): Plugin {
       let fc: types.FunctionDeclaration | undefined = undefined
 
       // TODO check that OriginalPage has no binding in global scope
-      // TODO if isDynamic, check that getRenderedPaths is exported
+      // TODO if isDynamic, check that `getStaticPaths` is exported
       traverse(ast, {
-        Program(path) {
-          if (isDynamic) {
-            if (path.scope.hasOwnBinding('getRenderedPaths')) {
-              const binding = path.scope.getOwnBinding('getRenderedPaths')
-              if (
-                binding &&
-                // types.isVariableDeclarator(binding.path.node) &&
-                // types.isObjectExpression(binding.path.node.init) &&
-                binding.referencePaths.some((path) =>
-                  types.isExportNamedDeclaration(path),
-                )
-              ) {
-                if (types.isVariableDeclarator(binding.path.node)) {
-                  // console.log(binding.path.node)
-                } else if (types.isFunctionDeclaration(binding.path.node)) {
-                  // console.log(
-                  //   binding.path
-                  //     .getScope(binding.path.scope)
-                  //     .getBinding('getPages'),
-                  // )
-                } else {
-                  throw new Error('wat 1')
-                }
-                // console.log(binding.path.node.init.type)
-                return
-              }
-            }
-            throw new Error('wat 3 pages must have getRenderedPaths Export')
-          }
-        },
+        // Program(path) {
+        //   if (isDynamic) {
+        //     if (path.scope.hasOwnBinding('getStaticPaths')) {
+        //       const binding = path.scope.getOwnBinding('getStaticPaths')
+        //       if (
+        //         binding &&
+        //         // types.isVariableDeclarator(binding.path.node) &&
+        //         // types.isObjectExpression(binding.path.node.init) &&
+        //         binding.referencePaths.some((path) =>
+        //           types.isExportNamedDeclaration(path),
+        //         )
+        //       ) {
+        //         if (types.isVariableDeclarator(binding.path.node)) {
+        //           // console.log(binding.path.node)
+        //         } else if (types.isFunctionDeclaration(binding.path.node)) {
+        //           // console.log(
+        //           //   binding.path
+        //           //     .getScope(binding.path.scope)
+        //           //     .getBinding('getPages'),
+        //           // )
+        //         } else {
+        //           throw new Error('wat 1')
+        //         }
+        //         // console.log(binding.path.node.init.type)
+        //         return
+        //       }
+        //     }
+        //     throw new Error('wat 3 pages must have `getStaticPaths` Export')
+        //   }
+        // },
         ExportDefaultDeclaration(path) {
           if (types.isFunctionDeclaration(path.node.declaration)) {
             fc = path.node.declaration
@@ -108,8 +108,8 @@ export default function tsxWrapPlugin(config: SiteConfig): Plugin {
                   ${
                     isDynamic
                       ? `
-                        const renderedPath = renderedPaths.find(({ params }) => shallowEqual(params, matches))
-                        const props = { frontmatter, matches, ...renderedPath.props, ...rest }
+                        const staticPath = staticPaths.find(({ params }) => shallowEqual(params, matches))
+                        const props = { frontmatter, matches, ...staticPath.props, ...rest }
                       `
                       : `const props = { frontmatter, matches, ...rest }`
                   }
@@ -142,7 +142,7 @@ export default function tsxWrapPlugin(config: SiteConfig): Plugin {
         ...(isDynamic
           ? [
               template.statement(
-                `const renderedPaths = await getRenderedPaths({ getPages: (path) => {
+                `const staticPaths = await getStaticPaths({ getPages: (path) => {
                   return [];
                 }, paginate: createPaginationHelper('${pagePath}') });`,
               )(),

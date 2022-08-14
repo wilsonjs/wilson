@@ -3,13 +3,13 @@ import type { Document, PaginationHelper, UserFrontmatter } from '@wilson/types'
 export type {
   StaticPageProps,
   DynamicPageProps,
-  GetRenderedPathsResult,
   PageFrontmatter,
   UserConfig,
   Document,
   PaginationHelper,
   PropsWithPagination,
-  GetRenderedPathsFn,
+  GetStaticPaths,
+  GetStaticPathsResult,
 } from '@wilson/types'
 
 /**

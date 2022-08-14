@@ -1,7 +1,7 @@
-import { Document, PropsWithPagination, GetRenderedPathsFn } from 'wilson'
+import { Document, PropsWithPagination, GetStaticPaths } from 'wilson'
 import styles from './[pagination].module.scss'
 
-export const getRenderedPaths: GetRenderedPathsFn = async ({
+export const getStaticPaths: GetStaticPaths = async ({
   getPages,
   paginate,
 }) => {

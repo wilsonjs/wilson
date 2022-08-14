@@ -157,10 +157,6 @@ export interface Page {
    * The page's component name
    */
   componentName: string
-  /**
-   *
-   */
-  renderedPaths: RenderedPath[]
   frontmatter: PageFrontmatter
 }
 
@@ -259,20 +255,20 @@ export type PropsWithPagination<T> = RenderableProps<
 >
 
 export interface DynamicPageExports extends StaticPageExports {
-  getRenderedPaths: GetRenderedPathsFn
+  getStaticPaths: GetStaticPaths
 }
 
-export type GetRenderedPathsResult<
+export type GetStaticPathsResult<
   Params extends string = string,
   Props extends Record<string, any> = Record<string, any>,
 > = { params: Record<Params, string>; props?: Props }
 
-export type RenderedPath = GetRenderedPathsResult & { url: string }
+export type StaticPath = GetStaticPathsResult & { url: string }
 
-export type GetRenderedPathsFn = (helpers: {
+export type GetStaticPaths = (helpers: {
   getPages: DocumentHelper
   paginate: PaginationHelper
-}) => Awaitable<GetRenderedPathsResult[]>
+}) => Awaitable<GetStaticPathsResult[]>
 
 interface SpecificParams<in Params extends string> {
   params: Record<Params, string>

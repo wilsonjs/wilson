@@ -19,7 +19,7 @@ export interface PageToRender {
 }
 
 /**
- * Converts a RenderedPath path to a filename.
+ * Converts a StaticPath path to a filename.
  *
  * - Removes starting slash
  * - Ensures .html extension
@@ -44,9 +44,8 @@ function replaceBrackets(string: string): string {
  * Returns an array of all pages to render.
  *
  * Will have single entries for static pages, and multiple entries for dynamic pages
- * depending on the return values of their `getRenderedPaths` implementation.
+ * depending on the return values of their `getStaticPaths` implementation.
  */
-// TODO misses renderedPaths of dynamic pages
 export async function getPagesToRender({
   pagesDir,
 }: SiteConfig): Promise<PageToRender[]> {
@@ -59,13 +58,13 @@ export async function getPagesToRender({
     const isDynamic = isDynamicPagePath(withoutExt)
 
     if (isDynamic) {
-      const { getRenderedPaths } = await getPageExports<DynamicPageExports>(
+      const { getStaticPaths } = await getPageExports<DynamicPageExports>(
         absolutePath,
         pagesDir,
       )
       const paginate = createPaginationHelper(relativePath)
-      const renderedPaths = (
-        await getRenderedPaths({
+      const staticPaths = (
+        await getStaticPaths({
           paginate,
           getPages: () => [],
         })
@@ -82,7 +81,7 @@ export async function getPagesToRender({
         }
       })
 
-      pagesToRender.push(...renderedPaths)
+      pagesToRender.push(...staticPaths)
     } else {
       const outputFilename = pathToFilename(withoutExt)
       pagesToRender.push({
