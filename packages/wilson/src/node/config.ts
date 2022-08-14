@@ -3,7 +3,7 @@ import type { ConfigEnv, UserConfig as ViteOptions } from 'vite'
 import { loadConfigFromFile, mergeConfig as mergeViteConfig } from 'vite'
 import pc from 'picocolors'
 import { dirname, join, resolve } from 'pathe'
-import type { NamedPlugins, SiteConfig, UserConfig } from '@wilson/types'
+import type { SiteConfig, UserConfig } from '@wilson/types'
 import { debug } from './utils'
 import { isObject } from '@wilson/utils'
 
@@ -165,7 +165,6 @@ function siteConfigDefaults(
     site: defaultSiteMeta,
     defaultContentLanguage: 'en',
     vite: viteConfigDefaults(root),
-    namedPlugins: {} as NamedPlugins,
     extendFrontmatter(userFrontmatter) {
       return userFrontmatter
     },

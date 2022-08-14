@@ -112,12 +112,6 @@ export interface SiteConfig extends Required<UserConfig> {
    * The mode the app is running in, typically `development` or `production`.
    */
   mode: string
-  namedPlugins: NamedPlugins
-}
-
-export interface NamedPlugins {
-  documents: Plugin
-  pages: Plugin
 }
 
 export interface Page {
