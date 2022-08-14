@@ -1,7 +1,5 @@
 import preact from '@preact/preset-vite'
 import type { SiteConfig } from '@wilson/types'
-import documents from '@wilson/documents'
-import pages from '@wilson/pages'
 import debug from 'debug'
 import { relative } from 'pathe'
 import pc from 'picocolors'
@@ -95,9 +93,6 @@ export default function wilsonPlugins(
   config: SiteConfig,
   ssr: boolean = false,
 ): PluginOption[] {
-  // config.namedPlugins.documents ??= documents(config)
-  // config.namedPlugins.pages ??= pages(config)
-
   debug('wilson:config')(config)
 
   return [
@@ -124,8 +119,6 @@ export default function wilsonPlugins(
           : [],
       },
     }),
-    // config.namedPlugins.pages,
-    // config.namedPlugins.documents,
     htmlFallback(config),
     devConfigWatch(config),
     inspect(),

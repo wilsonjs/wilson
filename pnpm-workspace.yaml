@@ -1,9 +1,7 @@
 packages:
   - packages/babel-plugin
-  - packages/documents
   - packages/hydration
   - packages/markdown
-  - packages/pages
   - packages/types
   - packages/utils
   - packages/wilson
