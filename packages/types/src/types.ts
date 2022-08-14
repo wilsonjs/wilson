@@ -80,8 +80,8 @@ export interface UserConfig {
    * Used to access and optionally modify page's frontmatter.
    */
   extendFrontmatter?: (
-    frontmatter: UserFrontmatter,
     filename: string,
+    frontmatter: UserFrontmatter,
   ) => Awaitable<UserFrontmatter | void>
 }
 
@@ -114,46 +114,6 @@ export interface SiteConfig extends Required<UserConfig> {
   mode: string
 }
 
-export interface Page {
-  /**
-   * React-router route path
-   */
-  route: string
-  /**
-   * Path of the page relative to the `pagesDir`
-   */
-  path: string
-  /**
-   * Path of the page relative to the `srcDir`
-   */
-  srcPath: string
-  /**
-   * Path of the page relative to the site root
-   */
-  rootPath: string
-  /**
-   * Import path of the page relative to the site root
-   */
-  importPath: string
-  /**
-   * Absolute path of the page
-   */
-  absolutePath: string
-  /**
-   * Is the page dynamic?
-   */
-  isDynamic: boolean
-  /**
-   * The page's file extension
-   */
-  fileExtension: string
-  /**
-   * The page's component name
-   */
-  componentName: string
-  frontmatter: PageFrontmatter
-}
-
 /**
  * Representation of an interactive island
  */
@@ -181,24 +141,11 @@ export interface Island {
  */
 export type IslandsByPath = Record<string, Island[]>
 
-/**
- * The definition of a route in Wilson, used to render pages.
- *
- * Routes are inferred from files in the `pagesDir.
- */
-export type Route = Pick<Page, 'componentName' | 'importPath' | 'route'>
-
-//  * Additional paths for the page, that behave like a copy of the route.
-// /**
-//  * When building the site, each path will be rendered separately.
-//  */
-// alias?: string | string[];
-
-export interface UserFrontmatter {
-  [key: string]: string | object | undefined
+export interface UserFrontmatter extends Record<string, any> {
+  title: string
 }
 
-export interface PageFrontmatter extends Record<string, any> {
+export interface PageFrontmatter extends UserFrontmatter {
   meta: {
     filename: string
     lastUpdated: Date
@@ -219,7 +166,7 @@ export interface StaticPageExports {
   frontmatter: PageFrontmatter
 }
 
-export interface Document {
+interface Document {
   href: string
   frontmatter: PageFrontmatter
 }
@@ -244,7 +191,7 @@ export type PaginationHelper<T = any> = (
   props?: PaginationProps<T>
 }>
 
-export type PropsWithPagination<T> = RenderableProps<
+export type PropsWithPagination<T extends {} = Document> = RenderableProps<
   BaseProps & PaginationProps<T>
 >
 

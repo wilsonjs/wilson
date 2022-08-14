@@ -21,85 +21,94 @@ export default function tsxFrontmatterPlugin(config: SiteConfig): Plugin {
 
       const ast = parse(code)
 
-      let userFrontmatter: UserFrontmatter = {}
+      let userFrontmatter: Record<string, any> = {}
       let frontmatterExport: types.VariableDeclarator | undefined
 
       traverse(ast, {
         Program(path) {
-          if (path.scope.hasOwnBinding('frontmatter')) {
-            const binding = path.scope.getBinding('frontmatter')
+          const binding = path.scope.getOwnBinding('frontmatter')
 
-            if (
-              binding &&
-              types.isVariableDeclarator(binding.path.node) &&
-              types.isObjectExpression(binding.path.node.init) &&
-              binding.referencePaths.some((path) =>
-                types.isExportNamedDeclaration(path),
-              )
-            ) {
-              const baseError = 'Frontmatter export must be JSON.'
+          if (
+            binding &&
+            types.isVariableDeclarator(binding.path.node) &&
+            types.isObjectExpression(binding.path.node.init) &&
+            binding.referencePaths.some((path) =>
+              types.isExportNamedDeclaration(path),
+            )
+          ) {
+            const titleProp = binding.path.node.init.properties.find(
+              (prop) =>
+                types.isObjectProperty(prop) &&
+                types.isIdentifier(prop.key) &&
+                prop.key.name === 'title',
+            ) as types.ObjectProperty | undefined
 
-              traverse(
-                binding.path.node,
-                {
-                  enter(path) {
-                    if (
-                      ![
-                        'Identifier',
-                        'ArrayExpression',
-                        'ObjectExpression',
-                        'ObjectProperty',
-                        'TemplateLiteral',
-                        'TemplateElement',
-                        'StringLiteral',
-                        'BooleanLiteral',
-                        'NullLiteral',
-                        'NumericLiteral',
-                      ].includes(path.type)
-                    ) {
-                      throw new Error(
-                        `${baseError} Illegal ${path.type} found!`,
-                      )
-                    }
-                  },
-                  ObjectProperty(path) {
-                    if (path.node.computed) {
-                      throw new Error(
-                        `${baseError} Illegal computed ObjectProperty found!`,
-                      )
-                    }
-                    if (types.isIdentifier(path.node.value)) {
-                      throw new Error(
-                        `${baseError} Illegal Identifier "${path.node.value.name}" in ObjectProperty found!`,
-                      )
-                    }
-                  },
-                  TemplateLiteral(path) {
-                    const identifier = path.node.expressions.find((e) =>
-                      types.isIdentifier(e),
-                    ) as types.Identifier
-                    if (identifier) {
-                      throw new Error(
-                        `${baseError} Illegal Identifier "${identifier.name}" found in TemplateLiteral`,
-                      )
-                    }
-                  },
-                },
-                binding.scope,
-                binding.path,
-              )
-
-              frontmatterExport = binding.path.node
-              userFrontmatter = new Function(
-                `return ${generate(binding.path.node.init).code}`,
-              )()
+            if (titleProp === undefined) {
+              throw new Error(`Frontmatter does not include "title"!`)
             }
+
+            const baseError = 'Frontmatter export must be JSON.'
+
+            traverse(
+              binding.path.node,
+              {
+                enter(path) {
+                  if (
+                    ![
+                      'Identifier',
+                      'ArrayExpression',
+                      'ObjectExpression',
+                      'ObjectProperty',
+                      'TemplateLiteral',
+                      'TemplateElement',
+                      'StringLiteral',
+                      'BooleanLiteral',
+                      'NullLiteral',
+                      'NumericLiteral',
+                    ].includes(path.type)
+                  ) {
+                    throw new Error(`${baseError} Illegal ${path.type} found!`)
+                  }
+                },
+                ObjectProperty(path) {
+                  if (path.node.computed) {
+                    throw new Error(
+                      `${baseError} Illegal computed ObjectProperty found!`,
+                    )
+                  }
+                  if (types.isIdentifier(path.node.value)) {
+                    throw new Error(
+                      `${baseError} Illegal Identifier "${path.node.value.name}" in ObjectProperty found!`,
+                    )
+                  }
+                },
+                TemplateLiteral(path) {
+                  const identifier = path.node.expressions.find((e) =>
+                    types.isIdentifier(e),
+                  ) as types.Identifier
+                  if (identifier) {
+                    throw new Error(
+                      `${baseError} Illegal Identifier "${identifier.name}" found in TemplateLiteral`,
+                    )
+                  }
+                },
+              },
+              binding.scope,
+              binding.path,
+            )
+
+            frontmatterExport = binding.path.node
+            userFrontmatter = new Function(
+              `return ${generate(binding.path.node.init).code}`,
+            )()
+          } else {
+            throw new Error('Page must export "frontmatter"!')
           }
         },
       })
 
       const frontmatter = await userToPageFrontmatter(
-        userFrontmatter,
+        userFrontmatter as UserFrontmatter,
         id,
         config,
       )

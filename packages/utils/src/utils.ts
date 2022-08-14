@@ -98,12 +98,10 @@ export async function userToPageFrontmatter(
 ): Promise<PageFrontmatter> {
   const filename = relative(root, absolutePagePath)
 
-  const {
-    meta: originalMeta,
-    layout: fmLayout,
-    ...rest
-  } = (await extendFrontmatter(userFrontmatter, filename)) ?? {}
+  const extended: UserFrontmatter =
+    (await extendFrontmatter(filename, userFrontmatter)) ?? userFrontmatter
 
+  const { meta: originalMeta, layout: fmLayout, ...rest } = extended
   const layout: string = typeof fmLayout === 'string' ? fmLayout : 'default'
 
   const meta = {

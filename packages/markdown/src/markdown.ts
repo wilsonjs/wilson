@@ -10,7 +10,7 @@ import type { PluginOption } from 'vite'
 import type { TransformResult } from 'rollup'
 // @ts-ignore
 import toJsx from '@mapbox/hast-util-to-jsx'
-import type { SiteConfig } from '@wilson/types'
+import type { SiteConfig, UserFrontmatter } from '@wilson/types'
 import { relative } from 'pathe'
 import { format } from 'prettier'
 import {
@@ -94,7 +94,9 @@ export default function markdownPlugin(config: SiteConfig): PluginOption {
         return null
       }
 
-      const { markdown, frontmatter: userFrontmatter } = parseFrontmatter(code)
+      const { markdown, frontmatter: userFrontmatter } = parseFrontmatter(
+        code,
+      ) as { markdown: string; frontmatter: UserFrontmatter }
       const { jsx } = await processMarkdown(markdown)
       const frontmatter = await userToPageFrontmatter(
         userFrontmatter,

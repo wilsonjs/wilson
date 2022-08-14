@@ -1,5 +1,9 @@
-import { Document, PropsWithPagination, GetStaticPaths } from 'wilson'
+import { PropsWithPagination, GetStaticPaths } from 'wilson'
 import styles from './[pagination].module.scss'
+
+export const frontmatter = {
+  title: 'Blog posts',
+}
 
 export const getStaticPaths: GetStaticPaths = async ({
   getPages,
@@ -28,7 +32,7 @@ export default function Page({
   items,
   prevPage,
   nextPage,
-}: PropsWithPagination<Document>) {
+}: PropsWithPagination) {
   return (
     <>
       <h1 className={styles.headline}>

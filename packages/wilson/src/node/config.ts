@@ -165,8 +165,8 @@ function siteConfigDefaults(
     site: defaultSiteMeta,
     defaultContentLanguage: 'en',
     vite: viteConfigDefaults(root),
-    extendFrontmatter(userFrontmatter) {
-      return userFrontmatter
+    extendFrontmatter(filename, frontmatter) {
+      return frontmatter
     },
   }
 }

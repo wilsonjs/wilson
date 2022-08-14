@@ -1,35 +1,16 @@
-import type { Document, PaginationHelper, UserFrontmatter } from '@wilson/types'
+import type { PaginationHelper } from '@wilson/types'
 
 export type {
   StaticPageProps,
   DynamicPageProps,
+  UserFrontmatter,
   PageFrontmatter,
-  UserConfig,
-  Document,
   PaginationHelper,
   PropsWithPagination,
   GetStaticPaths,
   GetStaticPathsResult,
+  UserConfig,
 } from '@wilson/types'
-
-/**
- * Used to access all files that are under the page directory or match a given
- * pattern.
- *
- * #### Examples
- *
- *  - `getDocuments()`
- *     .md and .mdx files in the page dir
- *
- *  - `getDocuments('blog')`
- *     .md and .mdx files in page dir subfolder "_blog_"
- *
- * @param pattern Pattern to match in the page directory
- * @returns An array of documents
- */
-export function getDocuments(pattern?: string): Document[] {
-  return []
-}
 
 /**
  * Creates a pagination helper function that is invoked with an array of
