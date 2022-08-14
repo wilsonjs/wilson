@@ -24,20 +24,22 @@ const routes: Array<{
   })),
 ]
 
-// TODO do this via extendRoutes
-routes.push({
-  component: NotFound,
-  props: {
-    default: true,
-    routes: routes.map(({ component, importPath, props: { path } }) => ({
-      path,
-      component: component.displayName,
-      importPath,
-    })),
-  },
-})
+if (!import.meta.env.SSR)
+  routes.push({
+    component: NotFound,
+    props: {
+      default: true,
+      routes: routes.map(({ component, importPath, props: { path } }) => ({
+        path,
+        component: component.displayName,
+        importPath,
+      })),
+    },
+  })
 
-type AppProps = RenderableProps<{ urlToBeRendered?: string }>
+type AppProps = RenderableProps<{
+  urlToBeRendered?: string
+}>
 
 export default function Router({ urlToBeRendered }: AppProps) {
   return (

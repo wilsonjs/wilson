@@ -77,10 +77,6 @@ export interface UserConfig {
    */
   pageExtensions?: string[]
   /**
-   * Used to access and optionally modify the generated routes.
-   */
-  extendRoutes?: (routes: Route[]) => Awaitable<Route[] | void>
-  /**
    * Used to access and optionally modify page's frontmatter.
    */
   extendFrontmatter?: (
@@ -198,8 +194,7 @@ export type IslandsByPath = Record<string, Island[]>
 /**
  * The definition of a route in Wilson, used to render pages.
  *
- * By default most routes would be inferred from files in the `pagesDir`, but a
- * user can provide custom routes using the `extendRoutes` hook.
+ * Routes are inferred from files in the `pagesDir.
  */
 export type Route = Pick<Page, 'componentName' | 'importPath' | 'route'>
 

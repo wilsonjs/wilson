@@ -169,25 +169,6 @@ function siteConfigDefaults(
     extendFrontmatter(userFrontmatter) {
       return userFrontmatter
     },
-    extendRoutes(routes) {
-      console.log('===================')
-      console.log('===================')
-      console.log('extendRoutes')
-      console.log('===================')
-      console.log('===================')
-      if (isDevelopmentMode) {
-        return [
-          ...routes,
-          {
-            route: '*',
-            importPath: 'wilson/dist/client/components/not-found',
-            componentName: 'NotFound',
-          },
-        ]
-      }
-      // else if (!drafts)
-      //   return routes.filter(route => !route.frontmatter?.draft)
-    },
   }
 }
 

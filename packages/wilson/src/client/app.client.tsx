@@ -1,8 +1,5 @@
 import { render } from 'preact'
-import 'preact/debug'
 import Router from './components/router'
+import 'preact/debug'
 
-export default Router
-
-if (!import.meta.env.SSR)
-  render(<Router />, document.getElementById('site') as HTMLElement)
+render(<Router />, document.getElementById('site') as HTMLElement)

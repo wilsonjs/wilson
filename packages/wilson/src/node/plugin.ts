@@ -68,6 +68,7 @@ function virtualClientEntrypoint(): Plugin {
 
 /**
  * Configures an HTML fallback middleware for vite's dev server.
+ *
  * @param siteConfig Site configuration
  * @returns Plugin
  */

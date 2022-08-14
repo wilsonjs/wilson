@@ -219,15 +219,13 @@ export interface ServerRenderResult {
   }
 }
 
-export type RenderToStringFn = (
-  renderedUrl: string,
-) => Promise<ServerRenderResult>
+export type RenderToStringFn = (renderedUrl: string) => ServerRenderResult
 
-export default async function renderToString(
-  urlToBeRendered: string,
-): Promise<ServerRenderResult> {
+const renderToString: RenderToStringFn = (urlToBeRendered) => {
   clearIslands()
-  const html = await render(<Router urlToBeRendered={urlToBeRendered} />)
+  const html = render(<Router urlToBeRendered={urlToBeRendered} />)
   const head = toStatic() as unknown as ServerRenderResult['head']
   return { html, islands, head }
 }
+
+export default renderToString
