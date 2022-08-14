@@ -3,7 +3,6 @@ import type { PaginationHelper } from '@wilson/types'
 export type {
   StaticPageProps,
   DynamicPageProps,
-  UserFrontmatter,
   PageFrontmatter,
   PaginationHelper,
   PropsWithPagination,
