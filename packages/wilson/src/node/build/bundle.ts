@@ -1,10 +1,12 @@
 import { fileURLToPath } from 'url'
 import type { SiteConfig } from '@wilson/types'
-import { dirname, join } from 'pathe'
+import { basename, dirname, join, relative, resolve } from 'pathe'
 import type { UserConfig as ViteUserConfig } from 'vite'
 import { build, mergeConfig } from 'vite'
-import type { RollupOutput } from 'rollup'
+import type { OutputOptions, RollupOutput } from 'rollup'
 import wilsonPlugins from '../plugin'
+import glob from 'fast-glob'
+import { isDynamicPagePath } from '@wilson/utils'
 
 const _dirname = dirname(fileURLToPath(import.meta.url))
 export const DIST_CLIENT_PATH = join(_dirname, '../client')
@@ -17,44 +19,103 @@ function resolveEntrypoints(ssr: boolean): Entrypoints {
   return { app: ssr ? SERVER_APP_PATH : CLIENT_APP_PATH }
 }
 
-export async function bundle(siteConfig: SiteConfig) {
-  const clientResult = await bundleWithVite(siteConfig, { ssr: false })
-  const serverResult = await bundleWithVite(siteConfig, { ssr: true })
+export async function bundle(config: SiteConfig) {
+  const clientResult = await bundleWithVite(config, {
+    ssr: false,
+    outDir: config.outDir,
+  })
+  const serverResult = await bundleWithVite(config, {
+    ssr: true,
+    outDir: config.tempDir,
+  })
+  await bundleDynamicPages(config)
   return { clientResult, serverResult }
 }
 
-async function bundleWithVite(
-  siteConfig: SiteConfig,
-  options: { ssr: boolean; htmlBuild?: boolean },
-) {
-  const entrypoints = resolveEntrypoints(options.ssr)
-  const { htmlBuild = false, ssr } = options
+/**
+ * Replaces opening bracket on start of given string and
+ * closing bracket on end of given string with underscores.
+ */
+function replaceBrackets(string: string): string {
+  return string.replace(/^\[/, '_').replace(/\]$/, '_')
+}
 
-  const config = mergeConfig(siteConfig.vite, {
-    logLevel: siteConfig.vite.logLevel ?? 'warn',
+/**
+ * Returns output filename for vite build of the given page path.
+ * @param absolutePath Absolute path of the page
+ * @param pagesDir Path to the pages directory
+ * @returns Output filename
+ */
+export function getOutputFilename(
+  absolutePath: string,
+  pagesDir: string,
+): string {
+  const relativePath = absolutePath.replace(new RegExp(`^${pagesDir}`), '')
+  const dirName = dirname(relativePath).replace(/^\//, '') || '.'
+  const directoryPart = dirName === '.' ? '' : `${replaceBrackets(dirName)}/`
+  const baseName = basename(absolutePath)
+  const filenamePart = replaceBrackets(
+    baseName.slice(0, baseName.lastIndexOf('.')),
+  )
+  return `${directoryPart}${filenamePart}.js`
+}
+
+async function bundleDynamicPages(config: SiteConfig) {
+  const entrypoints = await (await glob(join(config.pagesDir, '**/*.tsx')))
+    .map((file) => relative(config.root, file))
+    .filter((file) => isDynamicPagePath(file))
+
+  if (entrypoints.length > 0)
+    await bundleWithVite(config, {
+      ssr: true,
+      outDir: `${config.tempDir}/pages`,
+      entrypoints,
+      output: {
+        entryFileNames: ({ facadeModuleId }) => {
+          return getOutputFilename(facadeModuleId!, config.pagesDir)
+        },
+      },
+    })
+}
+
+async function bundleWithVite(
+  config: SiteConfig,
+  options: {
+    ssr: boolean
+    outDir: string
+    entrypoints?: string[]
+    output?: OutputOptions
+  },
+) {
+  const { ssr, entrypoints, outDir, output } = options
+  const input = entrypoints ?? resolveEntrypoints(options.ssr)
+
+  const viteConfig = mergeConfig(config.vite, {
+    logLevel: config.vite.logLevel ?? 'warn',
     ssr: {
       external: ssr
         ? []
         : ['preact', 'preact-router', 'preact-render-to-string'],
       noExternal: ['wilson'],
     },
-    plugins: wilsonPlugins(siteConfig, ssr),
+    clearScreen: false,
+    plugins: wilsonPlugins(config, ssr),
     build: {
       ssr,
-      cssCodeSplit: htmlBuild,
       manifest: !ssr,
       ssrManifest: !ssr,
       minify: ssr ? false : 'esbuild',
       emptyOutDir: false,
-      outDir: ssr ? siteConfig.tempDir : siteConfig.outDir,
+      outDir,
       sourcemap: false,
+      target: 'esnext',
       rollupOptions: {
-        input: entrypoints,
-        preserveEntrySignatures: htmlBuild ? undefined : 'allow-extension',
-        treeshake: htmlBuild,
+        input,
+        output,
+        preserveEntrySignatures: 'allow-extension',
       },
     },
   } as ViteUserConfig)
 
-  return (await build(config)) as RollupOutput
+  return (await build(viteConfig)) as RollupOutput
 }

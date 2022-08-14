@@ -1,4 +1,4 @@
-import type { UserConfig as ViteOptions } from 'vite'
+import type { UserConfig as ViteOptions, Plugin } from 'vite'
 import type { FunctionComponent, RenderableProps } from 'preact'
 
 export type Awaitable<T> = T | Promise<T>
@@ -77,10 +77,6 @@ export interface UserConfig {
    */
   pageExtensions?: string[]
   /**
-   * Used to access and optionally modify the generated routes.
-   */
-  extendRoutes?: (routes: Route[]) => Awaitable<Route[] | void>
-  /**
    * Used to access and optionally modify page's frontmatter.
    */
   extendFrontmatter?: (
@@ -116,6 +112,12 @@ export interface SiteConfig extends Required<UserConfig> {
    * The mode the app is running in, typically `development` or `production`.
    */
   mode: string
+  namedPlugins: NamedPlugins
+}
+
+export interface NamedPlugins {
+  documents: Plugin
+  pages: Plugin
 }
 
 export interface Page {
@@ -162,12 +164,6 @@ export interface Page {
   frontmatter: PageFrontmatter
 }
 
-export interface Document {
-  href: string
-  path: string
-  frontmatter: PageFrontmatter
-}
-
 /**
  * Representation of an interactive island
  */
@@ -198,8 +194,7 @@ export type IslandsByPath = Record<string, Island[]>
 /**
  * The definition of a route in Wilson, used to render pages.
  *
- * By default most routes would be inferred from files in the `pagesDir`, but a
- * user can provide custom routes using the `extendRoutes` hook.
+ * Routes are inferred from files in the `pagesDir.
  */
 export type Route = Pick<Page, 'componentName' | 'importPath' | 'route'>
 
@@ -219,7 +214,7 @@ export interface PageFrontmatter extends Record<string, any> {
     lastUpdated: Date
     [key: string]: any
   }
-  layout: string | undefined
+  layout: string
   // route: {
   //   name?: string
   //   path?: string
@@ -230,7 +225,13 @@ export interface PageFrontmatter extends Record<string, any> {
 
 export interface StaticPageExports {
   default: FunctionComponent
-  frontmatter?: UserFrontmatter
+  path: string
+  frontmatter: PageFrontmatter
+}
+
+export interface Document {
+  href: string
+  frontmatter: PageFrontmatter
 }
 
 interface PaginationProps<T = any> {
@@ -239,18 +240,19 @@ interface PaginationProps<T = any> {
   items: T[]
 }
 
-type PaginationHelperResult<T = any> = Array<{
-  params: { page: string }
-  props?: PaginationProps<T>
-}>
+type DocumentHelper = (path: string) => StaticPageExports[]
 
 export type PaginationHelper<T = any> = (
   items: T[],
   options: {
+    format: (pageNumber: number) => string
     pageSize?: number
-    format?: (pageNumber: number) => string
+    param?: string
   },
-) => PaginationHelperResult<T>
+) => Array<{
+  params: Record<string, string>
+  props?: PaginationProps<T>
+}>
 
 export type PropsWithPagination<T> = RenderableProps<
   BaseProps & PaginationProps<T>
@@ -268,6 +270,7 @@ export type GetRenderedPathsResult<
 export type RenderedPath = GetRenderedPathsResult & { url: string }
 
 export type GetRenderedPathsFn = (helpers: {
+  getPages: DocumentHelper
   paginate: PaginationHelper
 }) => Awaitable<GetRenderedPathsResult[]>
 

@@ -10,19 +10,20 @@ import type { PluginOption } from 'vite'
 import type { TransformResult } from 'rollup'
 // @ts-ignore
 import toJsx from '@mapbox/hast-util-to-jsx'
+import type { SiteConfig } from '@wilson/types'
+import { relative } from 'pathe'
+import { format } from 'prettier'
+import {
+  createComponentName,
+  getRouteForPage,
+  userToPageFrontmatter,
+} from '@wilson/utils'
 
-/**
- * Result of parsing frontmatter from markdown source code.
- */
+/** Result of parsing frontmatter from markdown source code */
 type FrontmatterParseResult = {
-  /**
-   * Markdown source code without the parsed frontmatter.
-   */
+  /** Markdown source code without the parsed frontmatter */
   markdown: string
-  /**
-   * The parsed frontmatter data.
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  /** The parsed frontmatter data */
   frontmatter: Record<string, any>
 }
 
@@ -74,30 +75,59 @@ export async function processMarkdown(
 
   const vfile = await processor.process(markdownCode)
   const jsx = (vfile.value as string)
-    .replace(/^<div>/, '<>')
-    .replace(/<\/div>$/, '</>')
+    .replace(/^<div>/, '')
+    .replace(/<\/div>$/, '')
 
   return { jsx }
 }
 
 /**
  * Wilson markdown plugin
- * @returns Plugin
  */
-export default function markdownPlugin(): PluginOption {
+export default function markdownPlugin(config: SiteConfig): PluginOption {
   return {
     name: 'wilson:markdown',
     enforce: 'pre',
 
     async transform(code: string, id: string): Promise<TransformResult> {
-      if (!id.endsWith('.md')) return null
+      if (!id.endsWith('.md')) {
+        return null
+      }
 
-      const { markdown } = parseFrontmatter(code)
+      const { markdown, frontmatter: userFrontmatter } = parseFrontmatter(code)
       const { jsx } = await processMarkdown(markdown)
+      const frontmatter = await userToPageFrontmatter(
+        userFrontmatter,
+        id,
+        config,
+      )
+      const layout = frontmatter.layout
+      const layoutPath = `${config.layoutsDir}/${layout}.tsx`
+      const path = getRouteForPage(relative(config.pagesDir, id))
+      const componentName = createComponentName(relative(config.pagesDir, id))
 
-      return /* tsx */ `
-        export default function Page() { return ${jsx} }
+      const newCode = /* tsx */ `
+        import { useTitle } from 'hoofd/preact';
+        import Layout from '${layoutPath}';
+
+        export const path = '${path}';                             // done
+        export const frontmatter = ${JSON.stringify(frontmatter)}; // done
+        const props = { frontmatter, path };
+
+        function Title() {
+          useTitle(frontmatter.title);
+          return null;
+        };
+
+        export default function ${componentName}Page({ url, params: matches }) {
+          return <Layout url={url} {...props}>
+            {frontmatter.title && <Title />}
+            ${jsx}
+          </Layout>;
+        };
       `
+
+      return format(newCode, { filepath: 'markdown.tsx' })
     },
   }
 }

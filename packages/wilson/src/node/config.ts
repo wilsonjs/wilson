@@ -3,7 +3,7 @@ import type { ConfigEnv, UserConfig as ViteOptions } from 'vite'
 import { loadConfigFromFile, mergeConfig as mergeViteConfig } from 'vite'
 import pc from 'picocolors'
 import { dirname, join, resolve } from 'pathe'
-import type { SiteConfig, UserConfig } from '@wilson/types'
+import type { NamedPlugins, SiteConfig, UserConfig } from '@wilson/types'
 import { debug } from './utils'
 import { isObject } from '@wilson/utils'
 
@@ -165,22 +165,9 @@ function siteConfigDefaults(
     site: defaultSiteMeta,
     defaultContentLanguage: 'en',
     vite: viteConfigDefaults(root),
+    namedPlugins: {} as NamedPlugins,
     extendFrontmatter(userFrontmatter) {
       return userFrontmatter
-    },
-    extendRoutes(routes) {
-      if (isDevelopmentMode) {
-        return [
-          ...routes,
-          {
-            route: '*',
-            importPath: 'wilson/dist/client/components/not-found',
-            componentName: 'NotFound',
-          },
-        ]
-      }
-      // else if (!drafts)
-      //   return routes.filter(route => !route.frontmatter?.draft)
     },
   }
 }

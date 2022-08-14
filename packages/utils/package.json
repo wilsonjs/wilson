@@ -28,6 +28,10 @@
     "lint": "eslint ."
   },
   "devDependencies": {
+    "@wilson/types": "workspace:^1.0.0",
     "tsup": "^6.1.3"
+  },
+  "dependencies": {
+    "pathe": "^0.3.2"
   }
 }

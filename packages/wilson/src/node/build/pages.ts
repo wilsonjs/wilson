@@ -1,5 +1,13 @@
-import type { RenderedPath } from '@wilson/types'
-import { getPages } from '@wilson/pages'
+import type {
+  DynamicPageExports,
+  SiteConfig,
+  StaticPageExports,
+} from '@wilson/types'
+import { isDynamicPagePath } from '@wilson/utils'
+import glob from 'fast-glob'
+import { join, relative } from 'pathe'
+import { createPaginationHelper } from '..'
+import { getOutputFilename } from './bundle'
 
 /**
  * A page that is about to be rendered to a static .html file.
@@ -17,18 +25,19 @@ export interface PageToRender {
  * - Ensures .html extension
  * - Represents paths ending in "/" with index.html files
  */
-function pathToFilename(path: string) {
-  return `${(path.endsWith('/') ? `${path}index` : path).replace(
-    /^\//g,
-    '',
-  )}.html`
+function pathToFilename(pagePathWithoutExt: string) {
+  return `${(pagePathWithoutExt.endsWith('/')
+    ? `${pagePathWithoutExt}index`
+    : pagePathWithoutExt
+  ).replace(/^\//g, '')}.html`
 }
 
 /**
- * Converts a RenderedPath to a PageToRender.
+ * Replaces opening bracket on start of given string and
+ * closing bracket on end of given string with underscores.
  */
-function toPageToRender({ url: path }: RenderedPath): PageToRender {
-  return { path, outputFilename: pathToFilename(path), rendered: '' }
+function replaceBrackets(string: string): string {
+  return string.replace(/^\[/, '_').replace(/\]$/, '_')
 }
 
 /**
@@ -37,8 +46,68 @@ function toPageToRender({ url: path }: RenderedPath): PageToRender {
  * Will have single entries for static pages, and multiple entries for dynamic pages
  * depending on the return values of their `getRenderedPaths` implementation.
  */
-export async function getPagesToRender(): Promise<PageToRender[]> {
-  return (await getPages())
-    .map((page) => page.renderedPaths.map(toPageToRender))
-    .flat()
+// TODO misses renderedPaths of dynamic pages
+export async function getPagesToRender({
+  pagesDir,
+}: SiteConfig): Promise<PageToRender[]> {
+  const files = await glob(join(pagesDir, `**/*.{md,tsx}`))
+  const pagesToRender = []
+
+  for (const absolutePath of files) {
+    const relativePath = relative(pagesDir, absolutePath)
+    const withoutExt = relativePath.replace(/\.[^.]+$/, '')
+    const isDynamic = isDynamicPagePath(withoutExt)
+
+    if (isDynamic) {
+      const { getRenderedPaths } = await getPageExports<DynamicPageExports>(
+        absolutePath,
+        pagesDir,
+      )
+      const paginate = createPaginationHelper(relativePath)
+      const renderedPaths = (
+        await getRenderedPaths({
+          paginate,
+          getPages: () => [],
+        })
+      ).map(({ params }) => {
+        let url = withoutExt
+        Object.entries(params).forEach(([key, value]) => {
+          url = url.replace(new RegExp(`\\[${key}\\]`, 'g'), value)
+        })
+        const outputFilename = pathToFilename(url)
+        return {
+          path: url.replace(/\/$/, ''),
+          outputFilename,
+          rendered: '',
+        }
+      })
+
+      pagesToRender.push(...renderedPaths)
+    } else {
+      const outputFilename = pathToFilename(withoutExt)
+      pagesToRender.push({
+        path: withoutExt === 'index' ? '/' : withoutExt,
+        outputFilename,
+        rendered: '',
+      })
+    }
+  }
+
+  return pagesToRender
+}
+
+/**
+ * Returns the module exports of a page.
+ *
+ * @param absolutePath Absolute path of the page to retrieve exports from
+ * @returns Exports of the page
+ */
+export async function getPageExports<T extends StaticPageExports>(
+  absolutePath: string,
+  pagesDir: string,
+): Promise<T> {
+  const outputFilename = getOutputFilename(absolutePath, pagesDir)
+  const importPath = join(process.cwd(), '.wilson/pages', outputFilename)
+  const pageExports = (await import(importPath)) as T
+  return pageExports
 }

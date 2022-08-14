@@ -9,7 +9,7 @@ import type {
   ObjectExpression,
   Program,
 } from '@babel/types'
-import { dirname, resolve } from 'path/posix'
+import { dirname, resolve } from 'path'
 
 interface Options {
   islandsDir: string

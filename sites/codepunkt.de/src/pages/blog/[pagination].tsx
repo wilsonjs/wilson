@@ -1,11 +1,25 @@
-import type { Document, PropsWithPagination, GetRenderedPathsFn } from 'wilson'
-import { getDocuments } from 'wilson'
-import styles from './[page].module.scss'
+import { Document, PropsWithPagination, GetRenderedPathsFn } from 'wilson'
+import styles from './[pagination].module.scss'
 
-export const getRenderedPaths: GetRenderedPathsFn = async ({ paginate }) => {
-  return paginate(getDocuments('blog'), {
+export const getRenderedPaths: GetRenderedPathsFn = async ({
+  getPages,
+  paginate,
+}) => {
+  // const pages = getPages('blog')
+  const pages = Object.values(
+    import.meta.glob<{
+      path: string
+      frontmatter: {}
+    }>('/src/pages/blog/**/*.md', {
+      eager: true,
+    }),
+  ).map(({ path, frontmatter }) => ({
+    frontmatter,
+    href: `/${path}`,
+  }))
+  return paginate(pages, {
     pageSize: 3,
-    format: (no) => `page-${no}`,
+    format: (no) => (no === 1 ? '' : `page-${no}`),
   })
 }
 

@@ -26,13 +26,14 @@ export async function renderPages(
   const pagesToRender = await withSpinner(
     'resolving static paths',
     getPagesToRender,
+    config,
   )
   const clientChunks = clientResult.output
   const islandsByPath: IslandsByPath = {}
 
   await withSpinner('rendering pages', async () => {
     for (const page of pagesToRender) {
-      const { rendered, islands } = await renderPage(
+      const { rendered, islands } = renderPage(
         config,
         clientChunks,
         page,
@@ -46,13 +47,13 @@ export async function renderPages(
   return { pagesToRender, islandsByPath }
 }
 
-export async function renderPage(
+export function renderPage(
   config: SiteConfig,
   clientChunks: RollupOutput['output'],
   page: PageToRender,
   rendertoString: RenderToStringFn,
-): Promise<{ rendered: string; islands: Island[] }> {
-  const { html, islands, head } = await rendertoString(page.path)
+): { rendered: string; islands: Island[] } {
+  const { html, islands, head } = rendertoString(page.path)
   // TODO: links, scripts and meta
   return {
     rendered: /* html */ `
