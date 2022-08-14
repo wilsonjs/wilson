@@ -90,9 +90,8 @@ async function bundleWithVite(
   const { ssr, entrypoints, outDir, output } = options
   const input = entrypoints ?? resolveEntrypoints(options.ssr)
 
-  // output: { entryFileNames: outputFilename },
   const viteConfig = mergeConfig(config.vite, {
-    // logLevel: config.vite.logLevel ?? 'warn',
+    logLevel: config.vite.logLevel ?? 'warn',
     ssr: {
       external: ssr
         ? []

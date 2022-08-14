@@ -31,36 +31,54 @@ export function getDocuments(pattern?: string): Document[] {
   return []
 }
 
-interface PaginateOptions {
-  pageSize?: number
-  param?: string
-  format?: (pageNumber: number) => string
-}
+/**
+ * Creates a pagination helper function that is invoked with an array of
+ * arbitrary items to paginate and a pagination options object that defines
+ *
+ * - The pagination page size
+ * - The dynamic parameter in the page's filename that is used for pagination
+ * - The formatter used to fill that dynamic parameter
+ *
+ * @param pageRelativePath Page path relative to the configured `pagesDir`
+ * @returns Pagination helper function
+ */
+export function createPaginationHelper(
+  pageRelativePath: string,
+): PaginationHelper {
+  const paramMatches = [...pageRelativePath.matchAll(/\[([^\]]+)\]/g)]
+  const defaultParam = paramMatches.length === 1 ? paramMatches[0][1] : 'page'
 
-// TODO write comment
-// TODO auto-adapt default param 'page' for pages with one dynamic parameter
-export const paginate: PaginationHelper = (items, options) => {
-  const format = options.format ?? ((no) => String(no))
-  const pageSize = options.pageSize ?? 10
-  const param = options.param ?? 'page'
-  const toPath = (no: number) => (no === 1 ? '' : format(no))
-  const pagesCount = Math.max(1, Math.ceil(items.length / pageSize))
+  return (items, options) => {
+    const pageSize = options.pageSize ?? 10
+    const pagesCount = Math.max(1, Math.ceil(items.length / pageSize))
+    const param = options.param ?? defaultParam
+    const urlPrefix = `/${pageRelativePath}`
+      .replace(new RegExp(`\\[${param}\\]`), '')
+      .replace(/\/\//, '/')
+      .replace(/\.[^.]+$/, '')
 
-  return Array.from({ length: pagesCount }, (val, i) => i + 1).map(
-    (pageNumber) => {
-      const firstItem = (pageNumber - 1) * pageSize
-      return {
-        params: { [param]: toPath(pageNumber) },
-        props: {
-          items: items.slice(firstItem, firstItem + pageSize),
-          nextPage:
-            pageNumber !== pagesCount
-              ? '/blog/' + toPath(pageNumber + 1)
-              : undefined,
-          prevPage:
-            pageNumber === 1 ? undefined : '/blog/' + toPath(pageNumber - 1),
-        },
-      }
-    },
-  )
+    return Array.from({ length: pagesCount }, (val, i) => i + 1).map(
+      (pageNumber) => {
+        const firstItem = (pageNumber - 1) * pageSize
+
+        const nextPage =
+          pageNumber !== pagesCount
+            ? urlPrefix + options.format(pageNumber + 1)
+            : undefined
+        const prevPage =
+          pageNumber === 1
+            ? undefined
+            : urlPrefix + options.format(pageNumber - 1)
+
+        return {
+          params: { [param]: options.format(pageNumber) },
+          props: {
+            items: items.slice(firstItem, firstItem + pageSize),
+            nextPage: nextPage?.replace(/\/$/, ''),
+            prevPage: prevPage?.replace(/\/$/, ''),
+          },
+        }
+      },
+    )
+  }
 }

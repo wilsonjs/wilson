@@ -19,8 +19,7 @@ export const getRenderedPaths: GetRenderedPathsFn = async ({
   }))
   return paginate(pages, {
     pageSize: 3,
-    param: 'pagination',
-    format: (no) => `page-${no}`,
+    format: (no) => (no === 1 ? '' : `page-${no}`),
   })
 }
 

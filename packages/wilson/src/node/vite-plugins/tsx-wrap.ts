@@ -15,14 +15,17 @@ export default function tsxWrapPlugin(config: SiteConfig): Plugin {
     name: 'wilson:tsx-wrap',
     enforce: 'pre',
 
-    async transform(code: string, id: string): Promise<TransformResult> {
-      if (!isPage(id, config.pagesDir, ['.tsx'])) {
+    async transform(
+      code: string,
+      absolutePath: string,
+    ): Promise<TransformResult> {
+      if (!isPage(absolutePath, config.pagesDir, ['.tsx'])) {
         return null
       }
 
-      const relativeId = relative(config.pagesDir, id)
-      const componentName = createComponentName(relativeId)
-      const dynamicParameterMatches = [...relativeId.matchAll(/\[([^\]]+)\]/g)]
+      const pagePath = relative(config.pagesDir, absolutePath)
+      const componentName = createComponentName(pagePath)
+      const dynamicParameterMatches = [...pagePath.matchAll(/\[([^\]]+)\]/g)]
       const isDynamic = dynamicParameterMatches.length > 0
 
       const ast = parse(code)
@@ -131,7 +134,7 @@ export default function tsxWrapPlugin(config: SiteConfig): Plugin {
         template.statement(`import { useTitle } from 'hoofd/preact';`)(),
         ...(isDynamic
           ? template.statements(`
-              import { paginate } from 'wilson';
+              import { createPaginationHelper } from 'wilson';
               import { shallowEqual } from 'fast-equals';
             `)()
           : []),
@@ -141,7 +144,7 @@ export default function tsxWrapPlugin(config: SiteConfig): Plugin {
               template.statement(
                 `const renderedPaths = await getRenderedPaths({ getPages: (path) => {
                   return [];
-                }, paginate });`,
+                }, paginate: createPaginationHelper('${pagePath}') });`,
               )(),
             ]
           : []),

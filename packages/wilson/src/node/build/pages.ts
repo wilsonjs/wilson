@@ -1,13 +1,12 @@
 import type {
   DynamicPageExports,
-  RenderedPath,
   SiteConfig,
   StaticPageExports,
 } from '@wilson/types'
 import { isDynamicPagePath } from '@wilson/utils'
 import glob from 'fast-glob'
-import { basename, dirname, join, relative } from 'pathe'
-import { paginate } from '..'
+import { join, relative } from 'pathe'
+import { createPaginationHelper } from '..'
 import { getOutputFilename } from './bundle'
 
 /**
@@ -26,11 +25,11 @@ export interface PageToRender {
  * - Ensures .html extension
  * - Represents paths ending in "/" with index.html files
  */
-function pathToFilename(path: string) {
-  return `${(path.endsWith('/') ? `${path}index` : path).replace(
-    /^\//g,
-    '',
-  )}.html`
+function pathToFilename(pagePathWithoutExt: string) {
+  return `${(pagePathWithoutExt.endsWith('/')
+    ? `${pagePathWithoutExt}index`
+    : pagePathWithoutExt
+  ).replace(/^\//g, '')}.html`
 }
 
 /**
@@ -54,20 +53,24 @@ export async function getPagesToRender({
   const files = await glob(join(pagesDir, `**/*.{md,tsx}`))
   const pagesToRender = []
 
-  for (const file of files) {
-    const path = relative(pagesDir, file.replace(/\.[^.]+$/, ''))
-    const isDynamic = isDynamicPagePath(path)
+  for (const absolutePath of files) {
+    const relativePath = relative(pagesDir, absolutePath)
+    const withoutExt = relativePath.replace(/\.[^.]+$/, '')
+    const isDynamic = isDynamicPagePath(withoutExt)
 
     if (isDynamic) {
-      const { getRenderedPaths: get } =
-        await getPageExports<DynamicPageExports>(file, pagesDir)
+      const { getRenderedPaths } = await getPageExports<DynamicPageExports>(
+        absolutePath,
+        pagesDir,
+      )
+      const paginate = createPaginationHelper(relativePath)
       const renderedPaths = (
-        await get({
+        await getRenderedPaths({
           paginate,
           getPages: () => [],
         })
       ).map(({ params }) => {
-        let url = path
+        let url = withoutExt
         Object.entries(params).forEach(([key, value]) => {
           url = url.replace(new RegExp(`\\[${key}\\]`, 'g'), value)
         })
@@ -81,9 +84,9 @@ export async function getPagesToRender({
 
       pagesToRender.push(...renderedPaths)
     } else {
-      const outputFilename = pathToFilename(path)
+      const outputFilename = pathToFilename(withoutExt)
       pagesToRender.push({
-        path: path === 'index' ? '/' : path,
+        path: withoutExt === 'index' ? '/' : withoutExt,
         outputFilename,
         rendered: '',
       })

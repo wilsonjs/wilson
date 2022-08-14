@@ -250,9 +250,9 @@ type DocumentHelper = (path: string) => StaticPageExports[]
 export type PaginationHelper<T = any> = (
   items: T[],
   options: {
+    format: (pageNumber: number) => string
     pageSize?: number
     param?: string
-    format?: (pageNumber: number) => string
   },
 ) => Array<{
   params: Record<string, string>
