@@ -8,5 +8,5 @@
     "lib": ["ESNext", "DOM"],
     "types": ["vite/client"]
   },
-  "include": [".", "../../types/virtual.d.ts", "../../client.d.ts"]
+  "include": [".", "../../client.d.ts"]
 }

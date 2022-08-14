@@ -170,6 +170,11 @@ function siteConfigDefaults(
       return userFrontmatter
     },
     extendRoutes(routes) {
+      console.log('===================')
+      console.log('===================')
+      console.log('extendRoutes')
+      console.log('===================')
+      console.log('===================')
       if (isDevelopmentMode) {
         return [
           ...routes,
