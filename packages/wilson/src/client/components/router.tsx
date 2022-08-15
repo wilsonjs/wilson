@@ -1,5 +1,7 @@
 import type { ComponentType, RenderableProps } from 'preact'
-import PreactRouter from 'preact-router'
+import { Router as Wouter, Route, Switch } from 'wouter-preact'
+// @ts-ignore
+import staticLocationHook from 'wouter-preact/static-location'
 import NotFound from './not-found'
 
 interface Page {
@@ -12,23 +14,51 @@ const pages: Record<string, Page> = import.meta.glob(
   { eager: true },
 )
 
-const routes: Array<{
+/**
+ * Counts how often a string occurs in a string.
+ *
+ * @param value String to be searched in
+ * @param char String to be searched for
+ * @returns Number of occurrences
+ */
+export function countOccurence(search: string, char: string) {
+  return (search.match(new RegExp(char, 'g')) || []).length
+}
+
+/**
+ * Compares two pages by their number of path segments and dynamic params.
+ */
+function byPathSegmentsAndDynamicParams(
+  { props: { path: a } }: Route,
+  { props: { path: b } }: Route,
+) {
+  if (a === '/') return -1
+  if (b === '/') return 1
+  const slashDiff = countOccurence(a, '/') - countOccurence(b, '/')
+  if (slashDiff) return slashDiff
+  const paramDiff = countOccurence(a, ':') - countOccurence(b, ':')
+  if (paramDiff) return paramDiff
+  return a.localeCompare(b)
+}
+
+interface Route {
   props: Record<string, any>
   importPath?: string
   component: ComponentType<any>
-}> = [
-  ...Object.entries(pages).map(([file, { path, default: Page }]) => ({
+}
+
+const routes: Route[] = Object.entries(pages)
+  .map(([file, { path, default: Page }]) => ({
     importPath: file,
     component: Page,
     props: { path },
-  })),
-]
+  }))
+  .sort(byPathSegmentsAndDynamicParams)
 
 if (!import.meta.env.SSR)
   routes.push({
     component: NotFound,
     props: {
-      default: true,
       routes: routes.map(({ component, importPath, props: { path } }) => ({
         path,
         component: component.displayName,
@@ -43,10 +73,19 @@ type AppProps = RenderableProps<{
 
 export default function Router({ urlToBeRendered }: AppProps) {
   return (
-    <PreactRouter url={urlToBeRendered}>
-      {routes.map(({ component: Page, props }) => (
-        <Page {...props} />
-      ))}
-    </PreactRouter>
+    <Wouter
+      {...(urlToBeRendered === undefined
+        ? {}
+        : { hook: staticLocationHook(urlToBeRendered) })}
+    >
+      <Switch>
+        {routes.map(({ component: Page, props }) => (
+          <Route
+            {...props}
+            component={(params) => <Page {...params} {...props} />}
+          />
+        ))}
+      </Switch>
+    </Wouter>
   )
 }

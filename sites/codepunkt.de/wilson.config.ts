@@ -11,4 +11,7 @@ export default {
     en: {},
     de: {},
   },
+  extendFrontmatter(filename, frontmatter) {
+    // frontmatter.layout = 'default'
+  },
 } as UserConfig

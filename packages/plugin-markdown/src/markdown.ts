@@ -19,8 +19,8 @@ import {
   userToPageFrontmatter,
 } from '@wilson/utils'
 
-/** Result of parsing frontmatter from markdown source code */
-type FrontmatterParseResult = {
+/** Result of parsing markdown source code with frontmatter */
+type MarkdownParseResult = {
   /** Markdown source code without the parsed frontmatter */
   markdown: string
   /** The parsed frontmatter data */
@@ -32,22 +32,21 @@ const frontmatterCache = new NodeCache()
 /**
  * Parses frontmatter from a markdown string.
  *
- * Converts a markdown string with frontmatter into a FrontmatterParseResult
+ * Converts a markdown string with frontmatter into a MarkdownParseResult
  * object with `markdown` and `frontmatter` properties.
  *
  * @param markdownCode The markdown code to parse
- * @returns The FrontmatterParseResult object
+ * @returns The MarkdownParseResult object
  */
-export function parseFrontmatter(markdownCode: string): FrontmatterParseResult {
-  const cachedResult =
-    frontmatterCache.get<FrontmatterParseResult>(markdownCode)
+export function parseFrontmatter(markdownCode: string): MarkdownParseResult {
+  const cachedResult = frontmatterCache.get<MarkdownParseResult>(markdownCode)
 
   if (cachedResult) {
     return cachedResult
   }
 
   const { content: markdown, data: frontmatter } = grayMatter(markdownCode)
-  frontmatterCache.set<FrontmatterParseResult>(markdownCode, {
+  frontmatterCache.set<MarkdownParseResult>(markdownCode, {
     markdown,
     frontmatter,
   })

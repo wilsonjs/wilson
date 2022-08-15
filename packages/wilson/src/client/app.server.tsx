@@ -7,7 +7,7 @@ import {
   hydrateOnMediaQuery,
   hydrateWhenIdle,
   hydrateWhenVisible,
-} from '@wilson/hydration'
+} from '@wilson/island-hydration'
 import type { Island } from '@wilson/types'
 import { toStatic } from 'hoofd/preact'
 import Router from './components/router'
@@ -39,7 +39,7 @@ function getHydrationScript(
     case Hydrate.SkipPrerender:
       componentImportVariable = 'component'
       importStatements = /* js */ `
-        import { ${hydrationFn} } from '@wilson/hydration';
+        import { ${hydrationFn} } from '@wilson/island-hydration';
         import { default as ${componentImportVariable} } from '${islandPath}';
         `
       break
@@ -48,7 +48,7 @@ function getHydrationScript(
     case Hydrate.WhenVisible:
       componentImportVariable = 'componentFn'
       importStatements = /* js */ `
-        import { ${hydrationFn} } from '@wilson/hydration';
+        import { ${hydrationFn} } from '@wilson/island-hydration';
         const ${componentImportVariable} = async () => (await import('${islandPath}')).default;
         `
       break

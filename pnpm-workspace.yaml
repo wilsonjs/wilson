@@ -1,9 +1,9 @@
 packages:
-  - packages/babel-plugin
-  - packages/hydration
-  - packages/markdown
+  - packages/babel-plugin-island-path
+  - packages/island-hydration
+  - packages/plugin-markdown
   - packages/types
   - packages/utils
   - packages/wilson
-  # - sites/docs
+  - sites/docs
   - sites/codepunkt.de

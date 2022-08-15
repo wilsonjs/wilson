@@ -95,7 +95,7 @@ async function bundleWithVite(
     ssr: {
       external: ssr
         ? []
-        : ['preact', 'preact-router', 'preact-render-to-string'],
+        : ['preact', 'preact-render-to-string', 'wouter-react'],
       noExternal: ['wilson'],
     },
     clearScreen: false,

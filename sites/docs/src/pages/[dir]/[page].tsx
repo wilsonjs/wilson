@@ -1,11 +1,15 @@
-import type { DynamicPageProps, GetRenderedPathsResult } from 'wilson'
+import type { DynamicPageProps, GetStaticPaths } from 'wilson'
 
 interface Props {
   wat: number
 }
 type Params = 'dir' | 'page'
 
-export function getRenderedPaths(): GetRenderedPathsResult<Params, Props>[] {
+export const frontmatter = {
+  title: 'DynamicPage',
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
   return [
     { params: { dir: 'foo', page: 'bar' } },
     { params: { dir: 'qux', page: 'quux' }, props: { wat: 6 } },

@@ -25,19 +25,11 @@ export interface PageToRender {
  * - Ensures .html extension
  * - Represents paths ending in "/" with index.html files
  */
-function pathToFilename(pagePathWithoutExt: string) {
-  return `${(pagePathWithoutExt.endsWith('/')
-    ? `${pagePathWithoutExt}index`
-    : pagePathWithoutExt
+function pathToFilename(cleanedPath: string) {
+  return `${(cleanedPath.endsWith('/')
+    ? `${cleanedPath}index`
+    : cleanedPath
   ).replace(/^\//g, '')}.html`
-}
-
-/**
- * Replaces opening bracket on start of given string and
- * closing bracket on end of given string with underscores.
- */
-function replaceBrackets(string: string): string {
-  return string.replace(/^\[/, '_').replace(/\]$/, '_')
 }
 
 /**
@@ -54,8 +46,13 @@ export async function getPagesToRender({
 
   for (const absolutePath of files) {
     const relativePath = relative(pagesDir, absolutePath)
-    const withoutExt = relativePath.replace(/\.[^.]+$/, '')
-    const isDynamic = isDynamicPagePath(withoutExt)
+    const path =
+      '/' +
+      relativePath
+        .replace(/\.[^.]+$/, '')
+        .replace(/index$/, '')
+        .replace(/\/$/, '')
+    const isDynamic = isDynamicPagePath(path)
 
     if (isDynamic) {
       const { getStaticPaths } = await getPageExports<DynamicPageExports>(
@@ -69,7 +66,7 @@ export async function getPagesToRender({
           getPages: () => [],
         })
       ).map(({ params }) => {
-        let url = withoutExt
+        let url = path
         Object.entries(params).forEach(([key, value]) => {
           url = url.replace(new RegExp(`\\[${key}\\]`, 'g'), value)
         })
@@ -83,9 +80,9 @@ export async function getPagesToRender({
 
       pagesToRender.push(...staticPaths)
     } else {
-      const outputFilename = pathToFilename(withoutExt)
+      const outputFilename = pathToFilename(path)
       pagesToRender.push({
-        path: withoutExt === 'index' ? '/' : withoutExt,
+        path,
         outputFilename,
         rendered: '',
       })

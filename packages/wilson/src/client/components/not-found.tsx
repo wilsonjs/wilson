@@ -1,11 +1,9 @@
-const data = {}
-
 export default function NotFound(props: { routes: any[] }) {
   return (
     <div className="not-found">
       <h1>Page Not Found</h1>
       <dl>
-        <dt>document.location.pathname</dt>
+        <dt>URL</dt>
         <dd>{document.location.pathname}</dd>
       </dl>
       <dl>

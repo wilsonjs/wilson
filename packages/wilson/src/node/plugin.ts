@@ -6,7 +6,7 @@ import pc from 'picocolors'
 import type { Plugin, PluginOption, ViteDevServer } from 'vite'
 import inspect from 'vite-plugin-inspect'
 import { configureMiddleware, createServer } from './server'
-import markdown from '@wilson/markdown'
+import markdown from '@wilson/plugin-markdown'
 import tsxPath from './vite-plugins/tsx-path'
 import tsxWrap from './vite-plugins/tsx-wrap'
 import tsxFrontmatter from './vite-plugins/tsx-frontmatter'
@@ -115,7 +115,7 @@ export default function wilsonPlugins(
               // directory. adds islandPath that is used in app.server.tsx to
               // __source for every VNode in a page that has partial hydration
               // props and is imported as default import from islands directory.
-              ['@wilson', config],
+              ['@wilson/island-path', config],
             ]
           : [],
       },

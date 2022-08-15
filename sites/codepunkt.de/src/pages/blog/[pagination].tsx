@@ -1,4 +1,5 @@
 import { PropsWithPagination, GetStaticPaths } from 'wilson'
+import { Link } from 'wouter-preact'
 import styles from './[pagination].module.scss'
 
 export const frontmatter = {
@@ -19,11 +20,11 @@ export const getStaticPaths: GetStaticPaths = async ({
     }),
   ).map(({ path, frontmatter }) => ({
     frontmatter,
-    href: `/${path}`,
+    href: path,
   }))
   return paginate(pages, {
     pageSize: 3,
-    format: (no) => (no === 1 ? '' : `page-${no}`),
+    format: (no: number) => (no === 1 ? '' : `page-${no}`),
   })
 }
 
@@ -43,12 +44,12 @@ export default function Page({
       <ol>
         {items.map((item) => (
           <li key={item.frontmatter.title}>
-            <a href={item.href}>{item.frontmatter.title}</a>
+            <Link href={item.href}>{item.frontmatter.title}</Link>
           </li>
         ))}
       </ol>
-      {prevPage && <a href={prevPage}>Prev</a>}
-      {nextPage && <a href={nextPage}>Next</a>}
+      {prevPage && <Link href={prevPage}>Prev</Link>}
+      {nextPage && <Link href={nextPage}>Next</Link>}
     </>
   )
 }

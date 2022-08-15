@@ -19,8 +19,8 @@
   },
   "dependencies": {
     "@preact/preset-vite": "^2.3.0",
-    "@wilson/babel-plugin": "workspace:^1.0.0",
-    "@wilson/hydration": "workspace:^1.0.0",
+    "@wilson/babel-plugin-island-path": "workspace:^1.0.0",
+    "@wilson/island-hydration": "workspace:^1.0.0",
     "fast-equals": "^4.0.1",
     "hoofd": "1.5.2",
     "preact": "^10.10.0",

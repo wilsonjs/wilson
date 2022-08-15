@@ -18,7 +18,7 @@ importers:
       turbo: 1.4.0
       typescript: 4.7.4
 
-  packages/babel-plugin:
+  packages/babel-plugin-island-path:
     specifiers:
       '@babel/core': ^7.18.9
       '@babel/helper-plugin-utils': ^7.18.9
@@ -35,7 +35,7 @@ importers:
       '@babel/helper-plugin-utils': 7.18.9
       '@babel/plugin-syntax-jsx': 7.18.6_@babel+core@7.18.9
       '@babel/traverse': 7.18.9
-      '@babel/types': 7.18.9
+      '@babel/types': 7.18.10
     devDependencies:
       '@types/babel__core': 7.1.19
       '@types/babel__helper-plugin-utils': 7.10.0
@@ -43,7 +43,7 @@ importers:
       '@types/node': 18.6.2
       tsup: 6.2.1
 
-  packages/hydration:
+  packages/island-hydration:
     specifiers:
       preact: ^10.10.0
       tsup: ^6.1.3
@@ -54,7 +54,7 @@ importers:
     devDependencies:
       tsup: 6.2.1
 
-  packages/markdown:
+  packages/plugin-markdown:
     specifiers:
       '@mapbox/hast-util-to-jsx': ^2.0.0
       '@types/debug': ^4.1.7
@@ -138,9 +138,9 @@ importers:
       '@types/node': ^18.0.0
       '@types/react': ^18.0.14
       '@types/react-dom': ^18.0.6
-      '@wilson/babel-plugin': workspace:^1.0.0
-      '@wilson/hydration': workspace:^1.0.0
-      '@wilson/markdown': workspace:^1.0.0
+      '@wilson/babel-plugin-island-path': workspace:^1.0.0
+      '@wilson/island-hydration': workspace:^1.0.0
+      '@wilson/plugin-markdown': workspace:^1.0.0
       '@wilson/types': workspace:^1.0.0
       '@wilson/utils': workspace:^1.0.0
       ast-types: ^0.14.2
@@ -160,7 +160,6 @@ importers:
       picocolors: ^1.0.0
       preact: ^10.10.0
       preact-render-to-string: ^5.2.1
-      preact-router: ^4.1.0
       prettier: ^2.7.1
       readdirp: ^3.6.0
       recast: ^0.21.2
@@ -170,6 +169,7 @@ importers:
       vite: 3.0.5
       vite-plugin-inspect: ^0.6.0
       vitest: ^0.16.0
+      wouter-preact: 2.8.0-alpha.2
     dependencies:
       '@babel/generator': 7.18.9
       '@babel/parser': 7.18.9
@@ -178,9 +178,9 @@ importers:
       '@babel/types': 7.18.9
       '@nuxt/devalue': 2.0.0
       '@preact/preset-vite': 2.3.0_preact@10.10.0+vite@3.0.5
-      '@wilson/babel-plugin': link:../babel-plugin
-      '@wilson/hydration': link:../hydration
-      '@wilson/markdown': link:../markdown
+      '@wilson/babel-plugin-island-path': link:../babel-plugin-island-path
+      '@wilson/island-hydration': link:../island-hydration
+      '@wilson/plugin-markdown': link:../plugin-markdown
       '@wilson/utils': link:../utils
       ast-types: 0.14.2
       debug: 4.3.4
@@ -198,13 +198,13 @@ importers:
       picocolors: 1.0.0
       preact: 10.10.0
       preact-render-to-string: 5.2.1_preact@10.10.0
-      preact-router: 4.1.0_preact@10.10.0
       prettier: 2.7.1
       readdirp: 3.6.0
       recast: 0.21.2
       sass: 1.54.0
       vite: 3.0.5_sass@1.54.0
       vite-plugin-inspect: 0.6.0_vite@3.0.5
+      wouter-preact: 2.8.0-alpha.2_preact@10.10.0
     devDependencies:
       '@types/babel__generator': 7.6.4
       '@types/babel__template': 7.4.1
@@ -226,21 +226,43 @@ importers:
   sites/codepunkt.de:
     specifiers:
       '@preact/preset-vite': ^2.3.0
-      '@wilson/babel-plugin': workspace:^1.0.0
-      '@wilson/hydration': workspace:^1.0.0
+      '@wilson/babel-plugin-island-path': workspace:^1.0.0
+      '@wilson/island-hydration': workspace:^1.0.0
       fast-equals: ^4.0.1
       hoofd: 1.5.2
       preact: ^10.10.0
       vite: 3.0.5
       wilson: workspace:^1.0.0
+      wouter-preact: 2.8.0-alpha.2
     dependencies:
       '@preact/preset-vite': 2.3.0_preact@10.10.0+vite@3.0.5
-      '@wilson/babel-plugin': link:../../packages/babel-plugin
-      '@wilson/hydration': link:../../packages/hydration
+      '@wilson/babel-plugin-island-path': link:../../packages/babel-plugin-island-path
+      '@wilson/island-hydration': link:../../packages/island-hydration
       fast-equals: 4.0.1
       hoofd: 1.5.2
       preact: 10.10.0
       vite: 3.0.5
+      wilson: link:../../packages/wilson
+      wouter-preact: 2.8.0-alpha.2_preact@10.10.0
+
+  sites/docs:
+    specifiers:
+      '@preact/preset-vite': ^2.3.0
+      '@wilson/babel-plugin-island-path': workspace:^1.0.0
+      '@wilson/island-hydration': workspace:^1.0.0
+      fast-equals: ^4.0.1
+      hoofd: 1.5.2
+      preact: ^10.10.0
+      vite: 3.0.0
+      wilson: workspace:^1.0.0
+    dependencies:
+      '@preact/preset-vite': 2.3.0_preact@10.10.0+vite@3.0.0
+      '@wilson/babel-plugin-island-path': link:../../packages/babel-plugin-island-path
+      '@wilson/island-hydration': link:../../packages/island-hydration
+      fast-equals: 4.0.1
+      hoofd: 1.5.2
+      preact: 10.10.0
+      vite: 3.0.0
       wilson: link:../../packages/wilson
 
 packages:
@@ -576,6 +598,7 @@ packages:
     hasBin: true
     dependencies:
       '@babel/types': 7.18.9
+    dev: false
 
   /@babel/plugin-proposal-class-properties/7.18.6_@babel+core@7.18.9:
     resolution: {integrity: sha512-cumfXOF0+nzZrrN8Rf0t7M+tF6sZc7vhQwYQck9q1/5w2OExlD+b4v4RpMJFaV1Z7WcDRgO6FqvxqxGlwo+RHQ==}
@@ -931,6 +954,26 @@ packages:
     resolution: {integrity: sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==}
     dev: false
 
+  /@preact/preset-vite/2.3.0_preact@10.10.0+vite@3.0.0:
+    resolution: {integrity: sha512-0kOuz7wdrQLqrPlyI/Ypw9IWDF2++GGcOHMRBYO5T2w2+dheelaBH+XrIN/okqdsGIflzFIFNyIGubo5BC8wbQ==}
+    peerDependencies:
+      '@babel/core': 7.x
+      vite: 2.x || 3.x
+    dependencies:
+      '@babel/plugin-transform-react-jsx': 7.18.6
+      '@babel/plugin-transform-react-jsx-development': 7.18.6
+      '@prefresh/vite': 2.2.8_preact@10.10.0+vite@3.0.0
+      '@rollup/pluginutils': 4.2.1
+      babel-plugin-transform-hook-names: 1.0.2
+      debug: 4.3.4
+      kolorist: 1.5.1
+      resolve: 1.22.1
+      vite: 3.0.0
+    transitivePeerDependencies:
+      - preact
+      - supports-color
+    dev: false
+
   /@preact/preset-vite/2.3.0_preact@10.10.0+vite@3.0.5:
     resolution: {integrity: sha512-0kOuz7wdrQLqrPlyI/Ypw9IWDF2++GGcOHMRBYO5T2w2+dheelaBH+XrIN/okqdsGIflzFIFNyIGubo5BC8wbQ==}
     peerDependencies:
@@ -967,6 +1010,23 @@ packages:
     resolution: {integrity: sha512-Mb9abhJTOV4yCfkXrMrcgFiFT7MfNOw8sDa+XyZBdq/Ai2p4Zyxqsb3EgHLOEdHpMj6J9aiZ54W8H6FTam1u+A==}
     dev: false
 
+  /@prefresh/vite/2.2.8_preact@10.10.0+vite@3.0.0:
+    resolution: {integrity: sha512-yGGa+PKPYPTzMlxgQ8aBgxw9K69I8X4iQ0E6KOcIvls96WKqKLLOYZW9SUgCve446jpUXvc9udviPBZjCeZIIQ==}
+    peerDependencies:
+      preact: ^10.4.0
+      vite: '>=2.0.0-beta.3'
+    dependencies:
+      '@babel/core': 7.18.9
+      '@prefresh/babel-plugin': 0.4.3
+      '@prefresh/core': 1.3.4_preact@10.10.0
+      '@prefresh/utils': 1.1.3
+      '@rollup/pluginutils': 4.2.1
+      preact: 10.10.0
+      vite: 3.0.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
   /@prefresh/vite/2.2.8_preact@10.10.0+vite@3.0.5:
     resolution: {integrity: sha512-yGGa+PKPYPTzMlxgQ8aBgxw9K69I8X4iQ0E6KOcIvls96WKqKLLOYZW9SUgCve446jpUXvc9udviPBZjCeZIIQ==}
     peerDependencies:
@@ -995,8 +1055,8 @@ packages:
   /@types/babel__core/7.1.19:
     resolution: {integrity: sha512-WEOTgRsbYkvA/KCsDwVEGkd7WAr1e3g31VHQ8zy5gul/V1qKullU/BU5I68X5v7V3GnB9eotmom4v5a5gjxorw==}
     dependencies:
-      '@babel/parser': 7.18.9
-      '@babel/types': 7.18.9
+      '@babel/parser': 7.18.11
+      '@babel/types': 7.18.10
       '@types/babel__generator': 7.6.4
       '@types/babel__template': 7.4.1
       '@types/babel__traverse': 7.17.1
@@ -1024,7 +1084,7 @@ packages:
   /@types/babel__traverse/7.17.1:
     resolution: {integrity: sha512-kVzjari1s2YVi77D3w1yuvohV2idweYXMCDzqBiVNN63TcDWrIlTVOYpqVrvbbyOE/IyzBoTKF0fdnLPEORFxA==}
     dependencies:
-      '@babel/types': 7.18.9
+      '@babel/types': 7.18.10
     dev: true
 
   /@types/braces/3.0.1:
@@ -4661,14 +4721,6 @@ packages:
       pretty-format: 3.8.0
     dev: false
 
-  /preact-router/4.1.0_preact@10.10.0:
-    resolution: {integrity: sha512-y1w2YvVpKAju9FMV+fAVR1NpH4MW5q07BZrziMZeg6F/rGJ9KvLUZtjOqsy2I8fDYiX36AM1AQTXIIK3jigBhA==}
-    peerDependencies:
-      preact: '>=10'
-    dependencies:
-      preact: 10.10.0
-    dev: false
-
   /preact/10.10.0:
     resolution: {integrity: sha512-fszkg1iJJjq68I4lI8ZsmBiaoQiQHbxf1lNq+72EmC/mZOsFF5zn3k1yv9QGoFgIXzgsdSKtYymLJsrJPoamjQ==}
 
@@ -5829,6 +5881,33 @@ packages:
       fsevents: 2.3.2
     dev: true
 
+  /vite/3.0.0:
+    resolution: {integrity: sha512-M7phQhY3+fRZa0H+1WzI6N+/onruwPTBTMvaj7TzgZ0v2TE+N2sdLKxJOfOv9CckDWt5C4HmyQP81xB4dwRKzA==}
+    engines: {node: '>=14.18.0'}
+    hasBin: true
+    peerDependencies:
+      less: '*'
+      sass: '*'
+      stylus: '*'
+      terser: ^5.4.0
+    peerDependenciesMeta:
+      less:
+        optional: true
+      sass:
+        optional: true
+      stylus:
+        optional: true
+      terser:
+        optional: true
+    dependencies:
+      esbuild: 0.14.54
+      postcss: 8.4.16
+      resolve: 1.22.1
+      rollup: 2.77.2
+    optionalDependencies:
+      fsevents: 2.3.2
+    dev: false
+
   /vite/3.0.5:
     resolution: {integrity: sha512-bRvrt9Tw8EGW4jj64aYFTnVg134E8hgDxyl/eEHnxiGqYk7/pTPss6CWlurqPOUzqvEoZkZ58Ws+Iu8MB87iMA==}
     engines: {node: ^14.18.0 || >=16.0.0}
@@ -5981,6 +6060,14 @@ packages:
     resolution: {integrity: sha512-Hz/mrNwitNRh/HUAtM/VT/5VH+ygD6DV7mYKZAtHOrbs8U7lvPS6xf7EJKMF0uW1KJCl0H701g3ZGus+muE5vQ==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /wouter-preact/2.8.0-alpha.2_preact@10.10.0:
+    resolution: {integrity: sha512-f19qDB+HhR6C3lnPFdsJQ8wZZIFzm0m8XciEiBzyB1VtkPE/QaSrm1dxcvqrZu1hKaUA/gdee6OGGj0jGDtgGA==}
+    peerDependencies:
+      preact: ^10.0.0
+    dependencies:
+      preact: 10.10.0
+    dev: false
 
   /wrappy/1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}

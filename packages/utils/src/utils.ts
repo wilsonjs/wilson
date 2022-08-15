@@ -114,7 +114,7 @@ export async function userToPageFrontmatter(
 }
 
 /**
- * Returns preact-router route path for a given page.
+ * Returns route path for a given page.
  * @param relativePagePath Relative path to the page
  */
 export function getRouteForPage(relativePagePath: string) {
@@ -134,7 +134,7 @@ export function getRouteForPage(relativePagePath: string) {
     .replace(/^\/|\/$/g, '')
     .replace(/(:[^/]+)$/, '$1?')
 
-  return route === '' ? '/' : route
+  return `/${route}`
 }
 
 /**
@@ -147,8 +147,8 @@ export function isDynamicPagePath(path: string) {
 }
 
 /**
- * Create a component name based on a preact-router route path.
- * @param path Preact-router route path
+ * Create a component name based on a route path.
+ * @param path Route path
  * @returns Component name string
  */
 export function createComponentName(path: string) {

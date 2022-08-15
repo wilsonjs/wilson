@@ -104,14 +104,18 @@ export default function tsxWrapPlugin(config: SiteConfig): Plugin {
 
             path.node.declaration = template.smart(
               `
-                function ${componentName}Page({ matches, ...rest }) {
+                function ${componentName}Page({ params: withUndefined, ...rest }) {
+                  const params = Object.keys(withUndefined).reduce(
+                    (acc, key) => ({ ...acc, [key]: withUndefined[key] ?? '' }),
+                    {}
+                  );
                   ${
                     isDynamic
                       ? `
-                        const staticPath = staticPaths.find(({ params }) => shallowEqual(params, matches))
-                        const props = { frontmatter, matches, ...staticPath.props, ...rest }
+                        const staticPath = staticPaths.find(({ params: p }) => shallowEqual(p, params));
+                        const props = { frontmatter, params, ...(staticPath.props ?? {}), ...rest };
                       `
-                      : `const props = { frontmatter, matches, ...rest }`
+                      : `const props = { frontmatter, params, ...rest };`
                   }
                   function Title() { useTitle(frontmatter.title); return null; };
                   return <Layout {...props}>
