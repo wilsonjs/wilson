@@ -1,7 +1,7 @@
 import type { ServerOptions, UserConfig as ViteUserConfig } from 'vite'
 import { mergeConfig, preview as vitePreview } from 'vite'
 import { resolveConfig } from './config'
-import wilsonPlugins from './plugin'
+import wilsonPlugins from './plugins'
 
 export async function preview(
   root: string = process.cwd(),

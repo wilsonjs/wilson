@@ -1,5 +1,5 @@
 {
-  "name": "@wilson/plugin-markdown",
+  "name": "@wilson/plugin-markdown-pages",
   "type": "module",
   "version": "1.0.0",
   "author": "Christoph Werner <christoph@codepunkt.de>",
@@ -7,24 +7,24 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/codepunkt/wilson",
-    "directory": "packages/plugin-markdown"
+    "directory": "packages/plugin-markdown-pages"
   },
   "exports": {
     ".": {
-      "require": "./src/markdown.cjs",
-      "import": "./dist/markdown.js"
+      "require": "./src/plugin.cjs",
+      "import": "./dist/plugin.js"
     },
     "./package.json": "./package.json"
   },
-  "main": "dist/markdown.js",
-  "types": "dist/markdown.d.ts",
+  "main": "dist/plugin.js",
+  "types": "dist/plugin.d.ts",
   "files": [
     "dist",
     "src"
   ],
   "scripts": {
     "dev": "npm run build -- --watch",
-    "build": "tsup src/markdown.ts",
+    "build": "tsup src/plugin.ts",
     "lint": "eslint ."
   },
   "devDependencies": {

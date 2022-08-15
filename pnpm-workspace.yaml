@@ -1,7 +1,8 @@
 packages:
   - packages/babel-plugin-island-path
   - packages/island-hydration
-  - packages/plugin-markdown
+  - packages/plugin-markdown-pages
+  - packages/plugin-typescript-pages
   - packages/types
   - packages/utils
   - packages/wilson

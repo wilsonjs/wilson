@@ -15,12 +15,8 @@
     "isolatedModules": true,
     "noEmit": true,
 
-    "jsx": "react-jsx",
-    "jsxImportSource": "preact",
-
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "types": ["vite/client", "wilson/client"]
+    "lib": ["ESNext"],
+    "types": ["node"]
   },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src"]
 }

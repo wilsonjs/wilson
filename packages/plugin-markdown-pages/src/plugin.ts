@@ -81,11 +81,11 @@ export async function processMarkdown(
 }
 
 /**
- * Wilson markdown plugin
+ * Wilson markdown pages plugin
  */
-export default function markdownPlugin(config: SiteConfig): PluginOption {
+export default function markdownPagesPlugin(config: SiteConfig): PluginOption {
   return {
-    name: 'wilson:markdown',
+    name: 'wilson-plugin-markdown-pages',
     enforce: 'pre',
 
     async transform(code: string, id: string): Promise<TransformResult> {

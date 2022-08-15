@@ -1,0 +1,57 @@
+{
+  "name": "@wilson/plugin-typescript-pages",
+  "type": "module",
+  "version": "1.0.0",
+  "author": "Christoph Werner <christoph@codepunkt.de>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codepunkt/wilson",
+    "directory": "packages/plugin-typescript-pages"
+  },
+  "exports": {
+    ".": {
+      "require": "./src/plugin.cjs",
+      "import": "./dist/plugin.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "dist/plugin.js",
+  "types": "dist/plugin.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "dev": "npm run build -- --watch",
+    "build": "tsup src/plugin.ts",
+    "lint": "eslint .",
+    "test": "c8 ava"
+  },
+  "devDependencies": {
+    "@esbuild-kit/esm-loader": "^2.4.2",
+    "@types/babel__core": "^7.1.19",
+    "@types/babel__generator": "^7.6.4",
+    "@types/babel__template": "^7.4.1",
+    "@types/babel__traverse": "^7.17.1",
+    "@types/node": "^18.0.0",
+    "@types/prettier": "^2.7.0",
+    "@wilson/types": "workspace:^1.0.0",
+    "ava": "^4.3.1",
+    "c8": "^7.12.0",
+    "rollup": "^2.75.7",
+    "tsup": "^6.1.3",
+    "vite": "3.0.5"
+  },
+  "dependencies": {
+    "@babel/core": "^7.18.9",
+    "@babel/generator": "^7.18.9",
+    "@babel/parser": "^7.18.9",
+    "@babel/template": "^7.18.10",
+    "@babel/traverse": "^7.18.9",
+    "@babel/types": "^7.18.9",
+    "@wilson/utils": "workspace:^1.0.0",
+    "pathe": "^0.3.2",
+    "prettier": "^2.7.1"
+  }
+}

@@ -3,7 +3,7 @@ import { build as viteBuild, mergeConfig as mergeViteConfig } from 'vite'
 import type { UserConfig as ViteUserConfig, Plugin } from 'vite'
 import type { SiteConfig, IslandsByPath } from '@wilson/types'
 import { extendManualChunks } from './chunks'
-import wilsonPlugins from '../plugin'
+import wilsonPlugins from '../plugins'
 
 export const VIRTUAL_PREFIX = 'wilson_island_'
 

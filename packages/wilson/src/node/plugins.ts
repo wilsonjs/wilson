@@ -6,10 +6,9 @@ import pc from 'picocolors'
 import type { Plugin, PluginOption, ViteDevServer } from 'vite'
 import inspect from 'vite-plugin-inspect'
 import { configureMiddleware, createServer } from './server'
-import markdown from '@wilson/plugin-markdown'
-import tsxPath from './vite-plugins/tsx-path'
+import markdownPagesPlugin from '@wilson/plugin-markdown-pages'
+import typescriptPagesPlugin from '@wilson/plugin-typescript-pages'
 import tsxWrap from './vite-plugins/tsx-wrap'
-import tsxFrontmatter from './vite-plugins/tsx-frontmatter'
 
 /**
  * Watches wilson config and restarts dev server when it changes.
@@ -97,9 +96,8 @@ export default function wilsonPlugins(
   debug('wilson:config')(config)
 
   return [
-    markdown(config),
-    tsxPath(config),
-    tsxFrontmatter(config),
+    markdownPagesPlugin(config),
+    typescriptPagesPlugin(config),
     tsxWrap(config),
     preact({
       include: [/\.[tj]sx?$/, /\.md$/],

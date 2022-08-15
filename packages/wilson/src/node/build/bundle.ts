@@ -4,7 +4,7 @@ import { basename, dirname, join, relative, resolve } from 'pathe'
 import type { UserConfig as ViteUserConfig } from 'vite'
 import { build, mergeConfig } from 'vite'
 import type { OutputOptions, RollupOutput } from 'rollup'
-import wilsonPlugins from '../plugin'
+import wilsonPlugins from '../plugins'
 import glob from 'fast-glob'
 import { isDynamicPagePath } from '@wilson/utils'
 

@@ -7,7 +7,7 @@ import type {
 import { createServer as createViteServer, mergeConfig } from 'vite'
 import type { ServerResponse } from 'http'
 import { resolveConfig } from './config'
-import wilsonPlugins from './plugin'
+import wilsonPlugins from './plugins'
 import { extname, resolve } from 'pathe'
 import { fileExists } from './utils'
 import { SiteConfig } from '@wilson/types'

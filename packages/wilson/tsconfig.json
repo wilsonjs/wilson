@@ -1,18 +1,21 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "module": "es2020",
-    "target": "es2020",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
     "strict": true,
+    "allowJs": false,
+    "skipLibCheck": true,
+
+    "resolveJsonModule": true,
     "declaration": true,
     "noUnusedLocals": false,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
     "useUnknownInCatchVariables": false,
+
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
+
     "lib": ["ESNext", "DOM"],
     "types": ["node", "vitest", "vite/client"]
   },
