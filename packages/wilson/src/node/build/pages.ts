@@ -3,7 +3,7 @@ import type {
   SiteConfig,
   StaticPageExports,
 } from '@wilson/types'
-import { isDynamicPagePath } from '@wilson/utils'
+import { getRouteForPage, isDynamicPagePath } from '@wilson/utils'
 import glob from 'fast-glob'
 import { join, relative } from 'pathe'
 import { createPaginationHelper } from '..'
@@ -38,26 +38,24 @@ function pathToFilename(cleanedPath: string) {
  * Will have single entries for static pages, and multiple entries for dynamic pages
  * depending on the return values of their `getStaticPaths` implementation.
  */
-export async function getPagesToRender({
-  pagesDir,
-}: SiteConfig): Promise<PageToRender[]> {
-  const files = await glob(join(pagesDir, `**/*.{md,tsx}`))
+export async function getPagesToRender(
+  config: SiteConfig,
+): Promise<PageToRender[]> {
+  const files = await glob(join(config.pagesDir, `**/*.{md,tsx}`))
   const pagesToRender = []
 
   for (const absolutePath of files) {
-    const relativePath = relative(pagesDir, absolutePath)
-    const path =
-      '/' +
-      relativePath
-        .replace(/\.[^.]+$/, '')
-        .replace(/index$/, '')
-        .replace(/\/$/, '')
+    const relativePath = relative(config.pagesDir, absolutePath)
+    const path = getRouteForPage(relativePath, {
+      ...config,
+      replaceParams: false,
+    })
     const isDynamic = isDynamicPagePath(path)
 
     if (isDynamic) {
       const { getStaticPaths } = await getPageExports<DynamicPageExports>(
         absolutePath,
-        pagesDir,
+        config.pagesDir,
       )
       const paginate = createPaginationHelper(relativePath)
       const staticPaths = (
@@ -89,6 +87,7 @@ export async function getPagesToRender({
     }
   }
 
+  console.log({ pagesToRender })
   return pagesToRender
 }
 

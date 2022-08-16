@@ -1,4 +1,4 @@
-import type { UserConfig as ViteOptions, Plugin } from 'vite'
+import type { UserConfig as ViteOptions } from 'vite'
 import type { FunctionComponent, RenderableProps } from 'preact'
 
 export type Awaitable<T> = T | Promise<T>
@@ -72,6 +72,10 @@ export interface UserConfig {
    * Default content language. Defaults to 'en'.
    */
   defaultContentLanguage?: string
+  /**
+   * Language information.
+   */
+  languages?: Record<string, Record<string, any>>
   /**
    * File extensions that are allowed as pages.
    */

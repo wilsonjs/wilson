@@ -104,7 +104,7 @@ export default function markdownPagesPlugin(config: SiteConfig): PluginOption {
       )
       const layout = frontmatter.layout
       const layoutPath = `${config.layoutsDir}/${layout}.tsx`
-      const path = getRouteForPage(relative(config.pagesDir, id))
+      const path = getRouteForPage(relative(config.pagesDir, id), config)
       const componentName = createComponentName(relative(config.pagesDir, id))
 
       const newCode = /* tsx */ `

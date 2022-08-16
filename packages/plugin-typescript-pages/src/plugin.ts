@@ -59,12 +59,13 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
         const dynamicParameterMatches = [
           ...relativePath.matchAll(/\[([^\]]+)\]/g),
         ]
-        const path = getRouteForPage(relative(config.pagesDir, id))
+        const path = getRouteForPage(relative(config.pagesDir, id), config)
         const isDynamic = dynamicParameterMatches.length > 0
         const componentName = createComponentName(relativePath)
 
         const transformResult = await transformFromAstAsync(syntaxTree, code, {
           ast: true,
+          filename: id,
           plugins: [
             [
               prependImportsPlugin,

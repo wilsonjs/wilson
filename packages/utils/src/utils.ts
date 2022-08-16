@@ -114,30 +114,6 @@ export async function userToPageFrontmatter(
 }
 
 /**
- * Returns route path for a given page.
- * @param relativePagePath Relative path to the page
- */
-export function getRouteForPage(relativePagePath: string) {
-  const reactRouterLike = relativePagePath
-    .split('/')
-    .filter((x) => x)
-    .map((segment) =>
-      isDynamicPagePath(segment)
-        ? segment.replace(/\[([^\]]+)\]/g, ':$1')
-        : segment.toLowerCase(),
-    )
-    .join('/')
-
-  const route = reactRouterLike
-    .slice(0, reactRouterLike.lastIndexOf('.'))
-    .replace(/index$/, '')
-    .replace(/^\/|\/$/g, '')
-    .replace(/(:[^/]+)$/, '$1?')
-
-  return `/${route}`
-}
-
-/**
  * Returns if a path has dynamic parts.
  *
  * As an example, `foo/bar` is not dynamic while `blog/[page]` is.
@@ -168,3 +144,5 @@ export function createComponentName(path: string) {
     (s: string) => s.charAt(0) + s.charAt(1).toUpperCase(),
   )
 }
+
+export { default as getRouteForPage } from './get-route-for-page'
