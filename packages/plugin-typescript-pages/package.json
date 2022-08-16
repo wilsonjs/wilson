@@ -52,6 +52,7 @@
     "@babel/types": "^7.18.9",
     "@wilson/utils": "workspace:^1.0.0",
     "pathe": "^0.3.2",
-    "prettier": "^2.7.1"
+    "prettier": "^2.7.1",
+    "zod": "^3.18.0"
   }
 }

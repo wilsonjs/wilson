@@ -1,14 +1,13 @@
-import { createComponentName, getRouteForPage, isPage } from '@wilson/utils'
+import { createComponentName, isPage } from '@wilson/utils'
 import { TransformResult } from 'rollup'
 import { relative } from 'pathe'
 import template from '@babel/template'
 import type { Plugin } from 'vite'
-import type { GetStaticPaths, SiteConfig } from '@wilson/types'
+import type { SiteConfig } from '@wilson/types'
 import types from '@babel/types'
 import parse from './util/parse'
 import format from './util/format'
 import { traverse } from './util/babel-import'
-import path from 'path'
 
 export default function tsxWrapPlugin(config: SiteConfig): Plugin {
   return {
@@ -35,72 +34,10 @@ export default function tsxWrapPlugin(config: SiteConfig): Plugin {
       // TODO check that OriginalPage has no binding in global scope
       // TODO if isDynamic, check that `getStaticPaths` is exported
       traverse(ast, {
-        // Program(path) {
-        //   if (isDynamic) {
-        //     if (path.scope.hasOwnBinding('getStaticPaths')) {
-        //       const binding = path.scope.getOwnBinding('getStaticPaths')
-        //       if (
-        //         binding &&
-        //         // types.isVariableDeclarator(binding.path.node) &&
-        //         // types.isObjectExpression(binding.path.node.init) &&
-        //         binding.referencePaths.some((path) =>
-        //           types.isExportNamedDeclaration(path),
-        //         )
-        //       ) {
-        //         if (types.isVariableDeclarator(binding.path.node)) {
-        //           // console.log(binding.path.node)
-        //         } else if (types.isFunctionDeclaration(binding.path.node)) {
-        //           // console.log(
-        //           //   binding.path
-        //           //     .getScope(binding.path.scope)
-        //           //     .getBinding('getPages'),
-        //           // )
-        //         } else {
-        //           throw new Error('wat 1')
-        //         }
-        //         // console.log(binding.path.node.init.type)
-        //         return
-        //       }
-        //     }
-        //     throw new Error('wat 3 pages must have `getStaticPaths` Export')
-        //   }
-        // },
         ExportDefaultDeclaration(path) {
           if (types.isFunctionDeclaration(path.node.declaration)) {
             fc = path.node.declaration
             fc.id = { type: 'Identifier', name: 'OriginalPage' }
-            path.node.declaration = {
-              type: 'FunctionDeclaration',
-              async: false,
-              generator: false,
-              params: [
-                {
-                  type: 'ObjectPattern',
-                  properties: [
-                    {
-                      type: 'ObjectProperty',
-                      shorthand: true,
-                      computed: false,
-                      key: { type: 'Identifier', name: 'url' },
-                      value: { type: 'Identifier', name: 'url' },
-                    },
-                    {
-                      type: 'ObjectProperty',
-                      shorthand: false,
-                      computed: false,
-                      key: { type: 'Identifier', name: 'params' },
-                      value: { type: 'Identifier', name: 'matches' },
-                    },
-                  ],
-                },
-              ],
-              body: {
-                type: 'BlockStatement',
-                body: [],
-                directives: [],
-              },
-              id: { type: 'Identifier', name: `${componentName}Page` },
-            }
 
             path.node.declaration = template.smart(
               `
@@ -135,13 +72,6 @@ export default function tsxWrapPlugin(config: SiteConfig): Plugin {
       })
 
       ast.program.body = [
-        template.statement(`import { useTitle } from 'hoofd/preact';`)(),
-        ...(isDynamic
-          ? template.statements(`
-              import { createPaginationHelper } from 'wilson';
-              import { shallowEqual } from 'fast-equals';
-            `)()
-          : []),
         ...ast.program.body,
         ...(isDynamic
           ? [

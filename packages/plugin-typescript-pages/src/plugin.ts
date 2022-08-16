@@ -4,7 +4,8 @@ import type { TransformResult } from 'rollup'
 import type { SiteConfig, UserFrontmatter } from '@wilson/types'
 import { transformFromAstAsync } from '@babel/core'
 import parseFrontmatterPlugin from './babel-plugins/parse-frontmatter'
-import prependDefaultImportPlugin from './babel-plugins/prepend-default-import'
+// import prependDefaultImportPlugin from './babel-plugins/prepend-default-import'
+import prependImportsPlugin from './babel-plugins/prepend-imports'
 import addNamedStringExportPlugin from './babel-plugins/add-named-string-export'
 import extendFrontmatterPlugin from './babel-plugins/extend-frontmatter'
 import parser from '@babel/parser'
@@ -52,14 +53,46 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
         )
         const layout = frontmatter.layout
         const layoutPath = `${config.layoutsDir}/${layout}.tsx`
+        const relativePath = relative(config.pagesDir, id)
+        const dynamicParameterMatches = [
+          ...relativePath.matchAll(/\[([^\]]+)\]/g),
+        ]
         const path = getRouteForPage(relative(config.pagesDir, id))
+        const isDynamic = dynamicParameterMatches.length > 0
 
         const transformResult = await transformFromAstAsync(syntaxTree, code, {
           ast: true,
           plugins: [
             [
-              prependDefaultImportPlugin,
-              { importIdentifier: 'Layout', importSource: layoutPath },
+              prependImportsPlugin,
+              {
+                imports: [
+                  {
+                    identifiers: [{ default: true, name: 'Layout' }],
+                    source: layoutPath,
+                  },
+                  {
+                    identifiers: [{ default: false, name: 'useTitle' }],
+                    source: 'hoofd/preact',
+                  },
+                  ...(isDynamic
+                    ? [
+                        {
+                          identifiers: [
+                            { default: false, name: 'createPaginationHelper' },
+                          ],
+                          source: 'wilson',
+                        },
+                        {
+                          identifiers: [
+                            { default: false, name: 'shallowEqual' },
+                          ],
+                          source: 'fast-equals',
+                        },
+                      ]
+                    : []),
+                ],
+              },
             ],
             [
               addNamedStringExportPlugin,
