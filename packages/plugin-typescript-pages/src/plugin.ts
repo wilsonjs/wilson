@@ -1,4 +1,9 @@
-import { getRouteForPage, isPage, userToPageFrontmatter } from '@wilson/utils'
+import {
+  createComponentName,
+  getRouteForPage,
+  isPage,
+  userToPageFrontmatter,
+} from '@wilson/utils'
 import type { Plugin } from 'vite'
 import type { TransformResult } from 'rollup'
 import type { SiteConfig, UserFrontmatter } from '@wilson/types'
@@ -8,6 +13,7 @@ import prependImportsPlugin from './babel-plugins/prepend-imports'
 import addNamedStringExportPlugin from './babel-plugins/add-named-string-export'
 import extendFrontmatterPlugin from './babel-plugins/extend-frontmatter'
 import addStaticPathsPlugin from './babel-plugins/add-static-paths'
+import wrapPageComponentPlugin from './babel-plugins/wrap-page-component'
 import parser from '@babel/parser'
 import type { File } from '@babel/types'
 import type { ParseResult } from '@babel/parser'
@@ -55,6 +61,7 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
         ]
         const path = getRouteForPage(relative(config.pagesDir, id))
         const isDynamic = dynamicParameterMatches.length > 0
+        const componentName = createComponentName(relativePath)
 
         const transformResult = await transformFromAstAsync(syntaxTree, code, {
           ast: true,
@@ -96,6 +103,7 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
             ],
             [extendFrontmatterPlugin, { frontmatter }],
             isDynamic && [addStaticPathsPlugin, { relativePath }],
+            [wrapPageComponentPlugin, { componentName, isDynamic }],
           ].filter(Boolean) as PluginItem[],
         })
 

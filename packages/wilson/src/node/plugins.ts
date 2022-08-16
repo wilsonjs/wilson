@@ -8,7 +8,6 @@ import inspect from 'vite-plugin-inspect'
 import { configureMiddleware, createServer } from './server'
 import markdownPagesPlugin from '@wilson/plugin-markdown-pages'
 import typescriptPagesPlugin from '@wilson/plugin-typescript-pages'
-import tsxWrap from './vite-plugins/tsx-wrap'
 
 /**
  * Watches wilson config and restarts dev server when it changes.
@@ -98,7 +97,6 @@ export default function wilsonPlugins(
   return [
     markdownPagesPlugin(config),
     typescriptPagesPlugin(config),
-    tsxWrap(config),
     preact({
       include: [/\.[tj]sx?$/, /\.md$/],
       devtoolsInProd: true,
