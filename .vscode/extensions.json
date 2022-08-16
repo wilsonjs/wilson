@@ -6,6 +6,7 @@
     "christian-kohler.path-intellisense",
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
+    "editorconfig.editorconfig",
     "jock.svg",
     "syler.sass-indented"
   ]

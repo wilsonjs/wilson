@@ -1,16 +1,14 @@
 {
-  "debug.node.autoAttach": "off",
   "terminal.integrated.tabs.enabled": true,
   "search.exclude": {
-    "**/node_modules": true,
+    "**/.turbo": true,
+    "**/.wilson": true,
     "**/coverage": true,
-    "**/dist": true
+    "**/dist": true,
+    "**/node_modules": true
   },
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": ["source.fixAll"],
-  "files.associations": {
-    "*.js": "javascriptreact"
-  },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -27,6 +25,6 @@
     "editor.wordWrapColumn": 80
   },
   "todo-tree.general.enableFileWatcher": true,
-  "todo-tree.general.debug": true,
-  "todo-tree.general.rootFolder": "${workspaceFolder}/application"
+  "todo-tree.general.debug": false,
+  "todo-tree.general.rootFolder": "${workspaceFolder}"
 }
