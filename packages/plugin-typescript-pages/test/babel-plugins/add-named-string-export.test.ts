@@ -4,23 +4,23 @@ import test from 'ava'
 
 test('throws when invoked with invalid options', async (t) => {
   await t.throwsAsync(transformAsync('', { plugins: [plugin] }), {
-    message: new RegExp('options.exportIdentifer is required!'),
+    message: new RegExp('Invalid plugin options'),
   })
 
   await t.throwsAsync(transformAsync('', { plugins: [[plugin, {}]] }), {
-    message: new RegExp('options.exportIdentifer is required!'),
+    message: new RegExp('Invalid plugin options'),
   })
 
   await t.throwsAsync(
     transformAsync('', { plugins: [[plugin, { exportString: 'bar' }]] }),
-    { message: new RegExp('options.exportIdentifer is required!') },
+    { message: new RegExp('Invalid plugin options') },
   )
 
   await t.throwsAsync(
     transformAsync('', {
       plugins: [[plugin, { exportIdentifier: 'foo' }]],
     }),
-    { message: new RegExp('options.exportString is required!') },
+    { message: new RegExp('Invalid plugin options') },
   )
 
   await t.notThrowsAsync(

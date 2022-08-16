@@ -7,14 +7,14 @@ test('throws when invoked with invalid options', async (t) => {
     transformAsync(`export const frontmatter = {}`, {
       plugins: [plugin],
     }),
-    { message: new RegExp('options.frontmatter is required!') },
+    { message: new RegExp('Invalid plugin options') },
   )
 
   await t.throwsAsync(
     transformAsync(`export const frontmatter = {}`, {
       plugins: [[plugin, {}]],
     }),
-    { message: new RegExp('options.frontmatter is required!') },
+    { message: new RegExp('Invalid plugin options') },
   )
 
   await t.throwsAsync(

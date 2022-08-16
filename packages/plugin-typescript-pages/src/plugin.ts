@@ -22,10 +22,6 @@ function parse(code: string): ParseResult<File> {
   })
 }
 
-export interface PluginOptions {
-  frontmatter?: UserFrontmatter
-}
-
 /**
  * Wilson typescript pages plugin
  */
@@ -41,13 +37,13 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
 
       try {
         const syntaxTree = parse(code)
-        const frontmatterOptions: { frontmatter?: UserFrontmatter } = {}
+        const frontmatterOptions: { frontmatter?: object } = { frontmatter: {} }
         await transformFromAstAsync(syntaxTree, code, {
           plugins: [[parseFrontmatterPlugin, frontmatterOptions]],
         })
 
         const frontmatter = await userToPageFrontmatter(
-          frontmatterOptions.frontmatter!,
+          frontmatterOptions.frontmatter as UserFrontmatter,
           id,
           config,
         )

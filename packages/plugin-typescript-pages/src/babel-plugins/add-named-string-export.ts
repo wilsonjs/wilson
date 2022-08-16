@@ -1,33 +1,25 @@
 import type { PluginObj } from '@babel/core'
-import template from '@babel/template'
-import type * as BabelCoreNamespace from '@babel/core'
+import types from '@babel/types'
+import z from 'zod'
+import validateOptions from '../util/validate-options'
 
-type Babel = typeof BabelCoreNamespace
+const pluginOptions = z.object({
+  exportIdentifier: z.string(),
+  exportString: z.string(),
+})
 
-interface PluginOptions {
-  exportIdentifier: string
-  exportString: string
-}
-
-export default function addNamedStringExportPlugin({
-  types,
-}: Babel): PluginObj<{
-  opts: PluginOptions
+export default function addNamedStringExportPlugin(): PluginObj<{
+  opts: z.infer<typeof pluginOptions>
 }> {
   return {
     name: '@wilson/babel-plugin-add-named-string-export',
     visitor: {
-      Program(path, { opts: { exportIdentifier, exportString } }) {
-        if (exportIdentifier === undefined) {
-          throw new Error(`options.exportIdentifer is required!`)
-        }
-        if (exportString === undefined) {
-          throw new Error(`options.exportString is required!`)
-        }
+      Program(path, { opts }) {
+        validateOptions(pluginOptions, opts)
 
-        if (path.scope.hasOwnBinding(exportIdentifier)) {
+        if (path.scope.hasOwnBinding(opts.exportIdentifier)) {
           throw path.buildCodeFrameError(
-            `Top-level identifier "${exportIdentifier}" already exists!`,
+            `Top-level identifier "${opts.exportIdentifier}" already exists!`,
           )
         }
 
@@ -40,9 +32,14 @@ export default function addNamedStringExportPlugin({
         path.node.body.splice(
           firstExportIndex === -1 ? path.node.body.length : firstExportIndex,
           0,
-          template.statement(
-            `export const ${exportIdentifier} = '${exportString}';`,
-          )(),
+          types.exportNamedDeclaration(
+            types.variableDeclaration('const', [
+              types.variableDeclarator(
+                types.identifier(opts.exportIdentifier),
+                types.stringLiteral(opts.exportString),
+              ),
+            ]),
+          ),
         )
       },
     },

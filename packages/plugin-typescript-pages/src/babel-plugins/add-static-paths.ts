@@ -1,27 +1,20 @@
 import type { PluginObj } from '@babel/core'
 import types from '@babel/types'
 import z from 'zod'
+import validateOptions from '../util/validate-options'
 
 const pluginOptions = z.object({
   relativePath: z.string(),
 })
 
-export default function addNamedStringExportPlugin(): PluginObj<{
+export default function addStaticPathsPlugin(): PluginObj<{
   opts: z.infer<typeof pluginOptions>
 }> {
   return {
     name: '@wilson/babel-plugin-add-static-paths',
     visitor: {
       Program(path, { opts }) {
-        try {
-          pluginOptions.parse(opts)
-        } catch (e) {
-          if (e instanceof z.ZodError) {
-            throw new Error(
-              `Invalid plugin options: ${JSON.stringify(e.issues)}`,
-            )
-          }
-        }
+        validateOptions(pluginOptions, opts)
 
         const binding = path.scope.getOwnBinding('getStaticPaths')
 

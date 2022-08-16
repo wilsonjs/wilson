@@ -1,45 +1,37 @@
 import type { PluginObj } from '@babel/core'
 import types from '@babel/types'
 import z from 'zod'
+import validateOptions from '../util/validate-options'
 
-const importsOption = z.array(
-  z.object({
-    source: z.string(),
-    identifiers: z
-      .array(
-        z.object({ default: z.literal(true), name: z.string() }).or(
-          z.object({
-            default: z.literal(false),
-            name: z.string(),
-            alias: z.string().optional(),
-          }),
-        ),
-      )
-      .nonempty(),
-  }),
-)
+const pluginOptions = z.object({
+  imports: z.array(
+    z.object({
+      source: z.string(),
+      identifiers: z
+        .array(
+          z.object({ default: z.literal(true), name: z.string() }).or(
+            z.object({
+              default: z.literal(false),
+              name: z.string(),
+              alias: z.string().optional(),
+            }),
+          ),
+        )
+        .nonempty(),
+    }),
+  ),
+})
 
 export default function prependDefaultImportPlugin(): PluginObj<{
-  opts: { imports: z.infer<typeof importsOption> }
+  opts: z.infer<typeof pluginOptions>
 }> {
   return {
     name: '@wilson/babel-plugin-prepend-imports',
     visitor: {
-      Program(path, { opts: { imports } }) {
-        if (imports === undefined)
-          throw new Error('options.imports is required!')
+      Program(path, { opts }) {
+        validateOptions(pluginOptions, opts)
 
-        try {
-          importsOption.parse(imports)
-        } catch (e) {
-          if (e instanceof z.ZodError) {
-            throw new Error(
-              `Invalid plugin options: ${JSON.stringify(e.issues)}`,
-            )
-          }
-        }
-
-        imports.forEach((i) => {
+        opts.imports.forEach((i) => {
           i.identifiers.forEach((identifier) => {
             const bindingName =
               identifier.default === false
@@ -62,7 +54,7 @@ export default function prependDefaultImportPlugin(): PluginObj<{
         path.node.body.splice(
           insertIndex,
           0,
-          ...(imports.map((i) =>
+          ...(opts.imports.map((i) =>
             types.importDeclaration(
               i.identifiers.map((id) =>
                 id.default

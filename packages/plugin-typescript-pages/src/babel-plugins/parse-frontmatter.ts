@@ -1,25 +1,20 @@
-// import type * as BabelCoreNamespace from '@babel/core';
-// import type * as BabelTypesNamespace from '@babel/types';
-// import type { PluginObj, PluginPass } from '@babel/core';
-
-// export type Babel = typeof BabelCoreNamespace;
-// export type BabelTypes = typeof BabelTypesNamespace;
-
 import type * as BabelCoreNamespace from '@babel/core'
 import type { PluginObj } from '@babel/core'
 import { generate } from '../util/babel-import'
 import * as types from '@babel/types'
 import { UserFrontmatter } from '@wilson/types'
+import z from 'zod'
+import validateOptions from '../util/validate-options'
 
 type Babel = typeof BabelCoreNamespace
 
-interface PluginOpts {
-  frontmatter?: UserFrontmatter
-}
+const pluginOptions = z.object({
+  frontmatter: z.object({}),
+})
 
 export default function parseFrontmatterPlugin({
   traverse,
-}: Babel): PluginObj<{ opts: PluginOpts }> {
+}: Babel): PluginObj<{ opts: z.infer<typeof pluginOptions> }> {
   function findTitle(
     frontmatterObjectExpression: types.ObjectExpression,
   ): types.ObjectProperty | undefined {
@@ -34,7 +29,9 @@ export default function parseFrontmatterPlugin({
   return {
     name: '@wilson/babel-plugin-parse-frontmatter',
     visitor: {
-      Program(path, state) {
+      Program(path, { opts }) {
+        validateOptions(pluginOptions, opts)
+
         const frontmatterBinding = path.scope.getOwnBinding('frontmatter')
 
         if (
@@ -119,7 +116,7 @@ export default function parseFrontmatterPlugin({
               `return ${generate(frontmatterBinding.path.node.init).code}`,
             )() as UserFrontmatter
 
-            state.opts.frontmatter = userFrontmatter
+            opts.frontmatter = userFrontmatter
           } else {
             throw frontmatterBinding.path.buildCodeFrameError(
               'Pages must export "frontmatter"!',

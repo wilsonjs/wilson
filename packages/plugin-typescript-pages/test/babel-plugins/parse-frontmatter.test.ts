@@ -3,25 +3,48 @@ import { UserFrontmatter } from '@wilson/types'
 import plugin from './../../src/babel-plugins/parse-frontmatter'
 import test from 'ava'
 
+test('throws when invoked with invalid options', async (t) => {
+  await t.throwsAsync(
+    transformAsync(`export const frontmatter = {}`, {
+      plugins: [plugin],
+    }),
+    { message: new RegExp('Invalid plugin options') },
+  )
+
+  await t.throwsAsync(
+    transformAsync(`export const frontmatter = {}`, {
+      plugins: [[plugin, {}]],
+    }),
+    { message: new RegExp('Invalid plugin options') },
+  )
+
+  await t.throwsAsync(
+    transformAsync(`export const frontmatter = {}`, {
+      plugins: [[plugin, { frontmatter: 42 }]],
+    }),
+    { message: new RegExp('Invalid plugin options') },
+  )
+})
+
 test('throws when frontmatter is not exported', async (t) => {
   await t.throwsAsync(
     transformAsync(
       `export default function Page() { return <h1>My page</h1> }`,
-      { plugins: ['@babel/plugin-syntax-jsx', [plugin, {}]] },
+      { plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]] },
     ),
     { message: new RegExp('Pages must export "frontmatter"!') },
   )
 
   await t.throwsAsync(
     transformAsync(`const frontmatter = { title: 'Blog' }`, {
-      plugins: ['@babel/plugin-syntax-jsx', [plugin, {}]],
+      plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]],
     }),
     { message: new RegExp('Pages must export "frontmatter"!') },
   )
 
   await t.notThrowsAsync(
     transformAsync(`export const frontmatter = { title: 'Blog' }`, {
-      plugins: ['@babel/plugin-syntax-jsx', [plugin, {}]],
+      plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]],
     }),
   )
 })
@@ -29,7 +52,7 @@ test('throws when frontmatter is not exported', async (t) => {
 test("throws when frontmatter doesn't include title", async (t) => {
   await t.throwsAsync(
     transformAsync(`export const frontmatter = { layout: 'widescreen' }`, {
-      plugins: ['@babel/plugin-syntax-jsx', [plugin, {}]],
+      plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]],
     }),
     { message: new RegExp('Page frontmatter does not include "title"!') },
   )
@@ -38,7 +61,7 @@ test("throws when frontmatter doesn't include title", async (t) => {
 test('throws when frontmatter includes illegal types', async (t) => {
   await t.throwsAsync(
     transformAsync(`export const frontmatter = { fn: () => {} }`, {
-      plugins: ['@babel/plugin-syntax-jsx', [plugin, {}]],
+      plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]],
     }),
     {
       message: new RegExp(
@@ -50,7 +73,7 @@ test('throws when frontmatter includes illegal types', async (t) => {
   await t.throwsAsync(
     transformAsync(
       `const foo = 'bar'; export const frontmatter = { [foo]: 42 }`,
-      { plugins: ['@babel/plugin-syntax-jsx', [plugin, {}]] },
+      { plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]] },
     ),
     {
       message: new RegExp(
@@ -62,7 +85,7 @@ test('throws when frontmatter includes illegal types', async (t) => {
   await t.throwsAsync(
     transformAsync(
       `const foo = 'bar'; export const frontmatter = { templateLiteral: \`hi \$\{foo\}\` }`,
-      { plugins: ['@babel/plugin-syntax-jsx', [plugin, {}]] },
+      { plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]] },
     ),
     {
       message: new RegExp(
@@ -74,7 +97,7 @@ test('throws when frontmatter includes illegal types', async (t) => {
   await t.throwsAsync(
     transformAsync(
       `const foo = 'bar'; export const frontmatter = { id: foo }`,
-      { plugins: ['@babel/plugin-syntax-jsx', [plugin, {}]] },
+      { plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]] },
     ),
     {
       message: new RegExp(
@@ -86,7 +109,7 @@ test('throws when frontmatter includes illegal types', async (t) => {
   await t.throwsAsync(
     transformAsync(
       `const foo = 'bar'; export const frontmatter = { arr: [ foo ] }`,
-      { plugins: ['@babel/plugin-syntax-jsx', [plugin, {}]] },
+      { plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]] },
     ),
     {
       message: new RegExp(
@@ -97,7 +120,7 @@ test('throws when frontmatter includes illegal types', async (t) => {
 
   await t.throwsAsync(
     transformAsync(`export const frontmatter = { notDefined: undefined }`, {
-      plugins: ['@babel/plugin-syntax-jsx', [plugin, {}]],
+      plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]],
     }),
     {
       message: new RegExp(
@@ -108,7 +131,7 @@ test('throws when frontmatter includes illegal types', async (t) => {
 })
 
 test('stores frontmatter on plugin options object', async (t) => {
-  const options: { frontmatter?: UserFrontmatter } = {}
+  const options: { frontmatter?: object } = { frontmatter: {} }
   await transformAsync(`export const frontmatter = { title: 'Blog' }`, {
     plugins: ['@babel/plugin-syntax-jsx', [plugin, options]],
   })
