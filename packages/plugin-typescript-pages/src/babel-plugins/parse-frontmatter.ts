@@ -122,11 +122,11 @@ export default function parseFrontmatterPlugin({
             state.opts.frontmatter = userFrontmatter
           } else {
             throw frontmatterBinding.path.buildCodeFrameError(
-              'Page must export frontmatter!',
+              'Pages must export "frontmatter"!',
             )
           }
         } else {
-          throw path.buildCodeFrameError('Page must export frontmatter!')
+          throw path.buildCodeFrameError('Pages must export "frontmatter"!')
         }
       },
     },

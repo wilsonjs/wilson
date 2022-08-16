@@ -71,19 +71,6 @@ export default function tsxWrapPlugin(config: SiteConfig): Plugin {
         },
       })
 
-      ast.program.body = [
-        ...ast.program.body,
-        ...(isDynamic
-          ? [
-              template.statement(
-                `const staticPaths = await getStaticPaths({ getPages: (path) => {
-                  return [];
-                }, paginate: createPaginationHelper('${pagePath}') });`,
-              )(),
-            ]
-          : []),
-      ]
-
       if (fc) {
         ast.program.body.push(fc)
       }

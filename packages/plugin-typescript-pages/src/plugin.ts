@@ -2,12 +2,12 @@ import { getRouteForPage, isPage, userToPageFrontmatter } from '@wilson/utils'
 import type { Plugin } from 'vite'
 import type { TransformResult } from 'rollup'
 import type { SiteConfig, UserFrontmatter } from '@wilson/types'
-import { transformFromAstAsync } from '@babel/core'
+import { PluginItem, transformFromAstAsync } from '@babel/core'
 import parseFrontmatterPlugin from './babel-plugins/parse-frontmatter'
-// import prependDefaultImportPlugin from './babel-plugins/prepend-default-import'
 import prependImportsPlugin from './babel-plugins/prepend-imports'
 import addNamedStringExportPlugin from './babel-plugins/add-named-string-export'
 import extendFrontmatterPlugin from './babel-plugins/extend-frontmatter'
+import addStaticPathsPlugin from './babel-plugins/add-static-paths'
 import parser from '@babel/parser'
 import type { File } from '@babel/types'
 import type { ParseResult } from '@babel/parser'
@@ -99,7 +99,8 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
               { exportIdentifier: 'path', exportString: path },
             ],
             [extendFrontmatterPlugin, { frontmatter }],
-          ],
+            isDynamic && [addStaticPathsPlugin, { relativePath }],
+          ].filter(Boolean) as PluginItem[],
         })
 
         return format(transformResult!.ast!)

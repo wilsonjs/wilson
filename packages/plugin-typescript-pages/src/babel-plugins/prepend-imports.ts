@@ -1,5 +1,5 @@
 import type { PluginObj } from '@babel/core'
-import types, { Statement } from '@babel/types'
+import types from '@babel/types'
 import z from 'zod'
 
 const importsOption = z.array(
@@ -19,8 +19,6 @@ const importsOption = z.array(
   }),
 )
 
-// TODO implement tests
-// TODO remove prepend-default-import
 export default function prependDefaultImportPlugin(): PluginObj<{
   opts: { imports: z.infer<typeof importsOption> }
 }> {
@@ -76,7 +74,7 @@ export default function prependDefaultImportPlugin(): PluginObj<{
               ),
               types.stringLiteral(i.source),
             ),
-          ) as Statement[]),
+          ) as types.Statement[]),
         )
       },
     },

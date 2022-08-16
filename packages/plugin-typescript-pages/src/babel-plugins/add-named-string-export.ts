@@ -9,8 +9,6 @@ interface PluginOptions {
   exportString: string
 }
 
-const name = '@wilson/babel-plugin-add-named-string-export'
-
 export default function addNamedStringExportPlugin({
   types,
 }: Babel): PluginObj<{

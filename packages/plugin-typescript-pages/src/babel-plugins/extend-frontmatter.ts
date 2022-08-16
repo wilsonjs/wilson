@@ -2,23 +2,30 @@ import template from '@babel/template'
 import type { PluginObj, types } from '@babel/core'
 import { PageFrontmatter } from '@wilson/types'
 import { isObject } from '@wilson/utils'
+import z from 'zod'
 
-interface PluginOpts {
-  frontmatter: PageFrontmatter
-}
+const frontmatterOption = z.object({
+  title: z.string(),
+})
 
 export default function extendFrontmatterPlugin(): PluginObj<{
-  opts: PluginOpts
+  opts: { frontmatter: z.infer<typeof frontmatterOption> }
 }> {
   return {
     name: '@wilson/babel-plugin-extend-frontmatter',
     visitor: {
       Program(path, { opts: { frontmatter } }) {
-        if (frontmatter === undefined) {
+        if (frontmatter === undefined)
           throw new Error(`options.frontmatter is required!`)
-        }
-        if (!isObject(frontmatter)) {
-          throw new Error(`options.frontmatter must be an object!`)
+
+        try {
+          frontmatterOption.parse(frontmatter)
+        } catch (e) {
+          if (e instanceof z.ZodError) {
+            throw new Error(
+              `Invalid plugin options: ${JSON.stringify(e.issues)}`,
+            )
+          }
         }
 
         const binding = path.scope.getOwnBinding('frontmatter')

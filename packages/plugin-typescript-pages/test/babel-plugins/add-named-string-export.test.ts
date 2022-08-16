@@ -2,7 +2,7 @@ import { transformAsync } from '@babel/core'
 import plugin from '../../src/babel-plugins/add-named-string-export'
 import test from 'ava'
 
-test('throws when invoked with insufficient options', async (t) => {
+test('throws when invoked with invalid options', async (t) => {
   await t.throwsAsync(transformAsync('', { plugins: [plugin] }), {
     message: new RegExp('options.exportIdentifer is required!'),
   })

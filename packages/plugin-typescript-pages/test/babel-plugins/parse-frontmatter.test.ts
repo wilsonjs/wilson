@@ -9,14 +9,14 @@ test('throws when frontmatter is not exported', async (t) => {
       `export default function Page() { return <h1>My page</h1> }`,
       { plugins: ['@babel/plugin-syntax-jsx', [plugin, {}]] },
     ),
-    { message: new RegExp('Page must export frontmatter!') },
+    { message: new RegExp('Pages must export "frontmatter"!') },
   )
 
   await t.throwsAsync(
     transformAsync(`const frontmatter = { title: 'Blog' }`, {
       plugins: ['@babel/plugin-syntax-jsx', [plugin, {}]],
     }),
-    { message: new RegExp('Page must export frontmatter!') },
+    { message: new RegExp('Pages must export "frontmatter"!') },
   )
 
   await t.notThrowsAsync(
