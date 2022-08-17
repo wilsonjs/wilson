@@ -6,7 +6,7 @@ export default {
   verbose: true,
   nodeArguments: [
     '--no-warnings',
-    '--loader=@esbuild-kit/esm-loader',
+    '--loader=ts-node/esm',
     '--experimental-specifier-resolution=node',
   ],
   extensions: {
