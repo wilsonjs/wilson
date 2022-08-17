@@ -8,8 +8,8 @@ export default {
   },
   defaultContentLanguage: 'en',
   languages: {
-    en: {},
-    de: {},
+    en: { title: 'English' },
+    de: { title: 'Deutsch' },
   },
   extendFrontmatter(filename, frontmatter) {
     // frontmatter.layout = 'default'

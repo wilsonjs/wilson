@@ -187,6 +187,44 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                           false,
                           true,
                         ),
+                        types.objectProperty(
+                          types.identifier('translations'),
+                          types.callExpression(
+                            types.memberExpression(
+                              types.identifier('translations'),
+                              types.identifier('map'),
+                            ),
+                            [
+                              types.arrowFunctionExpression(
+                                [types.identifier('t')],
+                                types.objectExpression([
+                                  types.objectProperty(
+                                    types.identifier('title'),
+                                    types.memberExpression(
+                                      types.identifier('t'),
+                                      types.identifier('title'),
+                                    ),
+                                  ),
+                                  types.objectProperty(
+                                    types.identifier('route'),
+                                    types.callExpression(
+                                      types.identifier('replaceRouteParams'),
+                                      [
+                                        types.memberExpression(
+                                          types.identifier('t'),
+                                          types.identifier('route'),
+                                        ),
+                                        types.identifier('params'),
+                                      ],
+                                    ),
+                                  ),
+                                ]),
+                              ),
+                            ],
+                          ),
+                          false,
+                          true,
+                        ),
                         types.spreadElement(
                           types.logicalExpression(
                             '??',
@@ -216,6 +254,12 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                         types.objectProperty(
                           types.identifier('params'),
                           types.identifier('params'),
+                          false,
+                          true,
+                        ),
+                        types.objectProperty(
+                          types.identifier('translations'),
+                          types.identifier('translations'),
                           false,
                           true,
                         ),

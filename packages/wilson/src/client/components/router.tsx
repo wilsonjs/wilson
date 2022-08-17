@@ -1,3 +1,4 @@
+import { PageFrontmatter } from '@wilson/types'
 import type { ComponentType, RenderableProps } from 'preact'
 import { Router as Wouter, Route, Switch } from 'wouter-preact'
 // @ts-ignore
@@ -6,6 +7,7 @@ import NotFound from './not-found'
 
 interface Page {
   default: ComponentType
+  frontmatter: PageFrontmatter
   path: string
 }
 

@@ -1,6 +1,6 @@
 module.exports = (...args) =>
   new Promise((resolve, reject) => {
-    import('../dist/plugin.js')
+    import('../dist/index.js')
       .then((m) => resolve(m.default(...args)))
       .catch(reject)
   })

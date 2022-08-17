@@ -163,10 +163,8 @@ function siteConfigDefaults(
     srcDir,
     pageExtensions: ['.md', '.tsx'],
     site: defaultSiteMeta,
-    defaultContentLanguage: 'en',
-    languages: {
-      en: {},
-    },
+    defaultLanguage: 'en',
+    languages: {},
     vite: viteConfigDefaults(root),
     extendFrontmatter(filename, frontmatter) {
       return frontmatter
@@ -184,18 +182,25 @@ export async function resolveConfig(
   root: string = process.cwd(),
   env: ConfigEnv = { mode: 'development', command: 'serve' },
 ): Promise<SiteConfig> {
-  const siteConfig = await resolveUserConfig(root, env)
-  siteConfig.mode = env.mode
+  const config = await resolveUserConfig(root, env)
+  config.mode = env.mode
 
-  const srcDir = resolve(root, siteConfig.srcDir)
-  Object.assign(siteConfig, {
+  const srcDir = resolve(root, config.srcDir)
+  Object.assign(config, {
     srcDir,
-    pagesDir: resolve(srcDir, siteConfig.pagesDir),
-    outDir: resolve(root, siteConfig.outDir),
-    tempDir: resolve(root, siteConfig.tempDir),
-    layoutsDir: resolve(srcDir, siteConfig.layoutsDir),
-    islandsDir: resolve(srcDir, siteConfig.islandsDir),
+    pagesDir: resolve(srcDir, config.pagesDir),
+    outDir: resolve(root, config.outDir),
+    tempDir: resolve(root, config.tempDir),
+    layoutsDir: resolve(srcDir, config.layoutsDir),
+    islandsDir: resolve(srcDir, config.islandsDir),
   })
 
-  return siteConfig
+  const languageIds = Object.keys(config.languages)
+  if (languageIds.length === 1) {
+    throw new Error(
+      `Defining languages is useful from 2 languages on upwards, yet you only defined 1: ${languageIds[0]}`,
+    )
+  }
+
+  return config
 }

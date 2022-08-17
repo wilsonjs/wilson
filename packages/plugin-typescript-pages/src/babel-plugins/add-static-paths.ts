@@ -4,6 +4,8 @@ import z from 'zod'
 import validateOptions from '../util/validate-options'
 
 const pluginOptions = z.object({
+  defaultLanguage: z.string(),
+  languages: z.record(z.string(), z.object({ title: z.string() })),
   relativePath: z.string(),
 })
 
@@ -57,7 +59,25 @@ export default function addStaticPathsPlugin(): PluginObj<{
                       types.identifier('paginate'),
                       types.callExpression(
                         types.identifier('createPaginationHelper'),
-                        [types.stringLiteral(`${opts.relativePath}`)],
+                        [
+                          types.stringLiteral(opts.relativePath),
+                          types.stringLiteral(opts.defaultLanguage),
+                          types.objectExpression(
+                            Object.keys(opts.languages).map((id) =>
+                              types.objectProperty(
+                                types.identifier(id),
+                                types.objectExpression([
+                                  types.objectProperty(
+                                    types.identifier('title'),
+                                    types.stringLiteral(
+                                      opts.languages[id].title,
+                                    ),
+                                  ),
+                                ]),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ]),

@@ -15,7 +15,7 @@ import { relative } from 'pathe'
 import { format } from 'prettier'
 import {
   createComponentName,
-  getRouteForPage,
+  getRoutingInfo,
   userToPageFrontmatter,
 } from '@wilson/utils'
 
@@ -102,18 +102,21 @@ export default function markdownPagesPlugin(config: SiteConfig): PluginOption {
         id,
         config,
       )
+      const relativePath = relative(config.pagesDir, id)
       const layout = frontmatter.layout
       const layoutPath = `${config.layoutsDir}/${layout}.tsx`
-      const path = getRouteForPage(relative(config.pagesDir, id), config)
-      const componentName = createComponentName(relative(config.pagesDir, id))
+      const { route, translations } = getRoutingInfo(relativePath, config)
+      const componentName = createComponentName(relativePath)
 
       const newCode = /* tsx */ `
         import { useTitle } from 'hoofd/preact';
         import Layout from '${layoutPath}';
 
-        export const path = '${path}';                             // done
-        export const frontmatter = ${JSON.stringify(frontmatter)}; // done
-        const props = { frontmatter, path };
+        export const path = '${route}';
+        export const frontmatter = ${JSON.stringify(frontmatter)};
+        const props = { frontmatter, path, translations: ${JSON.stringify(
+          Array.from(translations),
+        )} };
 
         function Title() {
           useTitle(frontmatter.title);

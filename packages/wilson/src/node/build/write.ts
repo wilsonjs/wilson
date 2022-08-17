@@ -21,7 +21,12 @@ export async function writePages(
   await Promise.all(
     pagesToRender.map(
       async (page) =>
-        await writePage(config, page, manifest, islandsByPath[page.path] ?? []),
+        await writePage(
+          config,
+          page,
+          manifest,
+          islandsByPath[page.route] ?? [],
+        ),
     ),
   )
 

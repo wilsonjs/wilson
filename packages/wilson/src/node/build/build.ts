@@ -26,8 +26,8 @@ export async function build(root: string = process.cwd()) {
     siteConfig,
     bundleResult,
   )
-  pagesToRender.map(({ path, outputFilename }) =>
-    debug.build(`rendering page ${path} to ${outputFilename}`),
+  pagesToRender.map(({ route, outputFilename }) =>
+    debug.build(`rendering page ${route} to ${outputFilename}`),
   )
 
   await withSpinner(
