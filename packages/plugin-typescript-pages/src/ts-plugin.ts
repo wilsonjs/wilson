@@ -1,6 +1,6 @@
 import {
   createComponentName,
-  getRouteForPage,
+  getRoutingInfo,
   isPage,
   userToPageFrontmatter,
 } from '@wilson/utils'
@@ -14,6 +14,7 @@ import addNamedStringExportPlugin from './babel-plugins/add-named-string-export'
 import extendFrontmatterPlugin from './babel-plugins/extend-frontmatter'
 import addStaticPathsPlugin from './babel-plugins/add-static-paths'
 import wrapPageComponentPlugin from './babel-plugins/wrap-page-component'
+import addTranslationsPlugin from './babel-plugins/add-translations'
 import parser from '@babel/parser'
 import type { File } from '@babel/types'
 import type { ParseResult } from '@babel/parser'
@@ -37,7 +38,9 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
     enforce: 'pre',
 
     async transform(code: string, id: string): Promise<TransformResult> {
-      if (!isPage(id, config.pagesDir, ['.tsx'])) {
+      const { defaultLanguage, languages, layoutsDir, pagesDir } = config
+
+      if (!isPage(id, pagesDir, ['.tsx'])) {
         return null
       }
 
@@ -54,17 +57,22 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
           config,
         )
         const layout = frontmatter.layout
-        const layoutPath = `${config.layoutsDir}/${layout}.tsx`
-        const relativePath = relative(config.pagesDir, id)
+        const layoutPath = `${layoutsDir}/${layout}.tsx`
+        const relativePath = relative(pagesDir, id)
         const dynamicParameterMatches = [
           ...relativePath.matchAll(/\[([^\]]+)\]/g),
         ]
-        const path = getRouteForPage(relative(config.pagesDir, id))
+        const { route, translations } = getRoutingInfo(
+          relative(pagesDir, id),
+          config,
+        )
+
         const isDynamic = dynamicParameterMatches.length > 0
         const componentName = createComponentName(relativePath)
 
         const transformResult = await transformFromAstAsync(syntaxTree, code, {
           ast: true,
+          filename: id,
           plugins: [
             [
               prependImportsPlugin,
@@ -83,6 +91,7 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
                         {
                           identifiers: [
                             { default: false, name: 'createPaginationHelper' },
+                            { default: false, name: 'replaceRouteParams' },
                           ],
                           source: 'wilson',
                         },
@@ -99,10 +108,14 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
             ],
             [
               addNamedStringExportPlugin,
-              { exportIdentifier: 'path', exportString: path },
+              { exportIdentifier: 'path', exportString: route },
             ],
+            [addTranslationsPlugin, { translations }],
             [extendFrontmatterPlugin, { frontmatter }],
-            isDynamic && [addStaticPathsPlugin, { relativePath }],
+            isDynamic && [
+              addStaticPathsPlugin,
+              { relativePath, defaultLanguage, languages },
+            ],
             [wrapPageComponentPlugin, { componentName, isDynamic }],
           ].filter(Boolean) as PluginItem[],
         })

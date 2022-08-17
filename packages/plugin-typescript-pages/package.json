@@ -11,20 +11,20 @@
   },
   "exports": {
     ".": {
-      "require": "./src/plugin.cjs",
-      "import": "./dist/plugin.js"
+      "require": "./src/ts-plugin.cjs",
+      "import": "./dist/ts-plugin.js"
     },
     "./package.json": "./package.json"
   },
-  "main": "dist/plugin.js",
-  "types": "dist/plugin.d.ts",
+  "main": "dist/ts-plugin.js",
+  "types": "dist/ts-plugin.d.ts",
   "files": [
     "dist",
     "src"
   ],
   "scripts": {
     "dev": "npm run build -- --watch",
-    "build": "tsup src/plugin.ts",
+    "build": "tsup src/ts-plugin.ts",
     "lint": "eslint .",
     "test": "c8 ava"
   },
@@ -51,6 +51,7 @@
     "@babel/traverse": "^7.18.9",
     "@babel/types": "^7.18.9",
     "@wilson/utils": "workspace:^1.0.0",
+    "fast-glob": "^3.2.11",
     "pathe": "^0.3.2",
     "prettier": "^2.7.1",
     "zod": "^3.18.0"

@@ -1,9 +1,9 @@
-import { PropsWithPagination, GetStaticPaths } from 'wilson'
+import type { PropsWithPagination, GetStaticPaths } from 'wilson'
 import { Link } from 'wouter-preact'
 import styles from './[pagination].module.scss'
 
 export const frontmatter = {
-  title: 'Blog posts',
+  title: 'Blog',
 }
 
 export const getStaticPaths: GetStaticPaths = async ({
@@ -39,7 +39,7 @@ export default function Page({
       <h1 className={styles.headline}>
         Blog
         <br />
-        <small>Last modified: {frontmatter.meta.lastUpdated}</small>
+        <small>Letzte Änderung am: {frontmatter.meta.lastUpdated}</small>
       </h1>
       <ol>
         {items.map((item) => (
@@ -48,8 +48,8 @@ export default function Page({
           </li>
         ))}
       </ol>
-      {prevPage && <Link href={prevPage}>Prev</Link>}
-      {nextPage && <Link href={nextPage}>Next</Link>}
+      {prevPage && <Link href={prevPage}>Zurück</Link>}
+      {nextPage && <Link href={nextPage}>Vor</Link>}
     </>
   )
 }

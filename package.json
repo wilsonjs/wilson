@@ -8,19 +8,14 @@
     "url": "https://github.com/codepunkt/wilson"
   },
   "scripts": {
-    "build": "FORCE_COLOR=1 turbo run build",
+    "build": "FORCE_COLOR=1 turbo run build --output-logs=new-only",
     "preview": "FORCE_COLOR=1 turbo run preview",
     "dev": "DEBUG=wilson:* FORCE_COLOR=1 turbo run dev --continue",
     "lint": "turbo run lint",
     "format": "prettier --write '**/*.{js,jsx,ts,tsx}'",
     "docs:build": "npm -C sites/docs run build",
     "docs:now": "npm -C sites/docs run now",
-    "blog": "npm run -C playground/the-vue-point dev",
-    "blog:build": "npm run -C playground/the-vue-point build",
-    "blog:now": "npm run -C playground/the-vue-point now",
-    "release": "node scripts/release",
-    "changelog": "node scripts/changelog",
-    "test": "packages/iles/bin/iles.js test"
+    "test": "FORCE_COLOR=1 turbo run test --concurrency 1"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.25.2",

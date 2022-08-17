@@ -2,7 +2,7 @@ import { existsSync } from 'fs'
 import type { SiteConfig, Island, IslandsByPath } from '@wilson/types'
 import { join } from 'pathe'
 import type { RollupOutput } from 'rollup'
-import type { RenderToStringFn } from 'src/client/app.server'
+import type { RenderToStringFn } from '../../client/app.server'
 import { withSpinner } from '../utils'
 import type { bundle } from './bundle'
 import type { PageToRender } from './pages'
@@ -40,7 +40,7 @@ export async function renderPages(
         rendertoString,
       )
       page.rendered = rendered
-      islandsByPath[page.path] = islands
+      islandsByPath[page.route] = islands
     }
   })
 
@@ -53,12 +53,12 @@ export function renderPage(
   page: PageToRender,
   rendertoString: RenderToStringFn,
 ): { rendered: string; islands: Island[] } {
-  const { html, islands, head } = rendertoString(page.path)
+  const { html, islands, head } = rendertoString(page.route)
   // TODO: links, scripts and meta
   return {
     rendered: /* html */ `
       <!DOCTYPE html>
-      <html lang="${head.lang ?? config.defaultContentLanguage}">
+      <html lang="${head.lang ?? config.defaultLanguage}">
         <head>
           ${stylesheetTagsFrom(config, clientChunks)}
           <title>${head.title ?? config.site.title}</title>

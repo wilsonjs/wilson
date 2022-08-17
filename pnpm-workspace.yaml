@@ -1,10 +1,11 @@
 packages:
   - packages/babel-plugin-island-path
+  - packages/client-utils
   - packages/island-hydration
   - packages/plugin-markdown-pages
   - packages/plugin-typescript-pages
   - packages/types
   - packages/utils
   - packages/wilson
-  - sites/docs
+  # - sites/docs
   - sites/codepunkt.de

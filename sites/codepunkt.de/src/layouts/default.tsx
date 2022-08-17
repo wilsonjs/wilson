@@ -1,7 +1,10 @@
-import type { RenderableProps } from 'preact'
+import { StaticPageProps } from 'wilson'
 import { Link } from 'wouter-preact'
 
-export default function DefaultLayout({ children }: RenderableProps<{}>) {
+export default function DefaultLayout({
+  children,
+  translations,
+}: StaticPageProps) {
   return (
     <>
       <header>
@@ -10,6 +13,16 @@ export default function DefaultLayout({ children }: RenderableProps<{}>) {
         <Link href="/blog">Blog</Link>
       </header>
       <main>{children}</main>
+      <footer>
+        <ul>
+          {translations &&
+            translations.map((t) => (
+              <li>
+                <Link href={t.route}>{t.title}</Link>{' '}
+              </li>
+            ))}
+        </ul>
+      </footer>
     </>
   )
 }

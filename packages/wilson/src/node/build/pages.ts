@@ -3,7 +3,7 @@ import type {
   SiteConfig,
   StaticPageExports,
 } from '@wilson/types'
-import { isDynamicPagePath } from '@wilson/utils'
+import { getRoutingInfo, isDynamicPagePath } from '@wilson/utils'
 import glob from 'fast-glob'
 import { join, relative } from 'pathe'
 import { createPaginationHelper } from '..'
@@ -13,7 +13,7 @@ import { getOutputFilename } from './bundle'
  * A page that is about to be rendered to a static .html file.
  */
 export interface PageToRender {
-  path: string
+  route: string
   outputFilename: string
   rendered: string
 }
@@ -38,41 +38,43 @@ function pathToFilename(cleanedPath: string) {
  * Will have single entries for static pages, and multiple entries for dynamic pages
  * depending on the return values of their `getStaticPaths` implementation.
  */
-export async function getPagesToRender({
-  pagesDir,
-}: SiteConfig): Promise<PageToRender[]> {
-  const files = await glob(join(pagesDir, `**/*.{md,tsx}`))
+export async function getPagesToRender(
+  config: SiteConfig,
+): Promise<PageToRender[]> {
+  const files = await glob(join(config.pagesDir, `**/*.{md,tsx}`))
   const pagesToRender = []
 
   for (const absolutePath of files) {
-    const relativePath = relative(pagesDir, absolutePath)
-    const path =
-      '/' +
-      relativePath
-        .replace(/\.[^.]+$/, '')
-        .replace(/index$/, '')
-        .replace(/\/$/, '')
-    const isDynamic = isDynamicPagePath(path)
+    const relativePath = relative(config.pagesDir, absolutePath)
+    const { route } = getRoutingInfo(relativePath, {
+      ...config,
+      replaceParams: false,
+    })
+    const isDynamic = isDynamicPagePath(route)
 
     if (isDynamic) {
       const { getStaticPaths } = await getPageExports<DynamicPageExports>(
         absolutePath,
-        pagesDir,
+        config.pagesDir,
       )
-      const paginate = createPaginationHelper(relativePath)
+      const paginate = createPaginationHelper(
+        relativePath,
+        config.defaultLanguage,
+        config.languages,
+      )
       const staticPaths = (
         await getStaticPaths({
           paginate,
           getPages: () => [],
         })
       ).map(({ params }) => {
-        let url = path
+        let url = route
         Object.entries(params).forEach(([key, value]) => {
           url = url.replace(new RegExp(`\\[${key}\\]`, 'g'), value)
         })
         const outputFilename = pathToFilename(url)
         return {
-          path: url.replace(/\/$/, ''),
+          route: url.replace(/\/$/, ''),
           outputFilename,
           rendered: '',
         }
@@ -80,9 +82,9 @@ export async function getPagesToRender({
 
       pagesToRender.push(...staticPaths)
     } else {
-      const outputFilename = pathToFilename(path)
+      const outputFilename = pathToFilename(route)
       pagesToRender.push({
-        path,
+        route,
         outputFilename,
         rendered: '',
       })

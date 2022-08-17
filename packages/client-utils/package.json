@@ -1,5 +1,5 @@
 {
-  "name": "@wilson/utils",
+  "name": "@wilson/client-utils",
   "type": "module",
   "version": "1.0.0",
   "author": "Christoph Werner <christoph@codepunkt.de>",
@@ -7,24 +7,24 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/codepunkt/wilson",
-    "directory": "packages/utils"
+    "directory": "packages/client-utils"
   },
   "exports": {
     ".": {
-      "require": "./src/utils.cjs",
-      "import": "./dist/utils.js"
+      "require": "./src/index.cjs",
+      "import": "./dist/index.js"
     },
     "./package.json": "./package.json"
   },
-  "main": "dist/utils.js",
-  "types": "dist/utils.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist",
     "src"
   ],
   "scripts": {
     "dev": "npm run build -- --watch",
-    "build": "tsup src/utils.ts",
+    "build": "tsup src/index.ts",
     "lint": "eslint .",
     "test": "c8 ava"
   },
@@ -36,10 +36,5 @@
     "c8": "^7.12.0",
     "sinon": "^14.0.0",
     "tsup": "^6.1.3"
-  },
-  "dependencies": {
-    "@wilson/client-utils": "workspace:^1.0.0",
-    "fast-glob": "^3.2.11",
-    "pathe": "^0.3.2"
   }
 }

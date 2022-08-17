@@ -11,20 +11,20 @@
   },
   "exports": {
     ".": {
-      "require": "./src/plugin.cjs",
-      "import": "./dist/plugin.js"
+      "require": "./src/md-plugin.cjs",
+      "import": "./dist/md-plugin.js"
     },
     "./package.json": "./package.json"
   },
-  "main": "dist/plugin.js",
-  "types": "dist/plugin.d.ts",
+  "main": "dist/md-plugin.js",
+  "types": "dist/md-plugin.d.ts",
   "files": [
     "dist",
     "src"
   ],
   "scripts": {
     "dev": "npm run build -- --watch",
-    "build": "tsup src/plugin.ts",
+    "build": "tsup src/md-plugin.ts",
     "lint": "eslint ."
   },
   "devDependencies": {

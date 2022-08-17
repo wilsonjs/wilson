@@ -50,6 +50,7 @@
     "@nuxt/devalue": "^2.0.0",
     "@preact/preset-vite": "^2.3.0",
     "@wilson/babel-plugin-island-path": "workspace:^1.0.0",
+    "@wilson/client-utils": "workspace:^1.0.0",
     "@wilson/island-hydration": "workspace:^1.0.0",
     "@wilson/plugin-markdown-pages": "workspace:^1.0.0",
     "@wilson/plugin-typescript-pages": "workspace:^1.0.0",
