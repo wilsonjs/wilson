@@ -9,7 +9,7 @@ let exportDefault: types.ExportDefaultDeclaration
 const pluginOptions = z.object({
   componentName: z.string(),
   isDynamic: z.boolean(),
-  currentLanguage: z.string(),
+  language: z.string(),
 })
 
 export default function wrapPageComponentPlugin(): PluginObj<{
@@ -189,8 +189,8 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                           true,
                         ),
                         types.objectProperty(
-                          types.identifier('currentLanguage'),
-                          types.stringLiteral(opts.currentLanguage),
+                          types.identifier('language'),
+                          types.stringLiteral(opts.language),
                           false,
                           true,
                         ),
@@ -272,8 +272,8 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                           true,
                         ),
                         types.objectProperty(
-                          types.identifier('currentLanguage'),
-                          types.stringLiteral(opts.currentLanguage),
+                          types.identifier('language'),
+                          types.stringLiteral(opts.language),
                           false,
                           true,
                         ),

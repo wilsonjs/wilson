@@ -70,7 +70,7 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
 
         const isDynamic = dynamicParameterMatches.length > 0
         const componentName = createComponentName(relativePath)
-        const currentLanguage =
+        const language =
           getLanguage(
             id,
             config.languages.map(([id]) => id),
@@ -122,10 +122,7 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
               addStaticPathsPlugin,
               { relativePath, defaultLanguage, languages },
             ],
-            [
-              wrapPageComponentPlugin,
-              { componentName, currentLanguage, isDynamic },
-            ],
+            [wrapPageComponentPlugin, { componentName, language, isDynamic }],
           ].filter(Boolean) as PluginItem[],
         })
 

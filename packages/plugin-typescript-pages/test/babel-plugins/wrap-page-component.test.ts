@@ -36,10 +36,7 @@ test('throws when invoked with invalid options', async (t) => {
   await t.notThrowsAsync(
     transformAsync('export default function Page() {}', {
       plugins: [
-        [
-          plugin,
-          { componentName: 'Foo', currentLanguage: 'en', isDynamic: true },
-        ],
+        [plugin, { componentName: 'Foo', language: 'en', isDynamic: true }],
       ],
     }),
   )
@@ -49,10 +46,7 @@ test('throws without default export', async (t) => {
   await t.throwsAsync(
     transformAsync(`const foo = [];`, {
       plugins: [
-        [
-          plugin,
-          { componentName: 'Foo', currentLanguage: 'en', isDynamic: true },
-        ],
+        [plugin, { componentName: 'Foo', language: 'en', isDynamic: true }],
       ],
     }),
     {
@@ -67,10 +61,7 @@ test('throws when default export is not a function', async (t) => {
   await t.throwsAsync(
     transformAsync(`export default []`, {
       plugins: [
-        [
-          plugin,
-          { componentName: 'Foo', currentLanguage: 'en', isDynamic: true },
-        ],
+        [plugin, { componentName: 'Foo', language: 'en', isDynamic: true }],
       ],
     }),
     {
@@ -85,10 +76,7 @@ test('wraps exported page', async (t) => {
     {
       plugins: [
         '@babel/plugin-syntax-jsx',
-        [
-          plugin,
-          { componentName: 'Static', currentLanguage: 'en', isDynamic: false },
-        ],
+        [plugin, { componentName: 'Static', language: 'en', isDynamic: false }],
       ],
     },
   )
@@ -99,10 +87,7 @@ test('wraps exported page', async (t) => {
     {
       plugins: [
         '@babel/plugin-syntax-jsx',
-        [
-          plugin,
-          { componentName: 'Dynamic', currentLanguage: 'en', isDynamic: true },
-        ],
+        [plugin, { componentName: 'Dynamic', language: 'en', isDynamic: true }],
       ],
     },
   )
