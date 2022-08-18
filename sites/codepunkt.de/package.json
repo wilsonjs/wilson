@@ -19,6 +19,7 @@
     "directory": "sites/docs"
   },
   "dependencies": {
+    "@babel/plugin-transform-react-jsx": "^7.18.10",
     "@preact/preset-vite": "^2.3.0",
     "@wilson/babel-plugin-island-path": "workspace:^1.0.0",
     "@wilson/island-hydration": "workspace:^1.0.0",

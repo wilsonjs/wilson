@@ -17,7 +17,7 @@
     "jsxImportSource": "preact",
 
     "lib": ["ESNext", "DOM"],
-    "types": ["node", "vitest", "vite/client"]
+    "types": ["node", "vite/client"]
   },
   "include": ["src", "tests", "types", "client.d.ts"]
 }
