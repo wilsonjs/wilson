@@ -108,7 +108,7 @@ export default function markdownPagesPlugin(config: SiteConfig): PluginOption {
       const layoutPath = `${config.layoutsDir}/${layout}.tsx`
       const { route, translations } = getRoutingInfo(relativePath, config)
       const componentName = createComponentName(relativePath)
-      const currentLanguage =
+      const language =
         getLanguage(
           id,
           config.languages.map(([id]) => id),
@@ -119,11 +119,12 @@ export default function markdownPagesPlugin(config: SiteConfig): PluginOption {
         import Layout from '${layoutPath}';
 
         export const path = '${route}';
+        export const language = '${language}';
         export const frontmatter = ${JSON.stringify(frontmatter)};
         const props = {
           frontmatter,
           path,
-          currentLanguage: '${currentLanguage}',
+          language: '${language}',
           translations: ${JSON.stringify(translations)}
         };
 

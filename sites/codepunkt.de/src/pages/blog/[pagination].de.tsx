@@ -1,4 +1,8 @@
-import type { PropsWithPagination, GetStaticPaths } from 'wilson'
+import type {
+  PropsWithPagination,
+  GetStaticPaths,
+  PageFrontmatter,
+} from 'wilson'
 import { Link } from 'wouter-preact'
 import styles from './[pagination].module.scss'
 
@@ -10,18 +14,24 @@ export const getStaticPaths: GetStaticPaths = async ({
   getPages,
   paginate,
 }) => {
-  // const pages = getPages('blog')
   const pages = Object.values(
     import.meta.glob<{
+      language: string
+      frontmatter: PageFrontmatter
       path: string
-      frontmatter: {}
     }>('/src/pages/blog/**/*.md', {
       eager: true,
     }),
-  ).map(({ path, frontmatter }) => ({
-    frontmatter,
-    href: path,
-  }))
+  )
+    .map(({ language, frontmatter, path }) => {
+      return language === 'de'
+        ? {
+            frontmatter,
+            href: path,
+          }
+        : null
+    })
+    .filter(Boolean)
   return paginate(pages, {
     pageSize: 3,
     format: (no: number) => (no === 1 ? '' : `page-${no}`),

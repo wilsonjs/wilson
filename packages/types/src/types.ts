@@ -239,7 +239,7 @@ interface BaseProps {
   path: string
   url: string
   frontmatter: PageFrontmatter
-  currentLanguage: string
+  language: string
   translations: Translation[]
 }
 

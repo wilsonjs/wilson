@@ -50,11 +50,13 @@ interface Route {
 }
 
 const routes: Route[] = Object.entries(pages)
-  .map(([file, { path, default: Page }]) => ({
-    importPath: file,
-    component: Page,
-    props: { path },
-  }))
+  .map(([file, { path, default: Page }]) => {
+    return {
+      importPath: file,
+      component: Page,
+      props: { path },
+    }
+  })
   .sort(byPathSegmentsAndDynamicParams)
 
 if (!import.meta.env.SSR)

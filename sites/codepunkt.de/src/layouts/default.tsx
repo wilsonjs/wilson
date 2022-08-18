@@ -8,15 +8,15 @@ function languageLink(href: string, lang: string): string {
 
 export default function DefaultLayout({
   children,
-  currentLanguage,
+  language,
   translations,
 }: StaticPageProps) {
   return (
     <>
       <header>
-        <Link href={languageLink('/', currentLanguage)}>Home</Link>
+        <Link href={languageLink('/', language)}>Home</Link>
         <Link href="/islands">Islands</Link>
-        <Link href={languageLink('/blog', currentLanguage)}>Blog</Link>
+        <Link href={languageLink('/blog', language)}>Blog</Link>
       </header>
       <main>{children}</main>
       <footer>
@@ -27,9 +27,7 @@ export default function DefaultLayout({
                 <Link
                   href={t.route}
                   class={styles.translation}
-                  aria-current={
-                    t.languageId === currentLanguage ? 'page' : false
-                  }
+                  aria-current={t.languageId === language ? 'page' : false}
                 >
                   {t.languageName}
                 </Link>
