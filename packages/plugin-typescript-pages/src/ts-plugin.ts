@@ -7,6 +7,7 @@ import {
 import type { Plugin } from 'vite'
 import type { TransformResult } from 'rollup'
 import type { SiteConfig, UserFrontmatter } from '@wilson/types'
+import { getLanguage } from '@wilson/client-utils'
 import { PluginItem, transformFromAstAsync } from '@babel/core'
 import parseFrontmatterPlugin from './babel-plugins/parse-frontmatter'
 import prependImportsPlugin from './babel-plugins/prepend-imports'
@@ -69,6 +70,11 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
 
         const isDynamic = dynamicParameterMatches.length > 0
         const componentName = createComponentName(relativePath)
+        const currentLanguage =
+          getLanguage(
+            id,
+            config.languages.map(([id]) => id),
+          ) ?? config.defaultLanguage
 
         const transformResult = await transformFromAstAsync(syntaxTree, code, {
           ast: true,
@@ -116,7 +122,10 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
               addStaticPathsPlugin,
               { relativePath, defaultLanguage, languages },
             ],
-            [wrapPageComponentPlugin, { componentName, isDynamic }],
+            [
+              wrapPageComponentPlugin,
+              { componentName, currentLanguage, isDynamic },
+            ],
           ].filter(Boolean) as PluginItem[],
         })
 

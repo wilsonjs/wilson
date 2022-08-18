@@ -164,7 +164,7 @@ function siteConfigDefaults(
     pageExtensions: ['.md', '.tsx'],
     site: defaultSiteMeta,
     defaultLanguage: 'en',
-    languages: {},
+    languages: [],
     vite: viteConfigDefaults(root),
     extendFrontmatter(filename, frontmatter) {
       return frontmatter
@@ -195,10 +195,18 @@ export async function resolveConfig(
     islandsDir: resolve(srcDir, config.islandsDir),
   })
 
-  const languageIds = Object.keys(config.languages)
-  if (languageIds.length === 1) {
+  if (config.languages.length === 1) {
     throw new Error(
-      `Defining languages is useful from 2 languages on upwards, yet you only defined 1: ${languageIds[0]}`,
+      `Defining languages is useful from 2 languages on upwards, yet you only defined 1: ${config.languages[0]}`,
+    )
+  }
+
+  if (
+    Array.from(new Set(config.languages.map(([id]) => id))).length !==
+    config.languages.length
+  ) {
+    throw new Error(
+      `Illegal language definition: Same identifer found more than once!`,
     )
   }
 

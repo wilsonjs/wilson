@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@mapbox/hast-util-to-jsx": "^2.0.0",
+    "@wilson/client-utils": "workspace:^1.0.0",
     "@wilson/utils": "workspace:^1.0.0",
     "debug": "^4.3.4",
     "gray-matter": "^4.0.3",

@@ -16,7 +16,7 @@ export default function getRoutingInfo(
     pagesDir: string
     replaceParams?: boolean
   },
-): { route: string; translations: Set<Translation> } {
+): { route: string; translations: Translation[] } {
   const { defaultLanguage, languages, pagesDir, replaceParams = true } = options
 
   const route = getRoute(relativePath, {

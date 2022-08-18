@@ -27,7 +27,7 @@ test('throws when getStaticPaths is missing or not exported', async (t) => {
           {
             relativePath: 'blog/[pagination].tsx',
             defaultLanguage: 'en',
-            languages: {},
+            languages: [],
           },
         ],
       ],
@@ -43,7 +43,7 @@ test('throws when getStaticPaths is missing or not exported', async (t) => {
           {
             relativePath: 'blog/[pagination].tsx',
             defaultLanguage: 'en',
-            languages: {},
+            languages: [],
           },
         ],
       ],
@@ -62,11 +62,11 @@ test('adds staticPaths after getStaticPaths', async (t) => {
           {
             relativePath: 'blog/[pagination].tsx',
             defaultLanguage: 'en',
-            languages: {
-              de: { title: 'Deutsch' },
-              en: { title: 'Englisch' },
-              fr: { title: 'Français' },
-            },
+            languages: [
+              ['de', { languageName: 'Deutsch' }],
+              ['en', { languageName: 'English' }],
+              ['fr', { languageName: 'Français' }],
+            ],
           },
         ],
       ],

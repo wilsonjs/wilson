@@ -10,14 +10,13 @@ export default function getTranslations(
     languages: Languages
     pagesDir: string
   },
-): Set<Translation> {
+): Translation[] {
   const { defaultLanguage, languages, pagesDir } = options
-  const languageIds = Object.keys(languages)
+  const languageIds = languages.map(([id]) => id)
   const language = getLanguage(relativePath, languageIds)
-  const result = new Set<Translation>()
 
   if (language === undefined) {
-    return result
+    return []
   }
 
   const globPattern = relativePath.replace(
@@ -26,19 +25,33 @@ export default function getTranslations(
   )
   const files = glob.sync(join(pagesDir, globPattern))
 
-  const translations = files
+  const translationsInGlobOrder = files
     .map((translation) => {
       const lang = getLanguage(translation, languageIds)!
 
       if (languageIds.includes(lang)) {
         const getRouteOpts = { defaultLanguage, languages }
         const route = getRoute(relative(pagesDir, translation), getRouteOpts)
-        return { route, title: languages[lang].title }
+        return {
+          route,
+          languageId: lang,
+          languageName: languages.find(([id]) => id === lang)![1].languageName,
+        }
       }
 
       return null
     })
     .filter(Boolean) as Translation[]
 
-  return new Set(translations)
+  const translations: Translation[] = []
+
+  // sort into languages configuration order
+  for (const id of languageIds) {
+    const matchingTranslation = translationsInGlobOrder.find(
+      (t) => t.languageId === id,
+    )
+    translations.push(...(matchingTranslation ? [matchingTranslation] : []))
+  }
+
+  return translations
 }

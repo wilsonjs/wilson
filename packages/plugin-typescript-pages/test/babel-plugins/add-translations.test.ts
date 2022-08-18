@@ -19,14 +19,14 @@ test('throws when invoked with invalid options', async (t) => {
 
   await t.throwsAsync(
     transformAsync(`export const frontmatter = {}`, {
-      plugins: [[plugin, { translations: [] }]],
+      plugins: [[plugin, { translations: 'hello' }]],
     }),
     { message: new RegExp('Invalid plugin options') },
   )
 
   await t.notThrowsAsync(
     transformAsync(`const getStaticPaths = () => {}`, {
-      plugins: [[plugin, { translations: new Set() }]],
+      plugins: [[plugin, { translations: [] }]],
     }),
   )
 })
@@ -34,7 +34,7 @@ test('throws when invoked with invalid options', async (t) => {
 test('throws when translations identifier already exists', async (t) => {
   await t.throwsAsync(
     transformAsync(`function translations() {}`, {
-      plugins: [[plugin, { translations: new Set() }]],
+      plugins: [[plugin, { translations: [] }]],
     }),
     {
       message: new RegExp(
@@ -52,11 +52,11 @@ test('adds translations array', async (t) => {
         [
           plugin,
           {
-            translations: new Set([
-              { route: '/', title: 'Englisch' },
-              { route: '/de', title: 'Deutsch' },
-              { route: '/fr', title: 'Français' },
-            ]),
+            translations: [
+              { route: '/', languageName: 'Englisch', languageId: 'en' },
+              { route: '/de', languageName: 'Deutsch', languageId: 'de' },
+              { route: '/fr', languageName: 'Français', languageId: 'fr' },
+            ],
           },
         ],
       ],

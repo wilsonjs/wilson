@@ -46,7 +46,7 @@ export default function getRoute(
   },
 ): string {
   const { defaultLanguage, languages, replaceParams = true } = options
-  const languageIds = Object.keys(languages)
+  const languageIds = languages.map(([id]) => id)
 
   const extension = relativePath.slice(relativePath.lastIndexOf('.'))
   const path =

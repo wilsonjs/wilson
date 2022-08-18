@@ -1,0 +1,6 @@
+.translation {
+  text-decoration: none;
+  &[aria-current='page'] {
+    color: green;
+  }
+}

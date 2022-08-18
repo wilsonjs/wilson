@@ -18,6 +18,7 @@ import {
   getRoutingInfo,
   userToPageFrontmatter,
 } from '@wilson/utils'
+import { getLanguage } from '@wilson/client-utils'
 
 /** Result of parsing markdown source code with frontmatter */
 type MarkdownParseResult = {
@@ -107,6 +108,11 @@ export default function markdownPagesPlugin(config: SiteConfig): PluginOption {
       const layoutPath = `${config.layoutsDir}/${layout}.tsx`
       const { route, translations } = getRoutingInfo(relativePath, config)
       const componentName = createComponentName(relativePath)
+      const currentLanguage =
+        getLanguage(
+          id,
+          config.languages.map(([id]) => id),
+        ) ?? config.defaultLanguage
 
       const newCode = /* tsx */ `
         import { useTitle } from 'hoofd/preact';
@@ -114,9 +120,12 @@ export default function markdownPagesPlugin(config: SiteConfig): PluginOption {
 
         export const path = '${route}';
         export const frontmatter = ${JSON.stringify(frontmatter)};
-        const props = { frontmatter, path, translations: ${JSON.stringify(
-          Array.from(translations),
-        )} };
+        const props = {
+          frontmatter,
+          path,
+          currentLanguage: '${currentLanguage}',
+          translations: ${JSON.stringify(translations)}
+        };
 
         function Title() {
           useTitle(frontmatter.title);

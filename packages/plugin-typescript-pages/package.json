@@ -50,6 +50,7 @@
     "@babel/template": "^7.18.10",
     "@babel/traverse": "^7.18.9",
     "@babel/types": "^7.18.9",
+    "@wilson/client-utils": "workspace:^1.0.0",
     "@wilson/utils": "workspace:^1.0.0",
     "fast-glob": "^3.2.11",
     "pathe": "^0.3.2",

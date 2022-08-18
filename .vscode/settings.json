@@ -6,8 +6,7 @@
     "**/coverage": true,
     "**/dist": true,
     "**/node_modules": true,
-    "**/snapshots": true,
-    "**/test": true
+    "**/snapshots": true
   },
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": ["source.fixAll"],

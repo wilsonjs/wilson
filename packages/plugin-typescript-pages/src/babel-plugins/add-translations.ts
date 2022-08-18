@@ -4,7 +4,13 @@ import z from 'zod'
 import validateOptions from '../util/validate-options'
 
 const pluginOptions = z.object({
-  translations: z.set(z.object({ route: z.string(), title: z.string() })),
+  translations: z.array(
+    z.object({
+      route: z.string(),
+      languageName: z.string(),
+      languageId: z.string(),
+    }),
+  ),
 })
 
 export default function addTranslationsPlugin(): PluginObj<{
@@ -35,8 +41,12 @@ export default function addTranslationsPlugin(): PluginObj<{
                       types.stringLiteral(translation.route),
                     ),
                     types.objectProperty(
-                      types.identifier('title'),
-                      types.stringLiteral(translation.title),
+                      types.identifier('languageName'),
+                      types.stringLiteral(translation.languageName),
+                    ),
+                    types.objectProperty(
+                      types.identifier('languageId'),
+                      types.stringLiteral(translation.languageId),
                     ),
                   ])
                 }),

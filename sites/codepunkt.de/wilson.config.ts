@@ -7,10 +7,10 @@ export default {
     description: 'Something something',
   },
   defaultContentLanguage: 'en',
-  languages: {
-    en: { title: 'English' },
-    de: { title: 'Deutsch' },
-  },
+  languages: [
+    ['en', { languageName: 'English' }],
+    ['de', { languageName: 'Deutsch' }],
+  ],
   extendFrontmatter(filename, frontmatter) {
     // frontmatter.layout = 'default'
   },

@@ -89,17 +89,20 @@ export interface UserConfig {
   ) => Awaitable<UserFrontmatter | void>
 }
 
-export type Languages = Record<
-  string,
-  {
-    title: string
-    [key: string]: any
-  }
+export type Languages = Array<
+  [
+    identifier: string,
+    config: {
+      languageName: string
+      [key: string]: any
+    },
+  ]
 >
 
 export type Translation = {
   route: string
-  title: string
+  languageId: string
+  languageName: string
 }
 
 /**
@@ -236,6 +239,7 @@ interface BaseProps {
   path: string
   url: string
   frontmatter: PageFrontmatter
+  currentLanguage: string
   translations: Translation[]
 }
 

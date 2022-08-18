@@ -1,24 +1,38 @@
-import { StaticPageProps } from 'wilson'
 import { Link } from 'wouter-preact'
+import type { StaticPageProps } from 'wilson'
+import styles from './default.module.scss'
+
+function languageLink(href: string, lang: string): string {
+  return lang === 'en' ? href : `/${lang}${href}`.replace(/\/$/, '')
+}
 
 export default function DefaultLayout({
   children,
+  currentLanguage,
   translations,
 }: StaticPageProps) {
   return (
     <>
       <header>
-        <Link href="/">Home</Link>
+        <Link href={languageLink('/', currentLanguage)}>Home</Link>
         <Link href="/islands">Islands</Link>
-        <Link href="/blog">Blog</Link>
+        <Link href={languageLink('/blog', currentLanguage)}>Blog</Link>
       </header>
       <main>{children}</main>
       <footer>
-        <ul>
+        <ul class={styles.translations}>
           {translations &&
             translations.map((t) => (
-              <li>
-                <Link href={t.route}>{t.title}</Link>{' '}
+              <li key={t.languageId}>
+                <Link
+                  href={t.route}
+                  class={styles.translation}
+                  aria-current={
+                    t.languageId === currentLanguage ? 'page' : false
+                  }
+                >
+                  {t.languageName}
+                </Link>
               </li>
             ))}
         </ul>
