@@ -24,7 +24,7 @@
     "fast-equals": "^4.0.1",
     "hoofd": "1.5.2",
     "preact": "^10.10.0",
-    "vite": "3.0.0",
+    "vite": "3.0.8",
     "wilson": "workspace:^1.0.0"
   }
 }
