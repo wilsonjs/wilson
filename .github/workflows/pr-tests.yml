@@ -11,6 +11,7 @@ on:
       - 'pnpm-workspace.yaml'
       - 'package.json'
       - 'turbo.json'
+      - '.github/workflows/pr-tests.yml'
   workflow_dispatch:
 
 jobs:
