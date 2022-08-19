@@ -15,8 +15,8 @@ export default function DefaultLayout({
     <>
       <header>
         <Link href={languageLink('/', language)}>Home</Link>
-        <Link href="/islands">Islands</Link>
         <Link href={languageLink('/blog', language)}>Blog</Link>
+        <Link href={languageLink('/about', language)}>About</Link>
       </header>
       <main>{children}</main>
       <footer>
