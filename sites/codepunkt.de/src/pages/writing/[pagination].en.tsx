@@ -19,7 +19,7 @@ export const getStaticPaths: GetStaticPaths = async ({
       language: string
       frontmatter: PageFrontmatter
       path: string
-    }>('/src/pages/blog/**/*.md', {
+    }>('/src/pages/writing/**/*.md', {
       eager: true,
     }),
   )
@@ -32,6 +32,7 @@ export const getStaticPaths: GetStaticPaths = async ({
         : null
     })
     .filter(Boolean)
+  console.log(pages)
   return paginate(pages, {
     pageSize: 3,
     format: (no: number) => (no === 1 ? '' : `page-${no}`),
