@@ -1,6 +1,269 @@
-.translation {
-  text-decoration: none;
-  &[aria-current='page'] {
-    color: green;
+@use 'sass:color';
+@import '../assets/mixins.scss';
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  padding: 0 var(--content-padding);
+  height: var(--header-height);
+}
+
+.logoLink {
+  z-index: 3;
+
+  &::after {
+    content: none;
   }
+}
+
+.logo {
+  height: var(--logo-height);
+  margin-top: calc(var(--logo-height) / 3);
+  margin-left: 4px;
+
+  margin-right: -110px;
+  @include responsive(sm) {
+    margin-right: 0;
+  }
+
+  [class~='wordmark'] {
+    color: var(--color-logo);
+    fill: currentColor;
+
+    display: none;
+    @include responsive(sm) {
+      display: inline;
+    }
+  }
+
+  [class~='logomark'] {
+    circle {
+      stroke: #286b10;
+      [data-mode='dark'] & {
+        stroke: #fff;
+      }
+    }
+    path:nth-child(2) {
+      fill: #9cc888;
+      [data-mode='dark'] & {
+        fill: #703ea0;
+      }
+    }
+    path:nth-child(3) {
+      fill: #338640;
+      [data-mode='dark'] & {
+        fill: #ad58ff;
+      }
+    }
+  }
+}
+
+.main {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 8rem var(--content-padding) 0;
+  display: block;
+}
+
+.footer {
+  border-top: 1px solid #c0d7bc;
+  margin-top: 128px;
+  padding: 6rem 0 3rem 0;
+
+  [data-mode='dark'] & {
+    border-top-color: #3f4355;
+  }
+
+  a {
+    color: inherit;
+
+    &:focus,
+    &:hover,
+    &:active {
+      color: var(--color-text);
+      outline: none;
+    }
+
+    &::after {
+      bottom: -4px;
+    }
+  }
+}
+
+.footerContent {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 var(--content-padding);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  column-gap: 1rem;
+  @include responsive(sm) {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+  @include responsive(md) {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+}
+
+.about {
+  font-size: 1rem;
+  color: var(--color-text-light);
+  margin-bottom: 2rem;
+  grid-column: 1 / span 5;
+  grid-row: 1 / span 1;
+
+  @include responsive(xs) {
+    grid-column: 1 / span 3;
+    grid-row: 1 / span 2;
+  }
+  @include responsive(sm) {
+    grid-column: span 3 / span 4;
+  }
+  @include responsive(md) {
+    grid-column: span 4 / span 4;
+  }
+
+  a::after {
+    content: none !important;
+  }
+}
+
+.aboutHeader {
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--color-text);
+}
+
+.translations,
+.sitemap {
+  grid-column: 1 / -1;
+  font-size: 0.8rem;
+  color: var(--color-text-light);
+  margin-bottom: 2rem;
+
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    margin-bottom: 0.4rem;
+  }
+}
+
+.translations {
+  grid-row-start: 2;
+  grid-column-start: 1;
+  @include responsive(xs) {
+    grid-row-start: 1;
+    grid-column-start: 5;
+  }
+  @include responsive(sm) {
+    grid-column-start: 5;
+  }
+  @include responsive(md) {
+    grid-column-start: 7;
+  }
+}
+
+.sitemap {
+  grid-row-start: 3;
+  grid-column-start: 1;
+  @include responsive(xs) {
+    grid-row-start: 2;
+    grid-column-start: 5;
+  }
+  @include responsive(sm) {
+    grid-row-start: 1;
+    grid-column-start: 7;
+  }
+  @include responsive(md) {
+    grid-column-start: 10;
+  }
+}
+
+.translationsHeader,
+.sitemapHeader {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--color-text);
+}
+
+.copyright {
+  color: var(--color-text-light);
+  font-size: 0.8rem;
+  grid-column: 1 / -1;
+  margin-top: 2rem;
+}
+
+.socialList {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-left: -8px !important;
+}
+
+.socialElement {
+  background: var(--color-bg);
+  position: relative;
+}
+
+.socialLink {
+  display: flex;
+  padding: 8px;
+  margin-right: 2px;
+
+  &::after {
+    content: none;
+  }
+}
+
+@mixin social-icon {
+  width: 1.3rem;
+  height: 1.3rem;
+  margin: 0;
+}
+
+@mixin fill-on-interaction($color) {
+  a:focus & path,
+  a:hover & path,
+  a:active & path {
+    fill: $color;
+  }
+}
+
+.socialTwitter,
+.socialGithub,
+.socialInstagram,
+.socialLinkedin,
+.socialEmail {
+  @include social-icon;
+  path {
+    fill: var(--color-text-light);
+  }
+}
+
+.socialTwitter {
+  @include fill-on-interaction(#00acee);
+}
+
+.socialGithub,
+.socialEmail {
+  @include fill-on-interaction(#bd2c00);
+}
+
+.socialInstagram {
+  @include fill-on-interaction(#8134af);
+}
+
+.socialLinkedin {
+  @include fill-on-interaction(#0e76a8);
 }
