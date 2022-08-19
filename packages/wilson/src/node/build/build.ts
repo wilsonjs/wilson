@@ -40,6 +40,6 @@ export async function build(root: string = process.cwd()) {
     async () => await writePages(siteConfig, pagesToRender, islandsByPath),
   )
 
-  // rmDir(siteConfig.tempDir)
+  rmDir(siteConfig.tempDir)
   console.info(`build complete in ${timeSince(startTime)}.`)
 }
