@@ -1,7 +1,8 @@
 ---
-draft: false
 title: How to set up syntax highlighting for Gatsby
 date: 2020-10-07
+layout: markdown
+draft: false
 description: We're analyzing the benefits of build-time solutions compared to run-time syntax highlighting libraries and showcase a list of the best Gatsby plugins for this purpose.
 taxonomies:
   categories:

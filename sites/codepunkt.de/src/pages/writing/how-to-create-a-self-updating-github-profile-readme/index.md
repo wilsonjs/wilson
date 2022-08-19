@@ -1,7 +1,8 @@
 ---
-draft: false
 title: How to create a self-updating GitHub profile README
 date: 2021-03-04
+layout: markdown
+draft: false
 description: Profile READMEs are a new GitHub feature that allows user-defined content to be displayed on top of your GitHub profile page. This article explains how to create a basic README, shows few beautiful examples and explains how I've built mine to automatically update with my latest blog posts.
 taxonomies:
   categories:
