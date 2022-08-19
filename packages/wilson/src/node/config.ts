@@ -123,6 +123,17 @@ function viteConfigDefaults(root: string): ViteOptions {
       exclude: [],
     },
     esbuild: {
+      /**
+       * @preact/preset-vite uses @babel/plugin-transform-react-jsx to
+       * transform jsx. this leads to esbuild warnings in development mode:
+       *
+       *    Top-level "this" will be replaced with undefined since this file
+       *    is an ECMAScript module
+       *
+       * To hide these, we use the `logOverride` option of esbuild.
+       * @see https://github.com/vitejs/vite/issues/8644
+       */
+      logOverride: { 'this-is-undefined-in-esm': 'silent' },
       jsxInject: "import { h, Fragment } from 'preact'",
       jsxFactory: 'h',
       jsxFragment: 'Fragment',
