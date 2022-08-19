@@ -8,6 +8,8 @@ import inspect from 'vite-plugin-inspect'
 import { configureMiddleware, createServer } from './server'
 import markdownPagesPlugin from '@wilson/plugin-markdown-pages'
 import typescriptPagesPlugin from '@wilson/plugin-typescript-pages'
+import type { LoadResult } from 'rollup'
+import { promises as fs } from 'fs'
 
 /**
  * Watches wilson config and restarts dev server when it changes.
@@ -83,6 +85,40 @@ function htmlFallback(config: SiteConfig): Plugin {
   }
 }
 
+import { transform as transformSVG } from '@svgr/core'
+import { transform } from 'sucrase'
+export const transformJsx = (code: string): string => {
+  return transform(code, {
+    transforms: ['jsx', 'typescript'],
+    production: true,
+    jsxPragma: 'h',
+    jsxFragmentPragma: 'Fragment',
+  }).code
+}
+const svgCache = new Map()
+function svg(): Plugin {
+  return {
+    name: 'wilson-plugin-svg',
+    enforce: 'pre',
+
+    async load(id): Promise<LoadResult> {
+      if (!id.match(/\.svg\?component$/)) return
+
+      id = id.replace(/\?component$/, '')
+      let result = svgCache.get(id)
+
+      if (!result) {
+        const buffer = await fs.readFile(id)
+        const jsx = await transformSVG(buffer.toString())
+        result = `import { h } from 'preact';\n${transformJsx(jsx)}`
+        svgCache.set(id, result)
+      }
+
+      return result
+    },
+  }
+}
+
 /**
  *
  * @param config Site's configuration
@@ -120,5 +156,6 @@ export default function wilsonPlugins(
     devConfigWatch(config),
     inspect(),
     virtualClientEntrypoint(),
+    svg(),
   ].filter(Boolean)
 }

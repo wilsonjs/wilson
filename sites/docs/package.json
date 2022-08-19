@@ -25,6 +25,8 @@
     "fast-equals": "^4.0.1",
     "hoofd": "1.5.2",
     "preact": "^10.10.0",
+    "react": "npm:@preact/compat",
+    "react-dom": "npm:@preact/compat",
     "vite": "3.0.8",
     "wilson": "workspace:^1.0.0",
     "wouter-preact": "2.8.0-alpha.2"

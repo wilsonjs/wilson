@@ -24,7 +24,7 @@ export const getStaticPaths: GetStaticPaths = async ({
     }),
   )
     .map(({ language, frontmatter, path }) => {
-      return language === 'de'
+      return language === 'en'
         ? {
             frontmatter,
             href: path,

@@ -1,0 +1,18 @@
+[
+  {
+    "url": "/",
+    "name": "menu-home"
+  },
+  {
+    "url": "/writing/",
+    "name": "menu-writing"
+  },
+  {
+    "url": "/workshops/",
+    "name": "menu-workshops"
+  },
+  {
+    "url": "/about/",
+    "name": "menu-about"
+  }
+]

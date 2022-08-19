@@ -1,0 +1,307 @@
+@import './mixins.scss';
+@import './markdown.scss';
+
+// box sizing
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+// abbreviations
+abbr[title] {
+  border-bottom: 0.1em dotted rgba(40, 107, 16, 0.2);
+  cursor: help;
+  text-decoration: none;
+  [data-mode='dark'] & {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+// remove list styles and margin/padding on otherwise styled lists
+ul[class],
+ol[class] {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+a:not([class]) {
+  text-decoration: none;
+  color: var(--color-link);
+}
+
+// make images easier to work with
+img {
+  max-width: 100%;
+  display: block;
+}
+
+// remove all animations and transitions for people that prefer not to see them
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+:root {
+  --font-body: 'Open Sans', -apple-system, 'BlinkMacSystemFont', 'Segoe UI',
+    'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif;
+  --font-headline: Montserrat, Lucida Bright, Lucidabright, 'Lucida Serif',
+    Lucida, 'DejaVu Serif', 'Bitstream Vera Serif', 'Liberation Serif', Georgia,
+    serif;
+  --font-monospace: 'Fira Code', Menlo, Monaco, Consolas, Courier New, monospace;
+
+  --header-height: 80px;
+  --content-padding: 16px;
+  --text-size: 16px;
+  --text-size-small: 13px;
+  --h1-size: 1.9rem;
+  --h2-size: 1.4rem;
+  --h3-size: 1.1rem;
+  --logo-height: 30px;
+
+  @include responsive(xs) {
+    --header-height: 100px;
+    --content-padding: 24px;
+    --text-size: 17px;
+    --text-size-small: 15px;
+    --h1-size: 2.2rem;
+    --h2-size: 1.6rem;
+    --h3-size: 1.2rem;
+    --logo-height: 36px;
+  }
+
+  @include responsive(sm) {
+    --content-padding: 32px;
+    --text-size: 18px;
+    --text-size-small: 16px;
+    --h1-size: 2.4rem;
+    --logo-height: 44px;
+  }
+
+  @include responsive(md) {
+    --header-height: 116px;
+    --content-padding: 40px;
+    --text-size: 20px;
+    --text-size-small: 18px;
+    --h1-size: 2.6rem;
+  }
+
+  @include responsive(lg) {
+    --text-size: 22px;
+    --text-size-small: 20px;
+    --logo-height: 50px;
+  }
+
+  @include responsive(xl) {
+    --h3-size: 1.3rem;
+  }
+}
+
+html {
+  scrollbar-color: lightgray white;
+  scrollbar-width: thin;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior-y: none;
+  font-kerning: normal;
+  font-size: var(--text-size);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -moz-font-feature-settings: 'kern', 'liga', 'clig', 'calt';
+  -ms-font-feature-settings: 'kern', 'liga', 'clig', 'calt';
+  -webkit-font-feature-settings: 'kern', 'liga', 'clig', 'calt';
+  font-feature-settings: 'kern', 'liga', 'clig', 'calt';
+  text-rendering: optimizeSpeed;
+  position: relative;
+
+  // disable outline on inputs other than keyboard
+  &:not([data-whatinput='keyboard']) * {
+    outline: none;
+  }
+}
+
+body {
+  position: relative;
+  min-height: 100%;
+  min-height: stretch;
+  margin: 0;
+  overflow-x: hidden;
+  min-height: 100%;
+  color: var(--color-text-light);
+  background: var(--color-bg);
+  line-height: calc(1ex / 0.32);
+}
+
+hr {
+  margin: 0 0 1.5rem 0;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+}
+
+h1 {
+  color: var(--color-headline);
+}
+
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--color-headline);
+  [data-mode='dark'] & {
+    color: var(--color-headline);
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-headline);
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+h1 {
+  font-size: var(--h1-size);
+  font-weight: 700;
+}
+h2 {
+  font-size: var(--h2-size);
+}
+h3 {
+  font-size: var(--h3-size);
+}
+
+a {
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+
+  &::after {
+    content: '';
+    height: 2px;
+    transform: scaleX(0);
+    transition: transform 0.25s ease;
+    transform-origin: left;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    display: block;
+    position: absolute;
+  }
+
+  &:focus::after,
+  &:hover::after,
+  &:active::after,
+  &[data-active='true']::after {
+    background-color: currentColor;
+    transform: scaleX(1);
+  }
+}
+
+p,
+ul {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+blockquote {
+  margin: 0 0 1.5rem;
+  padding: 0.75rem 0.75rem 0.75rem 32px;
+  border-left: 5px solid red;
+  background-color: var(--color-blockquote-bg);
+  --color-blockquote-bg: #e3eae6;
+  [data-mode='dark'] & {
+    --color-blockquote-bg: #1b2a38;
+  }
+  p {
+    margin-bottom: 0.75rem;
+  }
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+@keyframes dizzy-head {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  15% {
+    transform: translate(0, -2px) rotate(-3deg);
+  }
+  30% {
+    transform: translate(0, 4px) rotate(3deg);
+  }
+  45% {
+    transform: translate(0, -2px) rotate(-2deg);
+  }
+  60% {
+    transform: translate(0, 4px) rotate(4deg);
+  }
+  75% {
+    transform: translate(0, -2px) rotate(-3deg);
+  }
+  90% {
+    transform: translate(0, 4px) rotate(0deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+@keyframes dizzy-brow-left {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  20% {
+    transform: translate(0, -14px) rotate(6deg);
+  }
+  40% {
+    transform: translate(0, -3px) rotate(6deg);
+  }
+  60% {
+    transform: translate(0, -11px) rotate(6deg);
+  }
+  80% {
+    transform: translate(0, -5px) rotate(6deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+@keyframes dizzy-brow-right {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  20% {
+    transform: translate(0, -4px) rotate(-5deg);
+  }
+  40% {
+    transform: translate(0, -15px) rotate(-5deg);
+  }
+  60% {
+    transform: translate(0, -2px) rotate(-5deg);
+  }
+  80% {
+    transform: translate(0, -12px) rotate(-5deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
