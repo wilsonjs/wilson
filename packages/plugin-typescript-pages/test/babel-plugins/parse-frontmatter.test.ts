@@ -128,6 +128,19 @@ test('throws when frontmatter includes illegal types', async (t) => {
       ),
     },
   )
+
+  await t.notThrowsAsync(
+    transformAsync(
+      `export const frontmatter: UserFrontmatter = { title: "it's fine" }`,
+      {
+        plugins: [
+          '@babel/plugin-syntax-jsx',
+          '@babel/plugin-syntax-typescript',
+          [plugin, { frontmatter: {} }],
+        ],
+      },
+    ),
+  )
 })
 
 test('stores frontmatter on plugin options object', async (t) => {

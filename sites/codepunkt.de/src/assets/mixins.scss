@@ -1,0 +1,24 @@
+$breakpoints: (
+  // mobile portrait
+  xs: 568px,
+  // mobile landscape
+  sm: 768px,
+  // tablet portrait
+  md: 1024px,
+  // tablet landscape
+  lg: 1280px,
+  // laptop
+  xl: 1600px,
+  // desktop
+);
+
+@mixin responsive($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    $breakpoint-value: map-get($breakpoints, $breakpoint);
+    @media (min-width: $breakpoint-value) {
+      @content;
+    }
+  } @else {
+    @warn 'Invalid breakpoint: #{$breakpoint}.';
+  }
+}

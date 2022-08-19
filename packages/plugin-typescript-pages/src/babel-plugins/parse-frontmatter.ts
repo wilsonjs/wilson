@@ -62,6 +62,8 @@ export default function parseFrontmatterPlugin({
                       'BooleanLiteral',
                       'NullLiteral',
                       'NumericLiteral',
+                      'TSTypeAnnotation',
+                      'TSTypeReference',
                     ].includes(path.type)
                   ) {
                     throw path.buildCodeFrameError(

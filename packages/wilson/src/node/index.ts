@@ -10,6 +10,7 @@ export type {
   GetStaticPaths,
   GetStaticPathsResult,
   UserConfig,
+  UserFrontmatter,
 } from '@wilson/types'
 
 /**
