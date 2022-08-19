@@ -111,7 +111,7 @@ function viteConfigDefaults(root: string): ViteOptions {
       ],
     },
     server: {
-      fs: { allow: [root, DIST_CLIENT_PATH] },
+      fs: { strict: false, allow: [root, DIST_CLIENT_PATH] },
     },
     build: {
       cssCodeSplit: false,
