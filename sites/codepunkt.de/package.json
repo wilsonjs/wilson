@@ -31,7 +31,7 @@
     "typeface-fira-code": "^1.1.13",
     "typeface-montserrat": "^1.1.13",
     "typeface-open-sans": "^1.1.13",
-    "vite": "3.0.9",
+    "vite": "3.1.0",
     "what-input": "^5.2.12",
     "wilson": "workspace:^1.0.0",
     "wouter-preact": "2.8.0-alpha.2"
