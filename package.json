@@ -18,7 +18,7 @@
     "test": "FORCE_COLOR=1 turbo run test --concurrency 1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.26.0",
+    "@antfu/eslint-config": "^0.27.0",
     "eslint": "^8.20.0",
     "eslint-config-prettier": "^8.5.0",
     "prettier": "^2.7.1",
