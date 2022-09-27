@@ -12,7 +12,7 @@ const defaultSiteMeta = {
   description: '',
 }
 
-function mergeConfig<T = Record<string, any>>(
+function mergeConfig<T extends Record<string, any> = Record<string, any>>(
   a: T,
   b: T,
   isRoot = true,

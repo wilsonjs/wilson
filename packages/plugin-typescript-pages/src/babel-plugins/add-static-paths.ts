@@ -1,3 +1,4 @@
+import type * as BabelCoreNamespace from '@babel/core'
 import type { PluginObj } from '@babel/core'
 import types from '@babel/types'
 import z from 'zod'
@@ -8,10 +9,13 @@ const pluginOptions = z.object({
   languages: z.array(
     z.tuple([z.string(), z.object({ languageName: z.string() })]),
   ),
+  relativePagesDir: z.string(),
   relativePath: z.string(),
 })
 
-export default function addStaticPathsPlugin(): PluginObj<{
+type Babel = typeof BabelCoreNamespace
+
+export default function addStaticPathsPlugin({ traverse }: Babel): PluginObj<{
   opts: z.infer<typeof pluginOptions>
 }> {
   return {
@@ -38,6 +42,27 @@ export default function addStaticPathsPlugin(): PluginObj<{
           )
         }
 
+        let getPagesPattern: string | null = null
+        traverse(
+          binding.path.node,
+          {
+            CallExpression(path) {
+              if (
+                path.node.callee.type === 'Identifier' &&
+                path.node.callee.name === 'getPages' &&
+                path.node.arguments.length > 0 &&
+                path.node.arguments[0].type === 'StringLiteral'
+              ) {
+                getPagesPattern = (
+                  path.node.arguments[0] as types.StringLiteral
+                ).value
+              }
+            },
+          },
+          binding.scope,
+          binding.path,
+        )
+
         const insertIndex =
           1 + path.node.body.findIndex((s) => s === exportPath.node)
 
@@ -53,8 +78,41 @@ export default function addStaticPathsPlugin(): PluginObj<{
                     types.objectProperty(
                       types.identifier('getPages'),
                       types.arrowFunctionExpression(
-                        [types.identifier('path')],
-                        types.arrayExpression([]),
+                        [types.identifier('pattern')],
+                        getPagesPattern === null
+                          ? types.arrayExpression([])
+                          : types.blockStatement([
+                              types.returnStatement(
+                                types.callExpression(
+                                  types.memberExpression(
+                                    types.identifier('Object'),
+                                    types.identifier('values'),
+                                  ),
+                                  [
+                                    types.callExpression(
+                                      types.memberExpression(
+                                        types.metaProperty(
+                                          types.identifier('import'),
+                                          types.identifier('meta'),
+                                        ),
+                                        types.identifier('glob'),
+                                      ),
+                                      [
+                                        types.stringLiteral(
+                                          `/${opts.relativePagesDir}/${getPagesPattern}`,
+                                        ),
+                                        types.objectExpression([
+                                          types.objectProperty(
+                                            types.identifier('eager'),
+                                            types.booleanLiteral(true),
+                                          ),
+                                        ]),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ]),
                       ),
                     ),
                     types.objectProperty(

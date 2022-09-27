@@ -39,7 +39,7 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
     enforce: 'pre',
 
     async transform(code: string, id: string): Promise<TransformResult> {
-      const { defaultLanguage, languages, layoutsDir, pagesDir } = config
+      const { defaultLanguage, languages, layoutsDir, pagesDir, root } = config
 
       if (!isPage(id, pagesDir, ['.tsx'])) {
         return null
@@ -120,7 +120,12 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
             [extendFrontmatterPlugin, { frontmatter }],
             isDynamic && [
               addStaticPathsPlugin,
-              { relativePath, defaultLanguage, languages },
+              {
+                relativePath,
+                defaultLanguage,
+                languages,
+                relativePagesDir: relative(root, pagesDir),
+              },
             ],
             [wrapPageComponentPlugin, { componentName, language, isDynamic }],
           ].filter(Boolean) as PluginItem[],

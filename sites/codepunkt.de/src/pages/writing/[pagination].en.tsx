@@ -14,25 +14,10 @@ export const getStaticPaths: GetStaticPaths = async ({
   getPages,
   paginate,
 }) => {
-  const pages = Object.values(
-    import.meta.glob<{
-      language: string
-      frontmatter: PageFrontmatter
-      path: string
-    }>('/src/pages/writing/**/*.md', {
-      eager: true,
-    }),
+  const pages = getPages('writing/**/*.md').filter(
+    (page) => !page.frontmatter.draft && page.language === 'en',
   )
-    .map(({ language, frontmatter, path }) => {
-      return language === 'en'
-        ? {
-            frontmatter,
-            href: path,
-          }
-        : null
-    })
-    .filter(Boolean)
-  console.log(pages)
+
   return paginate(pages, {
     pageSize: 3,
     format: (no: number) => (no === 1 ? '' : `page-${no}`),
@@ -55,7 +40,7 @@ export default function Page({
       <ol>
         {items.map((item) => (
           <li key={item.frontmatter.title}>
-            <Link href={item.href}>{item.frontmatter.title}</Link>
+            <Link href={item.path}>{item.frontmatter.title}</Link>
           </li>
         ))}
       </ol>

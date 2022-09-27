@@ -6,6 +6,9 @@ export default function MarkdownLayout(props: StaticPageProps) {
     <>
       <DefaultLayout {...props}>
         <h1>{props.frontmatter.title}</h1>
+        {props.frontmatter.description && (
+          <p>{props.frontmatter.description}</p>
+        )}
         <div id="__wilson-markdown">{props.children}</div>
       </DefaultLayout>
     </>
