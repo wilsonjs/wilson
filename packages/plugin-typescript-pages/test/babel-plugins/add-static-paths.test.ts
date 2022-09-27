@@ -26,6 +26,7 @@ test('throws when getStaticPaths is missing or not exported', async (t) => {
           plugin,
           {
             relativePath: 'blog/[pagination].tsx',
+            relativePagesDir: 'src/pages',
             defaultLanguage: 'en',
             languages: [],
           },
@@ -42,6 +43,7 @@ test('throws when getStaticPaths is missing or not exported', async (t) => {
           plugin,
           {
             relativePath: 'blog/[pagination].tsx',
+            relativePagesDir: 'src/pages',
             defaultLanguage: 'en',
             languages: [],
           },
@@ -61,6 +63,33 @@ test('adds staticPaths after getStaticPaths', async (t) => {
           plugin,
           {
             relativePath: 'blog/[pagination].tsx',
+            relativePagesDir: 'src/pages',
+            defaultLanguage: 'en',
+            languages: [
+              ['de', { languageName: 'Deutsch' }],
+              ['en', { languageName: 'English' }],
+              ['fr', { languageName: 'Français' }],
+            ],
+          },
+        ],
+      ],
+    },
+  )
+  t.snapshot(result?.code)
+})
+
+test('provides getPages with import.meta.glob to getStaticPaths', async (t) => {
+  const result = await transformAsync(
+    `export const getStaticPaths = () => {
+      return getPages('foo/**/*.*');
+    };`,
+    {
+      plugins: [
+        [
+          plugin,
+          {
+            relativePath: 'blog/[pagination].tsx',
+            relativePagesDir: 'src/pages',
             defaultLanguage: 'en',
             languages: [
               ['de', { languageName: 'Deutsch' }],

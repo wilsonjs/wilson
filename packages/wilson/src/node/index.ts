@@ -1,4 +1,8 @@
-import type { Languages, PaginationHelper } from '@wilson/types'
+import type {
+  Languages,
+  PageFrontmatter,
+  PaginationHelper,
+} from '@wilson/types'
 import { getRoute } from '@wilson/client-utils'
 
 export type {

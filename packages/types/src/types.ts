@@ -180,15 +180,14 @@ export interface PageFrontmatter extends UserFrontmatter {
   // }
 }
 
-export interface StaticPageExports {
+export interface StaticPageExports extends Document {
   default: FunctionComponent
-  path: string
-  frontmatter: PageFrontmatter
 }
 
 interface Document {
-  href: string
   frontmatter: PageFrontmatter
+  language: string
+  path: string
 }
 
 interface PaginationProps<T = any> {
@@ -197,7 +196,7 @@ interface PaginationProps<T = any> {
   items: T[]
 }
 
-type DocumentHelper = (path: string) => StaticPageExports[]
+type PageHelper = (pattern: string) => Document[]
 
 export type PaginationHelper<T = any> = (
   items: T[],
@@ -227,7 +226,7 @@ export type GetStaticPathsResult<
 export type StaticPath = GetStaticPathsResult & { url: string }
 
 export type GetStaticPaths = (helpers: {
-  getPages: DocumentHelper
+  getPages: PageHelper
   paginate: PaginationHelper
 }) => Awaitable<GetStaticPathsResult[]>
 
