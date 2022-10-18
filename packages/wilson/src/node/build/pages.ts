@@ -53,34 +53,25 @@ export async function getPagesToRender(
     const isDynamic = isDynamicPagePath(route)
 
     if (isDynamic) {
-      const { getStaticPaths } = await getPageExports<DynamicPageExports>(
+      const { staticPaths } = await getPageExports<DynamicPageExports>(
         absolutePath,
         config.pagesDir,
       )
-      const paginate = createPaginationHelper(
-        relativePath,
-        config.defaultLanguage,
-        config.languages,
-      )
-      const staticPaths = (
-        await getStaticPaths({
-          paginate,
-          getPages: () => [],
-        })
-      ).map(({ params }) => {
-        let url = route
-        Object.entries(params).forEach(([key, value]) => {
-          url = url.replace(new RegExp(`\\[${key}\\]`, 'g'), value)
-        })
-        const outputFilename = pathToFilename(url)
-        return {
-          route: url.replace(/\/$/, ''),
-          outputFilename,
-          rendered: '',
-        }
-      })
 
-      pagesToRender.push(...staticPaths)
+      pagesToRender.push(
+        ...staticPaths.map(({ params }) => {
+          let url = route
+          Object.entries(params).forEach(([key, value]) => {
+            url = url.replace(new RegExp(`\\[${key}\\]`, 'g'), value)
+          })
+          const outputFilename = pathToFilename(url)
+          return {
+            route: url.replace(/\/$/, ''),
+            outputFilename,
+            rendered: '',
+          }
+        }),
+      )
     } else {
       const outputFilename = pathToFilename(route)
       pagesToRender.push({
