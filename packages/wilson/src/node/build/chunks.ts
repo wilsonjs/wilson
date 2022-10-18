@@ -11,7 +11,8 @@ export function extendManualChunks(config: SiteConfig): GetManualChunk {
     // const name = userChunks?.(id, api)
     const name = undefined
     if (name) return name
-    if (id.includes('vite/') || id.includes('plugin-vue')) return 'vite'
+    if (id.includes('vite/') || id.includes('@preact/preset-vite'))
+      return 'vite'
     if (id.includes('hydration/dist')) return 'wilson'
     if (id.includes('node_modules'))
       return vendorPerFramework(chunkForExtension, id, api, cache)
