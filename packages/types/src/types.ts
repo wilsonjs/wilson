@@ -184,7 +184,7 @@ export interface StaticPageExports extends Document {
   default: FunctionComponent
 }
 
-interface Document {
+export interface Document {
   frontmatter: PageFrontmatter
   language: string
   path: string
@@ -215,6 +215,7 @@ export type PropsWithPagination<T extends {} = Document> = RenderableProps<
 >
 
 export interface DynamicPageExports extends StaticPageExports {
+  staticPaths: GetStaticPathsResult[]
   getStaticPaths: GetStaticPaths
 }
 
