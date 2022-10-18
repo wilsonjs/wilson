@@ -69,80 +69,82 @@ export default function addStaticPathsPlugin({ traverse }: Babel): PluginObj<{
         path.node.body.splice(
           insertIndex,
           0,
-          types.variableDeclaration('const', [
-            types.variableDeclarator(
-              types.identifier('staticPaths'),
-              types.awaitExpression(
-                types.callExpression(types.identifier('getStaticPaths'), [
-                  types.objectExpression([
-                    types.objectProperty(
-                      types.identifier('getPages'),
-                      types.arrowFunctionExpression(
-                        [types.identifier('pattern')],
-                        getPagesPattern === null
-                          ? types.arrayExpression([])
-                          : types.blockStatement([
-                              types.returnStatement(
-                                types.callExpression(
-                                  types.memberExpression(
-                                    types.identifier('Object'),
-                                    types.identifier('values'),
-                                  ),
-                                  [
-                                    types.callExpression(
-                                      types.memberExpression(
-                                        types.metaProperty(
-                                          types.identifier('import'),
-                                          types.identifier('meta'),
-                                        ),
-                                        types.identifier('glob'),
-                                      ),
-                                      [
-                                        types.stringLiteral(
-                                          `/${opts.relativePagesDir}/${getPagesPattern}`,
-                                        ),
-                                        types.objectExpression([
-                                          types.objectProperty(
-                                            types.identifier('eager'),
-                                            types.booleanLiteral(true),
-                                          ),
-                                        ]),
-                                      ],
+          types.exportNamedDeclaration(
+            types.variableDeclaration('const', [
+              types.variableDeclarator(
+                types.identifier('staticPaths'),
+                types.awaitExpression(
+                  types.callExpression(types.identifier('getStaticPaths'), [
+                    types.objectExpression([
+                      types.objectProperty(
+                        types.identifier('getPages'),
+                        types.arrowFunctionExpression(
+                          [types.identifier('pattern')],
+                          getPagesPattern === null
+                            ? types.arrayExpression([])
+                            : types.blockStatement([
+                                types.returnStatement(
+                                  types.callExpression(
+                                    types.memberExpression(
+                                      types.identifier('Object'),
+                                      types.identifier('values'),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            ]),
-                      ),
-                    ),
-                    types.objectProperty(
-                      types.identifier('paginate'),
-                      types.callExpression(
-                        types.identifier('createPaginationHelper'),
-                        [
-                          types.stringLiteral(opts.relativePath),
-                          types.stringLiteral(opts.defaultLanguage),
-                          types.arrayExpression(
-                            opts.languages.map(([id, config]) =>
-                              types.arrayExpression([
-                                types.stringLiteral(id),
-                                types.objectExpression([
-                                  types.objectProperty(
-                                    types.identifier('languageName'),
-                                    types.stringLiteral(config.languageName),
+                                    [
+                                      types.callExpression(
+                                        types.memberExpression(
+                                          types.metaProperty(
+                                            types.identifier('import'),
+                                            types.identifier('meta'),
+                                          ),
+                                          types.identifier('glob'),
+                                        ),
+                                        [
+                                          types.stringLiteral(
+                                            `/${opts.relativePagesDir}/${getPagesPattern}`,
+                                          ),
+                                          types.objectExpression([
+                                            types.objectProperty(
+                                              types.identifier('eager'),
+                                              types.booleanLiteral(true),
+                                            ),
+                                          ]),
+                                        ],
+                                      ),
+                                    ],
                                   ),
-                                ]),
+                                ),
                               ]),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                      types.objectProperty(
+                        types.identifier('paginate'),
+                        types.callExpression(
+                          types.identifier('createPaginationHelper'),
+                          [
+                            types.stringLiteral(opts.relativePath),
+                            types.stringLiteral(opts.defaultLanguage),
+                            types.arrayExpression(
+                              opts.languages.map(([id, config]) =>
+                                types.arrayExpression([
+                                  types.stringLiteral(id),
+                                  types.objectExpression([
+                                    types.objectProperty(
+                                      types.identifier('languageName'),
+                                      types.stringLiteral(config.languageName),
+                                    ),
+                                  ]),
+                                ]),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ]),
                   ]),
-                ]),
+                ),
               ),
-            ),
-          ]),
+            ]),
+          ),
         )
       },
     },

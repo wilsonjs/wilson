@@ -59,7 +59,7 @@ async function writePage(
     const rebasedCode = await rebaseImportsToAssetsDir(config, code)
     content = content.replace(
       `<script type="text/hydration">/*${island.id}-hydration*/</script>`,
-      // TODO: Remove additional script tag once Firefox is fixed
+      // TODO Remove additional script tag once Firefox is fixed
       // https://bugzilla.mozilla.org/show_bug.cgi?id=1737882
       `<script></script><script type="module" async>${rebasedCode}</script>`,
     )
