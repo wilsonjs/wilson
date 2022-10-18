@@ -175,6 +175,7 @@ function siteConfigDefaults(
     pageExtensions: ['.md', '.tsx'],
     site: defaultSiteMeta,
     defaultLanguage: 'en',
+    defaultLanguageInSubdir: false,
     languages: [],
     vite: viteConfigDefaults(root),
     extendFrontmatter(filename, frontmatter) {

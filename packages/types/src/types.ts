@@ -68,21 +68,17 @@ export interface UserConfig {
     title: string
     description: string
   }
-  /**
-   * Default content language. Defaults to 'en'.
-   */
+  /** Default content language. Defaults to 'en'. */
   defaultLanguage?: string
+  /** If the default language should be rendered below its own language code (/en) like the other languages, set this to `true`. Defaults to `false`. */
+  defaultLanguageInSubdir?: boolean
   /**
    * Language information.
    */
   languages?: Languages
-  /**
-   * File extensions that are allowed as pages.
-   */
+  /** File extensions that are allowed as pages. */
   pageExtensions?: string[]
-  /**
-   * Used to access and optionally modify page's frontmatter.
-   */
+  /** Used to access and optionally modify page's frontmatter. */
   extendFrontmatter?: (
     filename: string,
     frontmatter: UserFrontmatter,

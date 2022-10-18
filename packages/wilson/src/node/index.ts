@@ -50,6 +50,7 @@ export function replaceRouteParams(
 export function createPaginationHelper(
   pageRelativePath: string,
   defaultLanguage: string,
+  defaultLanguageInSubdir: boolean,
   languages: Languages,
 ): PaginationHelper {
   const paramMatches = [...pageRelativePath.matchAll(/\[([^\]]+)\]/g)]
@@ -61,6 +62,7 @@ export function createPaginationHelper(
     const param = options.param ?? defaultParam
     const urlPrefix = getRoute(`/${pageRelativePath}`, {
       defaultLanguage,
+      defaultLanguageInSubdir,
       languages,
       replaceParams: false,
     })

@@ -17,8 +17,12 @@ export function prefixLanguage(
   str: string,
   languageId: string,
   defaultLanguage: string,
+  defaultLanguageInSubdir: boolean,
 ): string {
-  const prefix = languageId === defaultLanguage ? '' : `${languageId}/`
+  const prefix =
+    languageId === defaultLanguage && !defaultLanguageInSubdir
+      ? ''
+      : `${languageId}/`
   return removeSlashWrap(
     `${prefix}${str.replace(new RegExp(`\.${languageId}$`), '')}`,
   )
@@ -41,11 +45,17 @@ export default function getRoute(
   relativePath: string,
   options: {
     defaultLanguage: string
+    defaultLanguageInSubdir: boolean
     languages: Languages
     replaceParams?: boolean
   },
 ): string {
-  const { defaultLanguage, languages, replaceParams = true } = options
+  const {
+    defaultLanguage,
+    defaultLanguageInSubdir,
+    languages,
+    replaceParams = true,
+  } = options
   const languageIds = languages.map(([id]) => id)
 
   const extension = relativePath.slice(relativePath.lastIndexOf('.'))
@@ -56,13 +66,16 @@ export default function getRoute(
 
   const toLowerCase = path.toLowerCase()
   const withoutExt = removeExtension(toLowerCase)
-  const language = getLanguage(toLowerCase, languageIds)
+  const language = getLanguage(toLowerCase, languageIds) ?? defaultLanguage
 
   const route = prefixSlash(
     removeTrailingIndex(
-      languageIds.length > 0 && language
-        ? prefixLanguage(withoutExt, language, defaultLanguage)
-        : withoutExt,
+      prefixLanguage(
+        withoutExt,
+        language,
+        defaultLanguage,
+        defaultLanguageInSubdir,
+      ),
     ),
   )
 

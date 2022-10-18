@@ -7,11 +7,12 @@ export default function getTranslations(
   relativePath: string,
   options: {
     defaultLanguage: string
+    defaultLanguageInSubdir: boolean
     languages: Languages
     pagesDir: string
   },
 ): Translation[] {
-  const { defaultLanguage, languages, pagesDir } = options
+  const { languages, pagesDir } = options
   const languageIds = languages.map(([id]) => id)
   const language = getLanguage(relativePath, languageIds)
 
@@ -30,8 +31,7 @@ export default function getTranslations(
       const lang = getLanguage(translation, languageIds)!
 
       if (languageIds.includes(lang)) {
-        const getRouteOpts = { defaultLanguage, languages }
-        const route = getRoute(relative(pagesDir, translation), getRouteOpts)
+        const route = getRoute(relative(pagesDir, translation), options)
         return {
           route,
           languageId: lang,
