@@ -4,6 +4,7 @@ import { Languages } from '@wilson/types'
 
 const options = {
   defaultLanguage: 'en',
+  defaultLanguageInSubdir: false,
   languages: [
     ['en', { languageName: 'Englisch' }],
     ['fr', { languageName: 'Français' }],
@@ -11,6 +12,7 @@ const options = {
 }
 const noReplace = { ...options, replaceParams: false }
 const noLanguages = { ...options, languages: [] }
+const inSubdir = { ...options, defaultLanguageInSubdir: true }
 
 test('returns route for page path', (t) => {
   t.is(getRoute('blog/post.tsx', options), '/blog/post')
@@ -25,10 +27,8 @@ test('returns route for page path', (t) => {
   t.is(getRoute('blog/[pagination].en.tsx', options), '/blog/:pagination?')
   t.is(getRoute('blog/[tag]/[page].en.tsx', options), '/blog/:tag/:page?')
   t.is(getRoute('blog/[pagination].en.tsx', noReplace), '/blog/[pagination]')
-  t.is(
-    getRoute('blog/[pagination].en.tsx', noLanguages),
-    '/blog/:pagination?.en',
-  )
+  t.is(getRoute('blog/[pagination].en.tsx', noLanguages), '/blog/:pagination?')
+  t.is(getRoute('blog/[pagination].en.tsx', inSubdir), '/en/blog/:pagination?')
   t.is(getRoute('blog/[pagination].fr.tsx', options), '/fr/blog/:pagination?')
   t.is(getRoute('blog/[tag]/[page].fr.tsx', options), '/fr/blog/:tag/:page?')
   t.is(getRoute('blog/[pagination].fr.tsx', noReplace), '/fr/blog/[pagination]')

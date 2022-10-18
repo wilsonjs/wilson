@@ -80,7 +80,7 @@ test('handles paths with language suffixes correctly without any defined languag
   }
 
   t.deepEqual(getRoutingInfo('index.en.tsx', options), {
-    route: '/index.en',
+    route: '/',
     translations: [],
   })
 })
