@@ -51,9 +51,9 @@ export function renderPage(
   config: SiteConfig,
   clientChunks: RollupOutput['output'],
   page: PageToRender,
-  rendertoString: RenderToStringFn,
+  renderToString: RenderToStringFn,
 ): { rendered: string; islands: Island[] } {
-  const { html, islands, head } = rendertoString(page.route)
+  const { html, islands, head } = renderToString(page.route)
   // TODO: links, scripts and meta
   return {
     rendered: /* html */ `
