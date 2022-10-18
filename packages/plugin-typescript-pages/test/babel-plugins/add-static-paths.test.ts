@@ -28,6 +28,7 @@ test('throws when getStaticPaths is missing or not exported', async (t) => {
             relativePath: 'blog/[pagination].tsx',
             relativePagesDir: 'src/pages',
             defaultLanguage: 'en',
+            defaultLanguageInSubdir: false,
             languages: [],
           },
         ],
@@ -45,6 +46,7 @@ test('throws when getStaticPaths is missing or not exported', async (t) => {
             relativePath: 'blog/[pagination].tsx',
             relativePagesDir: 'src/pages',
             defaultLanguage: 'en',
+            defaultLanguageInSubdir: false,
             languages: [],
           },
         ],
@@ -65,6 +67,7 @@ test('adds staticPaths after getStaticPaths', async (t) => {
             relativePath: 'blog/[pagination].tsx',
             relativePagesDir: 'src/pages',
             defaultLanguage: 'en',
+            defaultLanguageInSubdir: false,
             languages: [
               ['de', { languageName: 'Deutsch' }],
               ['en', { languageName: 'English' }],
@@ -91,6 +94,7 @@ test('provides getPages with import.meta.glob to getStaticPaths', async (t) => {
             relativePath: 'blog/[pagination].tsx',
             relativePagesDir: 'src/pages',
             defaultLanguage: 'en',
+            defaultLanguageInSubdir: false,
             languages: [
               ['de', { languageName: 'Deutsch' }],
               ['en', { languageName: 'English' }],

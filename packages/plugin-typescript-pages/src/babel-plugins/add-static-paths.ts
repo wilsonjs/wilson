@@ -6,6 +6,7 @@ import validateOptions from '../util/validate-options'
 
 const pluginOptions = z.object({
   defaultLanguage: z.string(),
+  defaultLanguageInSubdir: z.boolean(),
   languages: z.array(
     z.tuple([z.string(), z.object({ languageName: z.string() })]),
   ),
@@ -123,6 +124,7 @@ export default function addStaticPathsPlugin({ traverse }: Babel): PluginObj<{
                           [
                             types.stringLiteral(opts.relativePath),
                             types.stringLiteral(opts.defaultLanguage),
+                            types.booleanLiteral(opts.defaultLanguageInSubdir),
                             types.arrayExpression(
                               opts.languages.map(([id, config]) =>
                                 types.arrayExpression([
