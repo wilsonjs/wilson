@@ -65,10 +65,10 @@ importers:
     specifiers:
       preact: ^10.10.0
       tsup: ^6.1.3
-      vite: 3.1.8
+      vite: 3.2.3
     dependencies:
       preact: 10.10.0
-      vite: 3.1.8
+      vite: 3.2.3
     devDependencies:
       tsup: 6.2.1
 
@@ -93,7 +93,7 @@ importers:
       rollup: ^2.75.7
       tsup: ^6.1.3
       unified: ^10.1.2
-      vite: 3.1.8
+      vite: 3.2.3
     dependencies:
       '@mapbox/hast-util-to-jsx': 2.0.0
       '@wilson/client-utils': link:../client-utils
@@ -115,7 +115,7 @@ importers:
       '@wilson/types': link:../types
       rollup: 2.77.2
       tsup: 6.2.1
-      vite: 3.1.8
+      vite: 3.2.3
 
   packages/plugin-typescript-pages:
     specifiers:
@@ -144,7 +144,7 @@ importers:
       prettier: ^2.7.1
       rollup: ^2.75.7
       tsup: ^6.1.3
-      vite: 3.1.8
+      vite: 3.2.3
       zod: ^3.18.0
     dependencies:
       '@babel/core': 7.18.9
@@ -174,17 +174,17 @@ importers:
       c8: 7.12.0
       rollup: 2.77.2
       tsup: 6.2.1
-      vite: 3.1.8
+      vite: 3.2.3_@types+node@18.6.2
 
   packages/types:
     specifiers:
       preact: ^10.10.0
       tsup: ^6.1.3
-      vite: 3.1.8
+      vite: 3.2.3
     devDependencies:
       preact: 10.10.0
       tsup: 6.2.1
-      vite: 3.1.8
+      vite: 3.2.3
 
   packages/utils:
     specifiers:
@@ -246,11 +246,11 @@ importers:
       sass: ^1.53.0
       sucrase: ^3.25.0
       tsup: ^6.1.3
-      vite: 3.1.8
+      vite: 3.2.3
       vite-plugin-inspect: ^0.7.0
       wouter-preact: 2.8.1
     dependencies:
-      '@preact/preset-vite': 2.3.0_3wprz5magcoovj3nc7nkvnpboq
+      '@preact/preset-vite': 2.3.0_ypvec6fzzt5prswrhkzq5mfoi4
       '@svgr/core': 6.3.1
       '@wilson/babel-plugin-island-path': link:../babel-plugin-island-path
       '@wilson/client-utils': link:../client-utils
@@ -273,8 +273,8 @@ importers:
       preact-render-to-string: 5.2.1_preact@10.10.0
       sass: 1.54.0
       sucrase: 3.25.0
-      vite: 3.1.8_sass@1.54.0
-      vite-plugin-inspect: 0.7.4_vite@3.1.8
+      vite: 3.2.3_e7tl4y2a3m5pvpctkvgh6b2ekm
+      vite-plugin-inspect: 0.7.4_vite@3.2.3
       wouter-preact: 2.8.1_preact@10.10.0
     devDependencies:
       '@types/debug': 4.1.7
@@ -302,13 +302,13 @@ importers:
       typeface-fira-code: ^1.1.13
       typeface-montserrat: ^1.1.13
       typeface-open-sans: ^1.1.13
-      vite: 3.1.8
+      vite: 3.2.3
       what-input: ^5.2.12
       wilson: workspace:^1.0.0
       wouter-preact: 2.8.1
     dependencies:
       '@babel/plugin-transform-react-jsx': 7.18.10_@babel+core@7.18.9
-      '@preact/preset-vite': 2.3.0_3wprz5magcoovj3nc7nkvnpboq
+      '@preact/preset-vite': 2.3.0_ypvec6fzzt5prswrhkzq5mfoi4
       '@wilson/babel-plugin-island-path': link:../../packages/babel-plugin-island-path
       '@wilson/island-hydration': link:../../packages/island-hydration
       fast-equals: 4.0.1
@@ -319,7 +319,7 @@ importers:
       typeface-fira-code: 1.1.13
       typeface-montserrat: 1.1.13
       typeface-open-sans: 1.1.13
-      vite: 3.1.8
+      vite: 3.2.3
       what-input: 5.2.12
       wilson: link:../../packages/wilson
       wouter-preact: 2.8.1_preact@10.10.0
@@ -335,12 +335,12 @@ importers:
       preact: ^10.10.0
       react: npm:@preact/compat
       react-dom: npm:@preact/compat
-      vite: 3.1.8
+      vite: 3.2.3
       wilson: workspace:^1.0.0
       wouter-preact: 2.8.1
     dependencies:
       '@babel/plugin-transform-react-jsx': 7.18.10_@babel+core@7.18.9
-      '@preact/preset-vite': 2.3.0_3wprz5magcoovj3nc7nkvnpboq
+      '@preact/preset-vite': 2.3.0_ypvec6fzzt5prswrhkzq5mfoi4
       '@wilson/babel-plugin-island-path': link:../../packages/babel-plugin-island-path
       '@wilson/island-hydration': link:../../packages/island-hydration
       fast-equals: 4.0.1
@@ -348,7 +348,7 @@ importers:
       preact: 10.10.0
       react: /@preact/compat/17.1.2_preact@10.10.0
       react-dom: /@preact/compat/17.1.2_preact@10.10.0
-      vite: 3.1.8
+      vite: 3.2.3
       wilson: link:../../packages/wilson
       wouter-preact: 2.8.1_preact@10.10.0
 
@@ -862,7 +862,7 @@ packages:
       preact: 10.10.0
     dev: false
 
-  /@preact/preset-vite/2.3.0_3wprz5magcoovj3nc7nkvnpboq:
+  /@preact/preset-vite/2.3.0_ypvec6fzzt5prswrhkzq5mfoi4:
     resolution: {integrity: sha512-0kOuz7wdrQLqrPlyI/Ypw9IWDF2++GGcOHMRBYO5T2w2+dheelaBH+XrIN/okqdsGIflzFIFNyIGubo5BC8wbQ==}
     peerDependencies:
       '@babel/core': 7.x
@@ -871,13 +871,13 @@ packages:
       '@babel/core': 7.18.9
       '@babel/plugin-transform-react-jsx': 7.18.6_@babel+core@7.18.9
       '@babel/plugin-transform-react-jsx-development': 7.18.6_@babel+core@7.18.9
-      '@prefresh/vite': 2.2.8_preact@10.10.0+vite@3.1.8
+      '@prefresh/vite': 2.2.8_preact@10.10.0+vite@3.2.3
       '@rollup/pluginutils': 4.2.1
       babel-plugin-transform-hook-names: 1.0.2_@babel+core@7.18.9
       debug: 4.3.4
       kolorist: 1.5.1
       resolve: 1.22.1
-      vite: 3.1.8_sass@1.54.0
+      vite: 3.2.3_e7tl4y2a3m5pvpctkvgh6b2ekm
     transitivePeerDependencies:
       - preact
       - supports-color
@@ -899,7 +899,7 @@ packages:
     resolution: {integrity: sha512-Mb9abhJTOV4yCfkXrMrcgFiFT7MfNOw8sDa+XyZBdq/Ai2p4Zyxqsb3EgHLOEdHpMj6J9aiZ54W8H6FTam1u+A==}
     dev: false
 
-  /@prefresh/vite/2.2.8_preact@10.10.0+vite@3.1.8:
+  /@prefresh/vite/2.2.8_preact@10.10.0+vite@3.2.3:
     resolution: {integrity: sha512-yGGa+PKPYPTzMlxgQ8aBgxw9K69I8X4iQ0E6KOcIvls96WKqKLLOYZW9SUgCve446jpUXvc9udviPBZjCeZIIQ==}
     peerDependencies:
       preact: ^10.4.0
@@ -911,7 +911,7 @@ packages:
       '@prefresh/utils': 1.1.3
       '@rollup/pluginutils': 4.2.1
       preact: 10.10.0
-      vite: 3.1.8_sass@1.54.0
+      vite: 3.2.3_e7tl4y2a3m5pvpctkvgh6b2ekm
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -1151,7 +1151,6 @@ packages:
 
   /@types/node/18.6.2:
     resolution: {integrity: sha512-KcfkBq9H4PI6Vpu5B/KoPeuVDAbmi+2mDBqGPGUgoL7yXQtcWGu2vJWmmRkneWK3Rh0nIAX192Aa87AqKHYChQ==}
-    dev: true
 
   /@types/normalize-package-data/2.4.1:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
@@ -4649,8 +4648,8 @@ packages:
       source-map: 0.6.1
     dev: false
 
-  /postcss/8.4.16:
-    resolution: {integrity: sha512-ipHE1XBvKzm5xI7hiHCZJCSugxvsdq2mPnsq5+UF+VHCjiBvtDrlxJfMBToWaP9D5XlgNmcFGqoHmUn0EYEaRQ==}
+  /postcss/8.4.18:
+    resolution: {integrity: sha512-Wi8mWhncLJm11GATDaQKobXSNEYGUHeQLiQqDFG1qQ5UTDPTEvKw0Xt5NsTpktGTwLps3ByrWsBrG0rB8YQ9oA==}
     engines: {node: ^10 || ^12 || >=14}
     dependencies:
       nanoid: 3.3.4
@@ -4863,8 +4862,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /rollup/2.78.1:
-    resolution: {integrity: sha512-VeeCgtGi4P+o9hIg+xz4qQpRl6R401LWEXBmxYKOV4zlF82lyhgh2hTZnheFUbANE8l2A41F458iwj2vEYaXJg==}
+  /rollup/2.79.1:
+    resolution: {integrity: sha512-uKxbd0IhMZOhjAiD5oAFp7BqvkA4Dv47qpOCtaNvng4HBwdbWtdOh8f5nZNuk2rp51PMGk3bzfWu5oayNEuYnw==}
     engines: {node: '>=10.0.0'}
     hasBin: true
     optionalDependencies:
@@ -5690,7 +5689,7 @@ packages:
       vfile-message: 3.1.2
     dev: false
 
-  /vite-plugin-inspect/0.7.4_vite@3.1.8:
+  /vite-plugin-inspect/0.7.4_vite@3.2.3:
     resolution: {integrity: sha512-06uSil9CPWsGwICsXixx2O3vsIOLNTkQaiBijmJA84BuxYKIWJ3k0r4I96kX1WgdA3olxJxVBXOjzryzeHOSuQ==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -5702,60 +5701,107 @@ packages:
       kolorist: 1.5.1
       sirv: 2.0.2
       ufo: 0.8.5
-      vite: 3.1.8_sass@1.54.0
+      vite: 3.2.3_e7tl4y2a3m5pvpctkvgh6b2ekm
     transitivePeerDependencies:
       - supports-color
     dev: false
 
-  /vite/3.1.8:
-    resolution: {integrity: sha512-m7jJe3nufUbuOfotkntGFupinL/fmuTNuQmiVE7cH2IZMuf4UbfbGYMUT3jVWgGYuRVLY9j8NnrRqgw5rr5QTg==}
+  /vite/3.2.3:
+    resolution: {integrity: sha512-h8jl1TZ76eGs3o2dIBSsvXDLb1m/Ec1iej8ZMdz+PsaFUsftZeWe2CZOI3qogEsMNaywc17gu0q6cQDzh/weCQ==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
+      '@types/node': '>= 14'
       less: '*'
       sass: '*'
       stylus: '*'
+      sugarss: '*'
       terser: ^5.4.0
     peerDependenciesMeta:
+      '@types/node':
+        optional: true
       less:
         optional: true
       sass:
         optional: true
       stylus:
         optional: true
+      sugarss:
+        optional: true
       terser:
         optional: true
     dependencies:
       esbuild: 0.15.11
-      postcss: 8.4.16
+      postcss: 8.4.18
       resolve: 1.22.1
-      rollup: 2.78.1
+      rollup: 2.79.1
     optionalDependencies:
       fsevents: 2.3.2
 
-  /vite/3.1.8_sass@1.54.0:
-    resolution: {integrity: sha512-m7jJe3nufUbuOfotkntGFupinL/fmuTNuQmiVE7cH2IZMuf4UbfbGYMUT3jVWgGYuRVLY9j8NnrRqgw5rr5QTg==}
+  /vite/3.2.3_@types+node@18.6.2:
+    resolution: {integrity: sha512-h8jl1TZ76eGs3o2dIBSsvXDLb1m/Ec1iej8ZMdz+PsaFUsftZeWe2CZOI3qogEsMNaywc17gu0q6cQDzh/weCQ==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
+      '@types/node': '>= 14'
       less: '*'
       sass: '*'
       stylus: '*'
+      sugarss: '*'
       terser: ^5.4.0
     peerDependenciesMeta:
+      '@types/node':
+        optional: true
       less:
         optional: true
       sass:
         optional: true
       stylus:
         optional: true
+      sugarss:
+        optional: true
       terser:
         optional: true
     dependencies:
+      '@types/node': 18.6.2
       esbuild: 0.15.11
-      postcss: 8.4.16
+      postcss: 8.4.18
       resolve: 1.22.1
-      rollup: 2.78.1
+      rollup: 2.79.1
+    optionalDependencies:
+      fsevents: 2.3.2
+    dev: true
+
+  /vite/3.2.3_e7tl4y2a3m5pvpctkvgh6b2ekm:
+    resolution: {integrity: sha512-h8jl1TZ76eGs3o2dIBSsvXDLb1m/Ec1iej8ZMdz+PsaFUsftZeWe2CZOI3qogEsMNaywc17gu0q6cQDzh/weCQ==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    hasBin: true
+    peerDependencies:
+      '@types/node': '>= 14'
+      less: '*'
+      sass: '*'
+      stylus: '*'
+      sugarss: '*'
+      terser: ^5.4.0
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+      less:
+        optional: true
+      sass:
+        optional: true
+      stylus:
+        optional: true
+      sugarss:
+        optional: true
+      terser:
+        optional: true
+    dependencies:
+      '@types/node': 18.6.2
+      esbuild: 0.15.11
+      postcss: 8.4.18
+      resolve: 1.22.1
+      rollup: 2.79.1
       sass: 1.54.0
     optionalDependencies:
       fsevents: 2.3.2
