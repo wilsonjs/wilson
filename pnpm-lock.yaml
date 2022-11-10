@@ -248,7 +248,7 @@ importers:
       tsup: ^6.1.3
       vite: 3.1.8
       vite-plugin-inspect: ^0.7.0
-      wouter-preact: 2.8.0-alpha.2
+      wouter-preact: 2.8.1
     dependencies:
       '@preact/preset-vite': 2.3.0_3wprz5magcoovj3nc7nkvnpboq
       '@svgr/core': 6.3.1
@@ -275,7 +275,7 @@ importers:
       sucrase: 3.25.0
       vite: 3.1.8_sass@1.54.0
       vite-plugin-inspect: 0.7.4_vite@3.1.8
-      wouter-preact: 2.8.0-alpha.2_preact@10.10.0
+      wouter-preact: 2.8.1_preact@10.10.0
     devDependencies:
       '@types/debug': 4.1.7
       '@types/js-beautify': 1.13.3
@@ -305,7 +305,7 @@ importers:
       vite: 3.1.8
       what-input: ^5.2.12
       wilson: workspace:^1.0.0
-      wouter-preact: 2.8.0-alpha.2
+      wouter-preact: 2.8.1
     dependencies:
       '@babel/plugin-transform-react-jsx': 7.18.10_@babel+core@7.18.9
       '@preact/preset-vite': 2.3.0_3wprz5magcoovj3nc7nkvnpboq
@@ -322,7 +322,7 @@ importers:
       vite: 3.1.8
       what-input: 5.2.12
       wilson: link:../../packages/wilson
-      wouter-preact: 2.8.0-alpha.2_preact@10.10.0
+      wouter-preact: 2.8.1_preact@10.10.0
 
   sites/docs:
     specifiers:
@@ -337,7 +337,7 @@ importers:
       react-dom: npm:@preact/compat
       vite: 3.1.8
       wilson: workspace:^1.0.0
-      wouter-preact: 2.8.0-alpha.2
+      wouter-preact: 2.8.1
     dependencies:
       '@babel/plugin-transform-react-jsx': 7.18.10_@babel+core@7.18.9
       '@preact/preset-vite': 2.3.0_3wprz5magcoovj3nc7nkvnpboq
@@ -350,7 +350,7 @@ importers:
       react-dom: /@preact/compat/17.1.2_preact@10.10.0
       vite: 3.1.8
       wilson: link:../../packages/wilson
-      wouter-preact: 2.8.0-alpha.2_preact@10.10.0
+      wouter-preact: 2.8.1_preact@10.10.0
 
 packages:
 
@@ -5834,8 +5834,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /wouter-preact/2.8.0-alpha.2_preact@10.10.0:
-    resolution: {integrity: sha512-f19qDB+HhR6C3lnPFdsJQ8wZZIFzm0m8XciEiBzyB1VtkPE/QaSrm1dxcvqrZu1hKaUA/gdee6OGGj0jGDtgGA==}
+  /wouter-preact/2.8.1_preact@10.10.0:
+    resolution: {integrity: sha512-9Jn630oZyWd/NiNGE5O5ydh6CNIRfg+GiZr46fYi8iHv0B5FyahZ7OKDABcFoKfHOVa76kx1QBJ5j0oFqy0ljg==}
     peerDependencies:
       preact: ^10.0.0
     dependencies:
