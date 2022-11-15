@@ -40,6 +40,6 @@
   "dependencies": {
     "@wilson/client-utils": "workspace:^1.0.0",
     "fast-glob": "^3.2.11",
-    "pathe": "^0.3.2"
+    "pathe": "^1.0.0"
   }
 }

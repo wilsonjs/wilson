@@ -43,7 +43,7 @@
     "debug": "^4.3.4",
     "gray-matter": "^4.0.3",
     "node-cache": "^5.1.2",
-    "pathe": "^0.3.2",
+    "pathe": "^1.0.0",
     "prettier": "^2.7.1",
     "rehype-raw": "^6.1.1",
     "remark-parse": "^10.0.1",
