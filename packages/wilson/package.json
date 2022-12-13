@@ -56,7 +56,7 @@
     "fast-glob": "^3.2.11",
     "hoofd": "1.5.2",
     "js-beautify": "^1.14.4",
-    "magic-string": "^0.26.2",
+    "magic-string": "^0.27.0",
     "mico-spinner": "^1.4.0",
     "minimist": "^1.2.6",
     "pathe": "^1.0.0",
