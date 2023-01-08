@@ -5,10 +5,11 @@ import remarkToRehype from 'remark-rehype'
 import type { Node } from 'unist'
 import remarkStringify from 'remark-stringify'
 import rehypeRaw from 'rehype-raw'
-import { unified, Processor } from 'unified'
+import type { Processor } from 'unified'
+import { unified } from 'unified'
 import type { PluginOption } from 'vite'
 import type { TransformResult } from 'rollup'
-// @ts-ignore
+// @ts-expect-error declaration file doesn't exist
 import toJsx from '@mapbox/hast-util-to-jsx'
 import type { SiteConfig, UserFrontmatter } from '@wilson/types'
 import { relative } from 'pathe'
@@ -18,10 +19,10 @@ import {
   getRoutingInfo,
   userToPageFrontmatter,
 } from '@wilson/utils'
-import { getLanguage } from '@wilson/client-utils'
+import { getTranslationKeys } from '@wilson/client-utils'
 
 /** Result of parsing markdown source code with frontmatter */
-type MarkdownParseResult = {
+interface MarkdownParseResult {
   /** Markdown source code without the parsed frontmatter */
   markdown: string
   /** The parsed frontmatter data */
@@ -108,24 +109,30 @@ export default function markdownPagesPlugin(config: SiteConfig): PluginOption {
       const layoutPath = `${config.layoutsDir}/${layout}.tsx`
       const { route, translations } = getRoutingInfo(relativePath, config)
       const componentName = createComponentName(relativePath)
-      const language =
-        getLanguage(
-          id,
-          config.languages.map(([id]) => id),
-        ) ?? config.defaultLanguage
+      const { languageId, translationKeys } = getTranslationKeys(
+        id,
+        config.languages,
+        config.defaultLanguage,
+      )
 
       const newCode = /* tsx */ `
         import { useTitle } from 'hoofd/preact';
         import Layout from '${layoutPath}';
 
         export const path = '${route}';
-        export const language = '${language}';
+        export const language = '${languageId}';
         export const frontmatter = ${JSON.stringify(frontmatter)};
         const props = {
           frontmatter,
           path,
-          language: '${language}',
-          translations: ${JSON.stringify(translations)}
+          language: '${languageId}',
+          localizeUrl: (url) => ${
+            languageId === config.defaultLanguage
+              ? 'url'
+              : `'/${languageId}' + url`
+          },
+          translations: ${JSON.stringify(translations)},
+          translate: (key) => (${JSON.stringify(translationKeys)}[key] ?? key),
         };
 
         function Title() {

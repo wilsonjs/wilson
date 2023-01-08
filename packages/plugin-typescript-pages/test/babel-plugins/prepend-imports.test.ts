@@ -1,19 +1,19 @@
 import { transformAsync } from '@babel/core'
-import plugin from '../../src/babel-plugins/prepend-imports'
 import test from 'ava'
+import plugin from '../../src/babel-plugins/prepend-imports'
 
 test('throws when invoked with invalid options', async (t) => {
   await t.throwsAsync(transformAsync('', { plugins: [plugin] }), {
-    message: new RegExp('Invalid plugin options'),
+    message: /Invalid plugin options/,
   })
 
   await t.throwsAsync(transformAsync('', { plugins: [[plugin, {}]] }), {
-    message: new RegExp('Invalid plugin options'),
+    message: /Invalid plugin options/,
   })
 
   await t.throwsAsync(
     transformAsync('', { plugins: [[plugin, { imports: {} }]] }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.notThrowsAsync(
@@ -24,14 +24,14 @@ test('throws when invoked with invalid options', async (t) => {
     transformAsync('', {
       plugins: [[plugin, { imports: [{ source: 'fs' }] }]],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.throwsAsync(
     transformAsync('', {
       plugins: [[plugin, { imports: [{ identifiers: [], source: 'fs' }] }]],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.throwsAsync(
@@ -43,7 +43,7 @@ test('throws when invoked with invalid options', async (t) => {
         ],
       ],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.notThrowsAsync(
@@ -72,7 +72,7 @@ test('throws when invoked with invalid options', async (t) => {
         ],
       ],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.throwsAsync(
@@ -88,7 +88,7 @@ test('throws when invoked with invalid options', async (t) => {
         ],
       ],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.notThrowsAsync(
@@ -126,7 +126,7 @@ test('throws when the exported identifier already exists', async (t) => {
         ],
       ],
     }),
-    { message: new RegExp('Top-level identifier "fs" already exists!') },
+    { message: /Top-level identifier "fs" already exists!/ },
   )
 
   await t.throwsAsync(
@@ -145,7 +145,7 @@ test('throws when the exported identifier already exists', async (t) => {
         ],
       ],
     }),
-    { message: new RegExp('Top-level identifier "promises" already exists!') },
+    { message: /Top-level identifier "promises" already exists!/ },
   )
 
   await t.throwsAsync(
@@ -166,7 +166,7 @@ test('throws when the exported identifier already exists', async (t) => {
         ],
       ],
     }),
-    { message: new RegExp('Top-level identifier "fs" already exists!') },
+    { message: /Top-level identifier "fs" already exists!/ },
   )
 })
 

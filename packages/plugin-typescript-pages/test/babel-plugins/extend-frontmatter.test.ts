@@ -1,34 +1,34 @@
 import { transformAsync } from '@babel/core'
-import plugin from '../../src/babel-plugins/extend-frontmatter'
 import test from 'ava'
+import plugin from '../../src/babel-plugins/extend-frontmatter'
 
 test('throws when invoked with invalid options', async (t) => {
   await t.throwsAsync(
     transformAsync(`export const frontmatter = {}`, {
       plugins: [plugin],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.throwsAsync(
     transformAsync(`export const frontmatter = {}`, {
       plugins: [[plugin, {}]],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.throwsAsync(
     transformAsync(`export const frontmatter = {}`, {
       plugins: [[plugin, { frontmatter: 42 }]],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.throwsAsync(
     transformAsync(`export const frontmatter = {}`, {
       plugins: [[plugin, { frontmatter: {} }]],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.notThrowsAsync(

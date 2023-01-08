@@ -1,28 +1,27 @@
 import { transformAsync } from '@babel/core'
-import { UserFrontmatter } from '@wilson/types'
-import plugin from './../../src/babel-plugins/parse-frontmatter'
 import test from 'ava'
+import plugin from './../../src/babel-plugins/parse-frontmatter'
 
 test('throws when invoked with invalid options', async (t) => {
   await t.throwsAsync(
     transformAsync(`export const frontmatter = {}`, {
       plugins: [plugin],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.throwsAsync(
     transformAsync(`export const frontmatter = {}`, {
       plugins: [[plugin, {}]],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.throwsAsync(
     transformAsync(`export const frontmatter = {}`, {
       plugins: [[plugin, { frontmatter: 42 }]],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 })
 
@@ -32,14 +31,14 @@ test('throws when frontmatter is not exported', async (t) => {
       `export default function Page() { return <h1>My page</h1> }`,
       { plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]] },
     ),
-    { message: new RegExp('Pages must export "frontmatter"!') },
+    { message: /Pages must export "frontmatter"!/ },
   )
 
   await t.throwsAsync(
     transformAsync(`const frontmatter = { title: 'Blog' }`, {
       plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]],
     }),
-    { message: new RegExp('Pages must export "frontmatter"!') },
+    { message: /Pages must export "frontmatter"!/ },
   )
 
   await t.notThrowsAsync(
@@ -54,7 +53,7 @@ test("throws when frontmatter doesn't include title", async (t) => {
     transformAsync(`export const frontmatter = { layout: 'widescreen' }`, {
       plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]],
     }),
-    { message: new RegExp('Page frontmatter does not include "title"!') },
+    { message: /Page frontmatter does not include "title"!/ },
   )
 })
 
@@ -64,9 +63,8 @@ test('throws when frontmatter includes illegal types', async (t) => {
       plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]],
     }),
     {
-      message: new RegExp(
-        'Frontmatter export must be JSON. Illegal ArrowFunctionExpression found!',
-      ),
+      message:
+        /Frontmatter export must be JSON. Illegal ArrowFunctionExpression found!/,
     },
   )
 
@@ -76,9 +74,8 @@ test('throws when frontmatter includes illegal types', async (t) => {
       { plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]] },
     ),
     {
-      message: new RegExp(
-        'Frontmatter export must be JSON. Illegal computed ObjectProperty found!',
-      ),
+      message:
+        /Frontmatter export must be JSON. Illegal computed ObjectProperty found!/,
     },
   )
 
@@ -88,9 +85,8 @@ test('throws when frontmatter includes illegal types', async (t) => {
       { plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]] },
     ),
     {
-      message: new RegExp(
-        'Frontmatter export must be JSON. Illegal Identifier "foo" found in TemplateLiteral',
-      ),
+      message:
+        /Frontmatter export must be JSON. Illegal Identifier "foo" found in TemplateLiteral/,
     },
   )
 
@@ -100,9 +96,8 @@ test('throws when frontmatter includes illegal types', async (t) => {
       { plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]] },
     ),
     {
-      message: new RegExp(
-        'Frontmatter export must be JSON. Illegal Identifier "foo" in ObjectProperty found!',
-      ),
+      message:
+        /Frontmatter export must be JSON. Illegal Identifier "foo" in ObjectProperty found!/,
     },
   )
 
@@ -112,9 +107,8 @@ test('throws when frontmatter includes illegal types', async (t) => {
       { plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]] },
     ),
     {
-      message: new RegExp(
-        'Frontmatter export must be JSON. Illegal Identifier "foo" in ArrayExpression found!',
-      ),
+      message:
+        /Frontmatter export must be JSON. Illegal Identifier "foo" in ArrayExpression found!/,
     },
   )
 
@@ -123,9 +117,8 @@ test('throws when frontmatter includes illegal types', async (t) => {
       plugins: ['@babel/plugin-syntax-jsx', [plugin, { frontmatter: {} }]],
     }),
     {
-      message: new RegExp(
-        'Frontmatter export must be JSON. Illegal Identifier "undefined" in ObjectProperty found!',
-      ),
+      message:
+        /Frontmatter export must be JSON. Illegal Identifier "undefined" in ObjectProperty found!/,
     },
   )
 

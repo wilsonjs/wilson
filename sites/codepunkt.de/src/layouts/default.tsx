@@ -5,12 +5,11 @@ import 'typeface-fira-code'
 import 'typeface-montserrat'
 import 'typeface-open-sans'
 import 'what-input'
-import '../assets/global.scss'
-import styles from './default.module.scss'
 import ColorModeProvider from '../components/color-mode-provider'
 import Menu from '../components/menu'
 import Logo from '../assets/logo.svg?component'
 import menuEntries from '../menu.json'
+import styles from './default.module.scss'
 
 export default function DefaultLayout(props: StaticPageProps) {
   return (
@@ -19,7 +18,7 @@ export default function DefaultLayout(props: StaticPageProps) {
         <Link href={`/`} class={styles.logoLink}>
           <Logo class={styles.logo} data-logo />
         </Link>
-        <Menu />
+        <Menu {...props} />
       </header>
       <main class={styles.main}>{props.children}</main>
       <footer class={styles.footer}>
@@ -27,7 +26,7 @@ export default function DefaultLayout(props: StaticPageProps) {
           <div class={styles.grid}>
             <div class={styles.about}>
               <div class={styles.aboutHeader}>Christoph Werner</div>
-              <p>footer-about</p>
+              <p>{props.translate('footer-about')}</p>
               <ol class={styles.socialList}>
                 <li class={styles.socialElement}>
                   <a
@@ -136,10 +135,10 @@ export default function DefaultLayout(props: StaticPageProps) {
               <div class={styles.sitemapHeader}>Sitemap</div>
               <ul>
                 {menuEntries.map(({ url, name }) => {
-                  const translatedName = 'name'
+                  name = props.translate(name)
                   return (
-                    <li key={translatedName}>
-                      <Link href={url}>{translatedName}</Link>
+                    <li key={name}>
+                      <Link href={props.localizeUrl(url)}>{name}</Link>
                     </li>
                   )
                 })}
@@ -155,7 +154,7 @@ export default function DefaultLayout(props: StaticPageProps) {
               </ul>
             </div>
             <div class={styles.copyright}>
-              {'footer-copyright'} © Christoph Werner 2022
+              {props.translate('footer-copyright')} © Christoph Werner 2022
             </div>
           </div>
         </div>

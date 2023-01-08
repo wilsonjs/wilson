@@ -4,8 +4,8 @@ import { loadConfigFromFile, mergeConfig as mergeViteConfig } from 'vite'
 import pc from 'picocolors'
 import { dirname, join, resolve } from 'pathe'
 import type { SiteConfig, UserConfig } from '@wilson/types'
-import { debug } from './utils'
 import { isObject } from '@wilson/utils'
+import { debug } from './utils'
 
 const defaultSiteMeta = {
   title: 'Welcome to Wilson!',
@@ -176,6 +176,7 @@ function siteConfigDefaults(
     site: defaultSiteMeta,
     defaultLanguage: 'en',
     defaultLanguageInSubdir: false,
+    // TODO validate that translationKeys values are all strings
     languages: [],
     vite: viteConfigDefaults(root),
     extendFrontmatter(filename, frontmatter) {

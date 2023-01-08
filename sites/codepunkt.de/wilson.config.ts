@@ -1,4 +1,4 @@
-import { UserConfig } from 'wilson'
+import type { UserConfig } from 'wilson'
 
 export default {
   siteUrl: 'https://codepunkt.de/',
@@ -8,10 +8,32 @@ export default {
   },
   defaultContentLanguage: 'en',
   languages: [
-    ['en', { languageName: 'English' }],
-    ['de', { languageName: 'Deutsch' }],
+    [
+      'en',
+      {
+        languageName: 'English',
+        translationKeys: {
+          'footer-about': 'Footer about',
+          'menu-about': 'About me',
+          'menu-home': 'Home',
+          'menu-workshops': 'Workshops',
+          'menu-writing': 'Writing',
+        },
+      },
+    ],
+    [
+      'de',
+      {
+        languageName: 'Deutsch',
+        translationKeys: {
+          'footer-about': 'hoee?',
+          'menu-about': 'Über mich',
+          'menu-home': 'Startseite',
+          'menu-workshops': 'Workshops',
+          'menu-writing': 'Blog',
+        },
+      },
+    ],
   ],
-  extendFrontmatter(filename, frontmatter) {
-    // frontmatter.layout = 'default'
-  },
+  extendFrontmatter() {},
 } as UserConfig

@@ -1,20 +1,20 @@
 import { transformAsync } from '@babel/core'
-import plugin from '../../src/babel-plugins/add-static-paths'
 import test from 'ava'
+import plugin from '../../src/babel-plugins/add-static-paths'
 
 test('throws when invoked with invalid options', async (t) => {
   await t.throwsAsync(
     transformAsync(`export const getStaticPaths = () => {}`, {
       plugins: [plugin],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.throwsAsync(
     transformAsync(`export const getStaticPaths = () => {}`, {
       plugins: [[plugin, {}]],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 })
 
@@ -34,7 +34,7 @@ test('throws when getStaticPaths is missing or not exported', async (t) => {
         ],
       ],
     }),
-    { message: new RegExp('Dynamic pages must export "getStaticPaths"!') },
+    { message: /Dynamic pages must export "getStaticPaths"!/ },
   )
 
   await t.throwsAsync(
@@ -52,7 +52,7 @@ test('throws when getStaticPaths is missing or not exported', async (t) => {
         ],
       ],
     }),
-    { message: new RegExp('Dynamic pages must export "getStaticPaths"!') },
+    { message: /Dynamic pages must export "getStaticPaths"!/ },
   )
 })
 

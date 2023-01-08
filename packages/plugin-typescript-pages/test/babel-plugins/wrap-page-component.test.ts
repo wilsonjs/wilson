@@ -1,12 +1,12 @@
 import { transformAsync } from '@babel/core'
-import plugin from '../../src/babel-plugins/wrap-page-component'
 import test from 'ava'
+import plugin from '../../src/babel-plugins/wrap-page-component'
 
 test('throws when invoked with invalid options', async (t) => {
   await t.throwsAsync(
     transformAsync('export default function Page() {}', { plugins: [plugin] }),
     {
-      message: new RegExp('Invalid plugin options'),
+      message: /Invalid plugin options/,
     },
   )
 
@@ -15,7 +15,7 @@ test('throws when invoked with invalid options', async (t) => {
       plugins: [[plugin, {}]],
     }),
     {
-      message: new RegExp('Invalid plugin options'),
+      message: /Invalid plugin options/,
     },
   )
 
@@ -23,20 +23,29 @@ test('throws when invoked with invalid options', async (t) => {
     transformAsync('export default function Page() {}', {
       plugins: [[plugin, { isDynamic: true }]],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.throwsAsync(
     transformAsync('export default function Page() {}', {
       plugins: [[plugin, { componentName: 'Foo' }]],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.notThrowsAsync(
     transformAsync('export default function Page() {}', {
       plugins: [
-        [plugin, { componentName: 'Foo', language: 'en', isDynamic: true }],
+        [
+          plugin,
+          {
+            componentName: 'Foo',
+            languageId: 'en',
+            isDefaultLanguage: true,
+            translationKeys: {},
+            isDynamic: true,
+          },
+        ],
       ],
     }),
   )
@@ -46,13 +55,21 @@ test('throws without default export', async (t) => {
   await t.throwsAsync(
     transformAsync(`const foo = [];`, {
       plugins: [
-        [plugin, { componentName: 'Foo', language: 'en', isDynamic: true }],
+        [
+          plugin,
+          {
+            componentName: 'Foo',
+            languageId: 'en',
+            isDefaultLanguage: true,
+            translationKeys: {},
+            isDynamic: true,
+          },
+        ],
       ],
     }),
     {
-      message: new RegExp(
-        'No default export found. Page component must be exported as default!',
-      ),
+      message:
+        /No default export found. Page component must be exported as default!/,
     },
   )
 })
@@ -61,11 +78,20 @@ test('throws when default export is not a function', async (t) => {
   await t.throwsAsync(
     transformAsync(`export default []`, {
       plugins: [
-        [plugin, { componentName: 'Foo', language: 'en', isDynamic: true }],
+        [
+          plugin,
+          {
+            componentName: 'Foo',
+            languageId: 'en',
+            isDefaultLanguage: true,
+            translationKeys: {},
+            isDynamic: true,
+          },
+        ],
       ],
     }),
     {
-      message: new RegExp('Default export must be FunctionDeclaration.'),
+      message: /Default export must be FunctionDeclaration./,
     },
   )
 })
@@ -76,7 +102,16 @@ test('wraps exported page', async (t) => {
     {
       plugins: [
         '@babel/plugin-syntax-jsx',
-        [plugin, { componentName: 'Static', language: 'en', isDynamic: false }],
+        [
+          plugin,
+          {
+            componentName: 'Static',
+            languageId: 'en',
+            isDefaultLanguage: true,
+            translationKeys: { foo: 'bar' },
+            isDynamic: false,
+          },
+        ],
       ],
     },
   )
@@ -87,7 +122,16 @@ test('wraps exported page', async (t) => {
     {
       plugins: [
         '@babel/plugin-syntax-jsx',
-        [plugin, { componentName: 'Dynamic', language: 'en', isDynamic: true }],
+        [
+          plugin,
+          {
+            componentName: 'Dynamic',
+            languageId: 'de',
+            isDefaultLanguage: false,
+            translationKeys: { bar: 'baz' },
+            isDynamic: true,
+          },
+        ],
       ],
     },
   )

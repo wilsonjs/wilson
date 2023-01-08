@@ -90,12 +90,15 @@ export type Languages = Array<
     identifier: string,
     config: {
       languageName: string
+      translationKeys: {
+        [key: string]: string
+      }
       [key: string]: any
     },
   ]
 >
 
-export type Translation = {
+export interface Translation {
   route: string
   languageId: string
   languageName: string
@@ -215,10 +218,13 @@ export interface DynamicPageExports extends StaticPageExports {
   getStaticPaths: GetStaticPaths
 }
 
-export type GetStaticPathsResult<
+export interface GetStaticPathsResult<
   Params extends string = string,
   Props extends Record<string, any> = Record<string, any>,
-> = { params: Record<Params, string>; props?: Props }
+> {
+  params: Record<Params, string>
+  props?: Props
+}
 
 export type StaticPath = GetStaticPathsResult & { url: string }
 
@@ -236,7 +242,9 @@ interface BaseProps {
   url: string
   frontmatter: PageFrontmatter
   language: string
+  localizeUrl: (url: string) => string
   translations: Translation[]
+  translate: (key: string) => string
 }
 
 export type StaticPageProps = RenderableProps<BaseProps>
