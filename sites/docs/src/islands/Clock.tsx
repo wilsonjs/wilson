@@ -13,7 +13,7 @@ export default function Clock() {
     <div className={styles.clock}>
       {typeof document === 'undefined'
         ? ''
-        : date.toLocaleTimeString() + '.' + (decimals === 10 ? '0' : decimals)}
+        : `${date.toLocaleTimeString()}.${decimals === 10 ? '0' : decimals}`}
     </div>
   )
 }

@@ -7,8 +7,13 @@ import {
 import type { Plugin } from 'vite'
 import type { TransformResult } from 'rollup'
 import type { SiteConfig, UserFrontmatter } from '@wilson/types'
-import { getLanguage } from '@wilson/client-utils'
-import { PluginItem, transformFromAstAsync } from '@babel/core'
+import type { PluginItem } from '@babel/core'
+import { transformFromAstAsync } from '@babel/core'
+import parser from '@babel/parser'
+import type { File } from '@babel/types'
+import type { ParseResult } from '@babel/parser'
+import { relative } from 'pathe'
+import { getTranslationKeys } from '@wilson/client-utils'
 import parseFrontmatterPlugin from './babel-plugins/parse-frontmatter'
 import prependImportsPlugin from './babel-plugins/prepend-imports'
 import addNamedStringExportPlugin from './babel-plugins/add-named-string-export'
@@ -16,10 +21,6 @@ import extendFrontmatterPlugin from './babel-plugins/extend-frontmatter'
 import addStaticPathsPlugin from './babel-plugins/add-static-paths'
 import wrapPageComponentPlugin from './babel-plugins/wrap-page-component'
 import addTranslationsPlugin from './babel-plugins/add-translations'
-import parser from '@babel/parser'
-import type { File } from '@babel/types'
-import type { ParseResult } from '@babel/parser'
-import { relative } from 'pathe'
 import format from './util/format'
 
 function parse(code: string): ParseResult<File> {
@@ -77,11 +78,13 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
 
         const isDynamic = dynamicParameterMatches.length > 0
         const componentName = createComponentName(relativePath)
-        const language =
-          getLanguage(
-            id,
-            config.languages.map(([id]) => id),
-          ) ?? config.defaultLanguage
+        const { languageId, translationKeys } = getTranslationKeys(
+          id,
+          config.languages,
+          config.defaultLanguage,
+        )
+
+        const isDefaultLanguage = languageId === config.defaultLanguage
 
         const transformResult = await transformFromAstAsync(syntaxTree, code, {
           ast: true,
@@ -135,7 +138,16 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
                 relativePagesDir: relative(root, pagesDir),
               },
             ],
-            [wrapPageComponentPlugin, { componentName, language, isDynamic }],
+            [
+              wrapPageComponentPlugin,
+              {
+                componentName,
+                languageId,
+                isDefaultLanguage,
+                isDynamic,
+                translationKeys,
+              },
+            ],
           ].filter(Boolean) as PluginItem[],
         })
 

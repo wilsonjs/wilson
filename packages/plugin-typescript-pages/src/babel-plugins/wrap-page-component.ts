@@ -3,13 +3,91 @@ import types from '@babel/types'
 import z from 'zod'
 import validateOptions from '../util/validate-options'
 
+function buildTranslateFunction(translationKeys: Record<string, string>) {
+  return types.objectProperty(
+    types.identifier('translate'),
+    types.arrowFunctionExpression(
+      [types.identifier('key')],
+      types.logicalExpression(
+        '??',
+        types.memberExpression(
+          types.objectExpression(
+            Object.entries(translationKeys).map(([key, value]) =>
+              types.objectProperty(
+                types.stringLiteral(key),
+                types.stringLiteral(value as string),
+              ),
+            ),
+          ),
+          types.identifier('key'),
+          true,
+        ),
+        types.identifier('key'),
+      ),
+    ),
+  )
+}
+
+function buildLocalizeUrlFunction(
+  isDefaultLanguage: boolean,
+  languageId: string,
+) {
+  return types.objectProperty(
+    types.identifier('localizeUrl'),
+    types.arrowFunctionExpression(
+      [types.identifier('url')],
+      isDefaultLanguage
+        ? types.identifier('url')
+        : types.templateLiteral(
+            [
+              types.templateElement({
+                raw: `/${languageId}`,
+                cooked: `/${languageId}`,
+              }),
+              types.templateElement({ raw: '', cooked: '' }, true),
+            ],
+            [types.identifier('url')],
+          ),
+    ),
+  )
+}
+
+// function createConsoleDir(identifiers: string[]) {
+//   return types.expressionStatement(
+//     types.callExpression(
+//       types.memberExpression(
+//         types.identifier('console'),
+//         types.identifier('dir'),
+//       ),
+//       [
+//         types.objectExpression(
+//           identifiers.map((identifier) =>
+//             types.objectProperty(
+//               types.identifier(identifier),
+//               types.identifier(identifier),
+//             ),
+//           ),
+//         ),
+//         types.objectExpression([
+//           types.objectProperty(
+//             types.identifier('depth'),
+//             types.numericLiteral(8),
+//           ),
+//         ]),
+//       ],
+//     ),
+//   )
+// }
+
 let program: types.Program
 let exportDefault: types.ExportDefaultDeclaration
 
 const pluginOptions = z.object({
   componentName: z.string(),
+  isDefaultLanguage: z.boolean(),
   isDynamic: z.boolean(),
-  language: z.string(),
+  languageId: z.string(),
+  translationKeys: z.object({}),
 })
 
 export default function wrapPageComponentPlugin(): PluginObj<{
@@ -141,37 +219,6 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                       ),
                     ),
                   ]),
-                  // // console.log
-                  // types.expressionStatement(
-                  //   types.callExpression(
-                  //     types.memberExpression(
-                  //       types.identifier('console'),
-                  //       types.identifier('dir'),
-                  //     ),
-                  //     [
-                  //       types.objectExpression([
-                  //         types.objectProperty(
-                  //           types.identifier('params'),
-                  //           types.identifier('params'),
-                  //         ),
-                  //         types.objectProperty(
-                  //           types.identifier('staticPaths'),
-                  //           types.identifier('staticPaths'),
-                  //         ),
-                  //         types.objectProperty(
-                  //           types.identifier('staticPath'),
-                  //           types.identifier('staticPath'),
-                  //         ),
-                  //       ]),
-                  //       types.objectExpression([
-                  //         types.objectProperty(
-                  //           types.identifier('depth'),
-                  //           types.numericLiteral(8),
-                  //         ),
-                  //       ]),
-                  //     ],
-                  //   ),
-                  // ),
                   types.variableDeclaration('const', [
                     types.variableDeclarator(
                       types.identifier('props'),
@@ -190,7 +237,7 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                         ),
                         types.objectProperty(
                           types.identifier('language'),
-                          types.stringLiteral(opts.language),
+                          types.stringLiteral(opts.languageId),
                           false,
                           true,
                         ),
@@ -239,6 +286,11 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                           false,
                           true,
                         ),
+                        buildTranslateFunction(opts.translationKeys),
+                        buildLocalizeUrlFunction(
+                          opts.isDefaultLanguage,
+                          opts.languageId,
+                        ),
                         types.spreadElement(
                           types.logicalExpression(
                             '??',
@@ -273,7 +325,7 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                         ),
                         types.objectProperty(
                           types.identifier('language'),
-                          types.stringLiteral(opts.language),
+                          types.stringLiteral(opts.languageId),
                           false,
                           true,
                         ),
@@ -282,6 +334,11 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                           types.identifier('translations'),
                           false,
                           true,
+                        ),
+                        buildTranslateFunction(opts.translationKeys),
+                        buildLocalizeUrlFunction(
+                          opts.isDefaultLanguage,
+                          opts.languageId,
                         ),
                         types.spreadElement(types.identifier('rest')),
                       ]),
@@ -327,13 +384,6 @@ export default function wrapPageComponentPlugin(): PluginObj<{
             ),
           ]),
         )
-
-        //     isDynamic
-        //       ? `
-        //         const staticPath = staticPaths.find(({ params: p }) => shallowEqual(p, params));
-        //         const props = { frontmatter, params, ...(staticPath.props ?? {}), ...rest };
-        //       `
-        //       : `const props = { frontmatter, params, ...rest };`
 
         program.body.push(fc)
       },
