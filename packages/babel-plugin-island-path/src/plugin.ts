@@ -1,5 +1,7 @@
+import { dirname, resolve } from 'path'
 import { declare } from '@babel/helper-plugin-utils'
-import { NodePath, types as t } from '@babel/core'
+import type { NodePath } from '@babel/core'
+import { types as t } from '@babel/core'
 import type {
   JSXAttribute,
   JSXExpressionContainer,
@@ -9,12 +11,10 @@ import type {
   ObjectExpression,
   Program,
 } from '@babel/types'
-import { dirname, resolve } from 'path'
 
 interface Options {
   islandsDir: string
-  layoutsDir: string
-  pagesDir: string
+  srcDir: string
 }
 
 const partialHydrationProps = [
@@ -52,7 +52,7 @@ function findIslandPath(
   jsxName: string,
   path: NodePath<Program>,
 ): string | undefined {
-  let islandPath: string | undefined = undefined
+  let islandPath: string | undefined
 
   path.traverse({
     ImportDeclaration(path) {
@@ -61,8 +61,10 @@ function findIslandPath(
           ({ type }) => type === 'ImportDefaultSpecifier',
         )
         if (defaultImport && defaultImport.local.name === jsxName) {
-          islandPath =
-            resolve(dirname(fileName), path.node.source.value) + '.tsx'
+          islandPath = `${resolve(
+            dirname(fileName),
+            path.node.source.value,
+          )}.tsx`
         }
       }
     },
@@ -88,14 +90,13 @@ function addIslandPathAttribute(
   )
 }
 
-export default declare((api, { islandsDir, layoutsDir, pagesDir }: Options) => {
+export default declare((api, { islandsDir, srcDir }: Options) => {
   return {
-    name: 'wat',
+    name: '@wilson/babel-plugin-island-path',
     visitor: {
       Program(programPath, state) {
         const fileName = state.file.opts.filename!
-        const isPageOrLayout =
-          fileName.startsWith(pagesDir) || fileName.startsWith(layoutsDir)
+        const isPageOrLayout = fileName.startsWith(srcDir)
 
         programPath.traverse({
           JSXOpeningElement(path) {
