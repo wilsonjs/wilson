@@ -1,27 +1,27 @@
 import { transformAsync } from '@babel/core'
-import plugin from '../../src/babel-plugins/add-translations'
 import test from 'ava'
+import plugin from '../../src/babel-plugins/add-translations'
 
 test('throws when invoked with invalid options', async (t) => {
   await t.throwsAsync(
     transformAsync(`export const getStaticPaths = () => {}`, {
       plugins: [plugin],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.throwsAsync(
     transformAsync(`export const getStaticPaths = () => {}`, {
       plugins: [[plugin, {}]],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.throwsAsync(
     transformAsync(`export const frontmatter = {}`, {
       plugins: [[plugin, { translations: 'hello' }]],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.notThrowsAsync(
@@ -37,9 +37,7 @@ test('throws when translations identifier already exists', async (t) => {
       plugins: [[plugin, { translations: [] }]],
     }),
     {
-      message: new RegExp(
-        'Top-level identifier "translations" already exists!',
-      ),
+      message: /Top-level identifier "translations" already exists!/,
     },
   )
 })

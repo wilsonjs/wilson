@@ -1,26 +1,26 @@
 import { transformAsync } from '@babel/core'
-import plugin from '../../src/babel-plugins/add-named-string-export'
 import test from 'ava'
+import plugin from '../../src/babel-plugins/add-named-string-export'
 
 test('throws when invoked with invalid options', async (t) => {
   await t.throwsAsync(transformAsync('', { plugins: [plugin] }), {
-    message: new RegExp('Invalid plugin options'),
+    message: /Invalid plugin options/,
   })
 
   await t.throwsAsync(transformAsync('', { plugins: [[plugin, {}]] }), {
-    message: new RegExp('Invalid plugin options'),
+    message: /Invalid plugin options/,
   })
 
   await t.throwsAsync(
     transformAsync('', { plugins: [[plugin, { exportString: 'bar' }]] }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.throwsAsync(
     transformAsync('', {
       plugins: [[plugin, { exportIdentifier: 'foo' }]],
     }),
-    { message: new RegExp('Invalid plugin options') },
+    { message: /Invalid plugin options/ },
   )
 
   await t.notThrowsAsync(
@@ -50,6 +50,6 @@ test('throws when the exported identifier already exists', async (t) => {
     transformAsync(`const foo = [];`, {
       plugins: [[plugin, { exportIdentifier: 'foo', exportString: 'bar' }]],
     }),
-    { message: new RegExp('Top-level identifier "foo" already exists!') },
+    { message: /Top-level identifier "foo" already exists!/ },
   )
 })

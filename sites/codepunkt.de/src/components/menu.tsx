@@ -1,9 +1,10 @@
-import { FunctionalComponent } from 'preact'
+import type { FunctionalComponent } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
+import type { StaticPageProps } from 'wilson'
+import menuEntries from '../menu.json'
 import MenuToggle from './menu-toggle'
 import ModeToggle from './mode-toggle'
 import styles from './menu.module.scss'
-import menuEntries from '../menu.json'
 
 // TODO activeClassName on links
 export const SOCIAL_LINKS = [
@@ -39,7 +40,7 @@ export const SOCIAL_LINKS = [
   },
 ]
 
-const Menu: FunctionalComponent = () => {
+const Menu: FunctionalComponent = (props: StaticPageProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const wasOpen = false
   const isWide = true
@@ -70,10 +71,10 @@ const Menu: FunctionalComponent = () => {
     <div class={styles.wrapper}>
       <ol class={styles.smallMenu}>
         {menuEntries.map(({ url, name }) => {
-          url = `${url}`
+          name = props.translate(name)
           return (
             <li key={name} class={styles.smallMenuEntry}>
-              <a href={url} class={styles.smallMenuLink}>
+              <a href={props.localizeUrl(url)} class={styles.smallMenuLink}>
                 {name}
               </a>
             </li>
@@ -89,10 +90,14 @@ const Menu: FunctionalComponent = () => {
             <div class={styles.content}>
               <ol class={styles.menu}>
                 {menuEntries.map(({ url, name }) => {
-                  url = `${url}`
+                  name = props.translate(name)
                   return (
                     <li key={name}>
-                      <a href={url} onClick={closeMenu} class={styles.menuLink}>
+                      <a
+                        href={props.localizeUrl(url)}
+                        onClick={closeMenu}
+                        class={styles.menuLink}
+                      >
                         {name}
                       </a>
                     </li>
