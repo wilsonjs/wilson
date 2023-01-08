@@ -96,7 +96,7 @@ export default declare((api, { islandsDir, srcDir }: Options) => {
     visitor: {
       Program(programPath, state) {
         const fileName = state.file.opts.filename!
-        const isPageOrLayout = fileName.startsWith(srcDir)
+        const isSourceFile = fileName.startsWith(srcDir)
 
         programPath.traverse({
           JSXOpeningElement(path) {
@@ -108,7 +108,7 @@ export default declare((api, { islandsDir, srcDir }: Options) => {
             // @babel/plugin-transform-react-jsx-development for
             // JSXOpeningElements that are not on a wilson page or layout or
             // don't have partial hydration attributes.
-            if (!isPageOrLayout || !hasPartialHydrationAttribute) {
+            if (!isSourceFile || !hasPartialHydrationAttribute) {
               return removeDevelopmentAttributes(path.node)
             }
 
