@@ -27,20 +27,9 @@ const ModeToggle: FunctionalComponent = memo(() => {
   const moonRef = useRef<SVGAnimateElement>(null)
 
   const [colorMode, setColorMode] = useState<ColorMode>(() => {
-    const preferDarkQuery = '(prefers-color-scheme: dark)'
-
-    const mediaQueryList = window.matchMedia(preferDarkQuery)
-    const supportsColorSchemeQuery = mediaQueryList.media === preferDarkQuery
-    const persistedColorMode = localStorage.getItem(colorModeStorageKey)
-
-    let colorMode: ColorMode = 'light'
-    if (typeof persistedColorMode === 'string') {
-      colorMode = persistedColorMode as ColorMode
-    } else if (supportsColorSchemeQuery) {
-      colorMode = mediaQueryList.matches ? 'dark' : 'light'
-    }
-
-    return colorMode
+    return localStorage.getItem(colorModeStorageKey) === 'dark'
+      ? 'dark'
+      : 'light'
   })
 
   useEffect(() => {

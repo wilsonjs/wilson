@@ -28,6 +28,7 @@
     "preact": "^10.10.0",
     "react": "npm:@preact/compat",
     "react-dom": "npm:@preact/compat",
+    "terser": "^5.16.1",
     "typeface-fira-code": "^1.1.13",
     "typeface-montserrat": "^1.1.13",
     "typeface-open-sans": "^1.1.13",

@@ -1,16 +1,16 @@
+import type { ServerResponse } from 'http'
 import type {
   Connect,
   ServerOptions,
-  UserConfig as ViteUserConfig,
   ViteDevServer,
+  UserConfig as ViteUserConfig,
 } from 'vite'
 import { createServer as createViteServer, mergeConfig } from 'vite'
-import type { ServerResponse } from 'http'
+import { extname, resolve } from 'pathe'
+import type { SiteConfig } from '@wilson/types'
 import { resolveConfig } from './config'
 import wilsonPlugins from './plugins'
-import { extname, resolve } from 'pathe'
 import { fileExists } from './utils'
-import { SiteConfig } from '@wilson/types'
 
 export async function createServer(
   root: string = process.cwd(),
@@ -51,6 +51,7 @@ export function configureMiddleware(config: SiteConfig, server: ViteDevServer) {
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
             <title>${config.site.title}</title>
+            ${await config.getHeadContent()}
           </head>
           <body>
             <div id="site"></div>

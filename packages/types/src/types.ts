@@ -48,22 +48,16 @@ export interface UserConfig {
    * @default 'src'
    */
   srcDir?: string
-  /**
-   * Specify the directory where temporary files during build are stored.
-   */
+  /** Specify the directory where temporary files during build are stored. */
   tempDir?: string
   /**
    * Specify the directory to nest generated assets under (relative to outDir).
    * @default 'assets'
    */
   assetsDir?: string
-  /**
-   * Whether to display drafts in documents and pages.
-   */
+  /** Whether to display drafts in documents and pages. */
   drafts?: boolean
-  /**
-   * Provide site-wide meta information.
-   */
+  /** Provide site-wide meta information. */
   site: {
     title: string
     description: string
@@ -72,9 +66,7 @@ export interface UserConfig {
   defaultLanguage?: string
   /** If the default language should be rendered below its own language code (/en) like the other languages, set this to `true`. Defaults to `false`. */
   defaultLanguageInSubdir?: boolean
-  /**
-   * Language information.
-   */
+  /** Language information. */
   languages?: Languages
   /** File extensions that are allowed as pages. */
   pageExtensions?: string[]
@@ -83,6 +75,8 @@ export interface UserConfig {
     filename: string,
     frontmatter: UserFrontmatter,
   ) => Awaitable<UserFrontmatter | void>
+  /** Returns contnt that is injected into evert page's <head> */
+  getHeadContent?: () => Promise<string>
 }
 
 export type Languages = Array<

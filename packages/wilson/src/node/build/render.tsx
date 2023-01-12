@@ -1,5 +1,5 @@
 import { existsSync } from 'fs'
-import type { SiteConfig, Island, IslandsByPath } from '@wilson/types'
+import type { Island, IslandsByPath, SiteConfig } from '@wilson/types'
 import { join } from 'pathe'
 import type { RollupOutput } from 'rollup'
 import type { RenderToStringFn } from '../../client/app.server'
@@ -33,7 +33,7 @@ export async function renderPages(
 
   await withSpinner('rendering pages', async () => {
     for (const page of pagesToRender) {
-      const { rendered, islands } = renderPage(
+      const { rendered, islands } = await renderPage(
         config,
         clientChunks,
         page,
@@ -47,12 +47,12 @@ export async function renderPages(
   return { pagesToRender, islandsByPath }
 }
 
-export function renderPage(
+export async function renderPage(
   config: SiteConfig,
   clientChunks: RollupOutput['output'],
   page: PageToRender,
   renderToString: RenderToStringFn,
-): { rendered: string; islands: Island[] } {
+): Promise<{ rendered: string; islands: Island[] }> {
   const { html, islands, head } = renderToString(page.route)
   // TODO: links, scripts and meta
   return {
@@ -60,8 +60,12 @@ export function renderPage(
       <!DOCTYPE html>
       <html lang="${head.lang ?? config.defaultLanguage}">
         <head>
-          ${stylesheetTagsFrom(config, clientChunks)}
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
           <title>${head.title ?? config.site.title}</title>
+          ${stylesheetTagsFrom(config, clientChunks)}
+          ${await config.getHeadContent()}
         </head>
         <body>
           <div id="site">${html}</div>

@@ -133,12 +133,12 @@ html {
 }
 
 html[data-mode='light'] {
-  background: #fff;
+  background: #f0f7f2;
 }
 
 html[data-mode='dark'],
 html[data-mode='dark'] * {
-  background: #000;
+  background: #15202b;
   color: #fff;
 }
 

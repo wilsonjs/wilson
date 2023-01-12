@@ -134,7 +134,7 @@ function viteConfigDefaults(root: string): ViteOptions {
        * @see https://github.com/vitejs/vite/issues/8644
        */
       logOverride: { 'this-is-undefined-in-esm': 'silent' },
-      jsxInject: "import { h, Fragment } from 'preact'",
+      jsxInject: "import { h } from 'preact'",
       jsxFactory: 'h',
       jsxFragment: 'Fragment',
     },
@@ -179,6 +179,7 @@ function siteConfigDefaults(
     // TODO validate that translationKeys values are all strings
     languages: [],
     vite: viteConfigDefaults(root),
+    getHeadContent: async () => '',
     extendFrontmatter(filename, frontmatter) {
       return frontmatter
     },
