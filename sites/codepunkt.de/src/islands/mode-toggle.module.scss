@@ -5,25 +5,16 @@
     margin-left: 1.5rem;
   }
 
-  // mode toggle button doesn't work when javascript is disabled. to not
-  // display it in that case, we default to display: none and inject a
-  // small script tag into the head in wilson.config.js `injectHead` method
-  // that will be executed when the page is loaded and sets the display
-  // of this button to 'flex' with a higher specificity than the selector
-  // generated from this scss module
-  display: none;
-
   svg {
     width: 36px;
-    color: var(--color-logo);
   }
 
   path {
     stroke-width: 1.2;
     stroke: currentColor;
+    fill: transparent;
   }
 
-  /* @TODO the following part will be duplicated in both buttons */
   /**
    * scale buttons down on mobile portrait, use negative right margin to
    * compensate for the scaling effect

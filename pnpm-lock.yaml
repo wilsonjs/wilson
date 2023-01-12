@@ -896,7 +896,7 @@ packages:
       debug: 4.3.4
       kolorist: 1.5.1
       resolve: 1.22.1
-      vite: 3.2.3_e7tl4y2a3m5pvpctkvgh6b2ekm
+      vite: 3.2.3
     transitivePeerDependencies:
       - preact
       - supports-color
@@ -930,7 +930,7 @@ packages:
       '@prefresh/utils': 1.1.3
       '@rollup/pluginutils': 4.2.1
       preact: 10.10.0
-      vite: 3.2.3_e7tl4y2a3m5pvpctkvgh6b2ekm
+      vite: 3.2.3
     transitivePeerDependencies:
       - supports-color
     dev: false

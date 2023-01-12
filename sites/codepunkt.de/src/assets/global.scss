@@ -132,6 +132,16 @@ html {
   }
 }
 
+html[data-mode='light'] {
+  background: #fff;
+}
+
+html[data-mode='dark'],
+html[data-mode='dark'] * {
+  background: #000;
+  color: #fff;
+}
+
 body {
   position: relative;
   min-height: 100%;

@@ -2,8 +2,8 @@ import type { FunctionalComponent } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
 import type { StaticPageProps } from 'wilson'
 import menuEntries from '../menu.json'
+import ModeToggle from '../islands/mode-toggle'
 import MenuToggle from './menu-toggle'
-import ModeToggle from './mode-toggle'
 import styles from './menu.module.scss'
 
 // TODO activeClassName on links
@@ -81,7 +81,7 @@ const Menu: FunctionalComponent = (props: StaticPageProps) => {
           )
         })}
       </ol>
-      <ModeToggle />
+      <ModeToggle clientVisible />
       <MenuToggle isOpen={isOpen} setIsOpen={setIsOpen} />
       {isOpen && (
         <>

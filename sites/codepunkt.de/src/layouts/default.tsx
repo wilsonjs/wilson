@@ -5,7 +5,6 @@ import 'typeface-fira-code'
 import 'typeface-montserrat'
 import 'typeface-open-sans'
 import 'what-input'
-import ColorModeProvider from '../components/color-mode-provider'
 import Menu from '../components/menu'
 import Logo from '../assets/logo.svg?component'
 import menuEntries from '../menu.json'
@@ -13,7 +12,7 @@ import styles from './default.module.scss'
 
 export default function DefaultLayout(props: StaticPageProps) {
   return (
-    <ColorModeProvider>
+    <>
       <header class={styles.header}>
         <Link href={`/`} class={styles.logoLink}>
           <Logo class={styles.logo} data-logo />
@@ -159,6 +158,6 @@ export default function DefaultLayout(props: StaticPageProps) {
           </div>
         </div>
       </footer>
-    </ColorModeProvider>
+    </>
   )
 }
