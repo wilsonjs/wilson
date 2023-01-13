@@ -5,8 +5,8 @@ import menuEntries from '../menu.json'
 import ModeToggle from '../islands/mode-toggle'
 import MenuToggle from './menu-toggle'
 import styles from './menu.module.scss'
+import Link from './link'
 
-// TODO activeClassName on links
 export const SOCIAL_LINKS = [
   {
     name: 'Twitter profile',
@@ -40,7 +40,7 @@ export const SOCIAL_LINKS = [
   },
 ]
 
-const Menu: FunctionalComponent = (props: StaticPageProps) => {
+const Menu: FunctionalComponent<StaticPageProps> = (props: StaticPageProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const wasOpen = false
   const isWide = true
@@ -74,9 +74,13 @@ const Menu: FunctionalComponent = (props: StaticPageProps) => {
           name = props.translate(name)
           return (
             <li key={name} class={styles.smallMenuEntry}>
-              <a href={props.localizeUrl(url)} class={styles.smallMenuLink}>
+              <Link
+                href={props.localizeUrl(url)}
+                exact={url === '/'}
+                class={styles.smallMenuLink}
+              >
                 {name}
-              </a>
+              </Link>
             </li>
           )
         })}

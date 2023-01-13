@@ -38,15 +38,21 @@ function buildLocalizeUrlFunction(
       [types.identifier('url')],
       isDefaultLanguage
         ? types.identifier('url')
-        : types.templateLiteral(
-            [
-              types.templateElement({
-                raw: `/${languageId}`,
-                cooked: `/${languageId}`,
-              }),
-              types.templateElement({ raw: '', cooked: '' }, true),
-            ],
-            [types.identifier('url')],
+        : types.callExpression(
+            types.memberExpression(
+              types.templateLiteral(
+                [
+                  types.templateElement({
+                    raw: `/${languageId}`,
+                    cooked: `/${languageId}`,
+                  }),
+                  types.templateElement({ raw: '', cooked: '' }, true),
+                ],
+                [types.identifier('url')],
+              ),
+              types.identifier('replace'),
+            ),
+            [types.regExpLiteral('\\/$'), types.stringLiteral('')],
           ),
     ),
   )

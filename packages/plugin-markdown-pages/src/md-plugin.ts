@@ -129,7 +129,7 @@ export default function markdownPagesPlugin(config: SiteConfig): PluginOption {
           localizeUrl: (url) => ${
             languageId === config.defaultLanguage
               ? 'url'
-              : `'/${languageId}' + url`
+              : `'/${languageId}' + url.replace(/\\/$/, '')`
           },
           translations: ${JSON.stringify(translations)},
           translate: (key) => (${JSON.stringify(translationKeys)}[key] ?? key),

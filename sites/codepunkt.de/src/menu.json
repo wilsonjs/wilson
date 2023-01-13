@@ -4,15 +4,15 @@
     "name": "menu-home"
   },
   {
-    "url": "/writing/",
+    "url": "/writing",
     "name": "menu-writing"
   },
   {
-    "url": "/workshops/",
+    "url": "/workshops",
     "name": "menu-workshops"
   },
   {
-    "url": "/about/",
+    "url": "/about",
     "name": "menu-about"
   }
 ]

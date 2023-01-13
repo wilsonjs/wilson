@@ -219,7 +219,7 @@ a {
   &:focus::after,
   &:hover::after,
   &:active::after,
-  &[data-active='true']::after {
+  &[data-active]::after {
     background-color: currentColor;
     transform: scaleX(1);
   }
