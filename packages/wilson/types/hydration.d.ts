@@ -20,6 +20,8 @@ export interface LazyHydrationAttributes {
   /**
    * Hydrates the component as soon as the browser matches the given media query.
    * Useful to avoid unnecessary work depending on the available viewport, such as in mobile devices.
+   *
+   * Example: `<Island clientMedia="(max-width: 968px)" />`
    */
   [Hydrate.OnMediaQuery]?: string
   /**
