@@ -126,6 +126,9 @@ html {
   text-rendering: optimizeSpeed;
   position: relative;
 
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+
   // disable outline on inputs other than keyboard
   &:not([data-whatinput='keyboard']) * {
     outline: none;
@@ -133,13 +136,17 @@ html {
 }
 
 html[data-mode='light'] {
-  background: #f0f7f2;
+  --color-bg: #f0f7f2;
+  --color-text-main: #28342b;
+  --color-accent: #318513;
+  --color-text-secondary: #28342b;
 }
 
-html[data-mode='dark'],
-html[data-mode='dark'] * {
-  background: #15202b;
-  color: #fff;
+html[data-mode='dark'] {
+  --color-bg: #15202b;
+  --color-text-main: #fff;
+  --color-accent: #f4ceff;
+  --color-text-secondary: #c5c5dd;
 }
 
 body {

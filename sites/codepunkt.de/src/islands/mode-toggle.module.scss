@@ -1,6 +1,13 @@
 @import '../assets/mixins.scss';
 
 .button {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--color-accent);
+  cursor: pointer;
+  transition: color 0.1s linear;
+
   &,
   svg {
     width: var(--mode-size);
@@ -17,21 +24,17 @@
    * scale buttons down on mobile portrait, use negative right margin to
    * compensate for the scaling effect
    */
-  transform: scale(0.8);
-  &:first-child {
-    margin-right: -10px;
-  }
-  @include responsive(xs) {
-    transform: none;
-    &:first-child {
-      margin-right: 0;
-    }
-  }
-  background: transparent;
-  border: none;
-  padding: 0;
-  justify-content: center;
-  align-items: center;
-  z-index: 3;
-  cursor: pointer;
+  // transform: scale(0.8);
+  // &:first-child {
+  //   margin-right: -10px;
+  // }
+  // @include responsive(xs) {
+  //   transform: none;
+  //   &:first-child {
+  //     margin-right: 0;
+  //   }
+  // }
+  // justify-content: center;
+  // align-items: center;
+  // z-index: 3;
 }

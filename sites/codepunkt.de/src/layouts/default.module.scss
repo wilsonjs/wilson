@@ -29,8 +29,12 @@
   }
 
   [class~='wordmark'] {
-    color: var(--color-logo);
+    color: var(--color-text-secondary);
     fill: currentColor;
+
+    [data-mode='dark'] & {
+      color: var(--color-text-main);
+    }
 
     display: none;
     @include responsive(sm) {

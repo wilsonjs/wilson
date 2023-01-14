@@ -3,7 +3,10 @@
 .wrapper {
   display: flex;
   align-items: center;
-  --button-size: 48px;
+  [data-mode='dark'] & {
+    color: var(--color-text-main);
+  }
+  // --button-size: 48px;
 }
 
 .mode {
@@ -40,7 +43,7 @@
 .smallMenuLink {
   font-weight: 600;
   &[data-active] {
-    color: var(--color-text);
+    color: var(--color-accent);
   }
 }
 
