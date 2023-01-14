@@ -12,6 +12,7 @@
 
 .logoLink {
   z-index: 3;
+  height: var(--logo-height);
 
   &::after {
     content: none;
@@ -20,10 +21,9 @@
 
 .logo {
   height: var(--logo-height);
-  margin-top: calc(var(--logo-height) / 3);
-  margin-left: 4px;
 
   margin-right: -110px;
+  margin-top: 5px;
   @include responsive(sm) {
     margin-right: 0;
   }

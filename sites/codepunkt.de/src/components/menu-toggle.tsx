@@ -1,5 +1,5 @@
-import { FunctionalComponent } from 'preact'
-import { StateUpdater } from 'preact/hooks'
+import type { FunctionalComponent } from 'preact'
+import type { StateUpdater } from 'preact/hooks'
 import styles from './menu-toggle.module.scss'
 
 const MenuToggleButton: FunctionalComponent<{

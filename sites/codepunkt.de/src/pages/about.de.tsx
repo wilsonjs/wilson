@@ -1,8 +1,8 @@
-import { StaticPageProps, UserFrontmatter } from 'wilson'
-import styles from './about.module.scss'
+import type { StaticPageProps, UserFrontmatter } from 'wilson'
 import me from '../assets/photos/me.jpg'
 import coding from '../assets/photos/coding.jpg'
 import timeout from '../assets/photos/timeout.jpg'
+import styles from './about.module.scss'
 
 export const frontmatter: UserFrontmatter = {
   title: 'Über mich',

@@ -1,12 +1,10 @@
 @import '../assets/mixins.scss';
 
 .button {
-  @include responsive(xs) {
-    margin-left: 1.5rem;
-  }
-
+  &,
   svg {
-    width: 36px;
+    width: var(--mode-size);
+    height: var(--mode-size);
   }
 
   path {
@@ -32,8 +30,6 @@
   background: transparent;
   border: none;
   padding: 0;
-  width: var(--button-size);
-  height: var(--button-size);
   justify-content: center;
   align-items: center;
   z-index: 3;

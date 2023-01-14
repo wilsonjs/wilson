@@ -14,9 +14,9 @@ export default function DefaultLayout(props: StaticPageProps) {
   return (
     <>
       <header class={styles.header}>
-        <Link href={`/`} class={styles.logoLink}>
+        <a href={`/`} class={styles.logoLink}>
           <Logo class={styles.logo} data-logo />
-        </Link>
+        </a>
         <Menu {...props} />
       </header>
       <main class={styles.main}>{props.children}</main>

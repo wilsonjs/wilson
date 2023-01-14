@@ -85,7 +85,9 @@ const Menu: FunctionalComponent<StaticPageProps> = (props: StaticPageProps) => {
           )
         })}
       </ol>
-      <ModeToggle clientVisible />
+      <div class={styles.mode}>
+        <ModeToggle clientVisible />
+      </div>
       <MenuToggle isOpen={isOpen} setIsOpen={setIsOpen} />
       {isOpen && (
         <>

@@ -8,7 +8,7 @@
 
   // menu toggle button doesn't work when javascript is disabled. to not
   // display it in that case, we default to display: none and inject a
-  // small script tag into the head in wilson.config.js `injectHead` method
+  // small script tag into the head with the `getHeadContent` option
   // that will be executed when the page is loaded and sets the display
   // of this button to 'flex' with a higher specificity than the selector
   // generated from this scss module

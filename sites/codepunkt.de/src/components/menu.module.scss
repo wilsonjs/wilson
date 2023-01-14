@@ -6,6 +6,17 @@
   --button-size: 48px;
 }
 
+.mode {
+  --mode-size: 36px;
+  min-width: var(--mode-size);
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+  @include responsive(xs) {
+    margin-left: 1.5rem;
+  }
+}
+
 .smallMenu {
   display: flex;
   align-items: center;
