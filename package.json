@@ -1,7 +1,7 @@
 {
   "name": "root",
   "private": true,
-  "packageManager": "pnpm@7.22.0",
+  "packageManager": "pnpm@7.25.0",
   "type": "module",
   "repository": {
     "type": "git",
