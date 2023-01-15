@@ -5,10 +5,6 @@
   align-items: center;
   --button-size: 36px;
 
-  [data-mode='dark'] & {
-    color: var(--color-text-main);
-  }
-
   button {
     transform: scale(0.8);
 
@@ -43,7 +39,7 @@
   font-weight: 600;
 
   &[data-active] {
-    color: var(--color-accent);
+    color: var(--color-contrast);
   }
 }
 

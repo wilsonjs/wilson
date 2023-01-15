@@ -22,14 +22,14 @@
   }
 
   /* change bun size on hover and keyboard focus */
-  html:not([data-state='menu']) &:hover div::before,
-  html:not([data-state='menu']) &:hover div::after,
-  html[data-whatinput='keyboard']:not([data-state='menu']) &:focus div::before,
-  html[data-whatinput='keyboard']:not([data-state='menu']) &:focus div::after {
+  &[aria-pressed='false']:hover div::before,
+  &[aria-pressed='false']:hover div::after,
+  html[data-whatinput='keyboard'] &:focus div::before,
+  html[data-whatinput='keyboard'] &:focus div::after {
     width: 28px;
   }
   /* change patty size on hover and keyboard focus */
-  &:hover span,
+  &[aria-pressed='false']:hover span,
   html[data-whatinput='keyboard'] &:focus span {
     width: 16px;
   }
@@ -46,7 +46,7 @@
     height: 2px;
     left: 0;
     z-index: 1;
-    background: var(--color-accent);
+    background: var(--color-contrast);
     transition: transform 0.2s ease-out, width 0.2s ease-out;
     will-change: transform, width;
   }
@@ -73,7 +73,7 @@
 
 .patty {
   display: block;
-  background: var(--color-accent);
+  background: var(--color-contrast);
   position: absolute;
   left: 0;
   top: 13px;
@@ -156,7 +156,7 @@
   display: block;
   font-size: var(--h1-size);
   font-weight: 600;
-  font-family: var(--font-headline);
+  font-family: var(--font-alternate);
   li:nth-child(1) & {
     animation-delay: 100ms;
   }

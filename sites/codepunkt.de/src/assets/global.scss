@@ -54,9 +54,9 @@ select {
 }
 
 :root {
-  --font-body: 'Open Sans', -apple-system, 'BlinkMacSystemFont', 'Segoe UI',
+  --font-main: 'Open Sans', -apple-system, 'BlinkMacSystemFont', 'Segoe UI',
     'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif;
-  --font-headline: Montserrat, Lucida Bright, Lucidabright, 'Lucida Serif',
+  --font-alternate: Montserrat, Lucida Bright, Lucidabright, 'Lucida Serif',
     Lucida, 'DejaVu Serif', 'Bitstream Vera Serif', 'Liberation Serif', Georgia,
     serif;
   --font-monospace: 'Fira Code', Menlo, Monaco, Consolas, Courier New, monospace;
@@ -117,7 +117,7 @@ html {
   overscroll-behavior-y: none;
   font-kerning: normal;
   font-size: var(--text-size);
-  font-family: var(--font-body);
+  font-family: var(--font-main);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -moz-font-feature-settings: 'kern', 'liga', 'clig', 'calt';
@@ -128,7 +128,7 @@ html {
   position: relative;
 
   background: var(--color-bg);
-  color: var(--color-text-secondary);
+  color: var(--color-text);
 
   // disable outline on inputs other than keyboard
   &:not([data-whatinput='keyboard']) * {
@@ -138,16 +138,20 @@ html {
 
 html[data-mode='light'] {
   --color-bg: #f0f7f2;
-  --color-text-main: #28342b;
-  --color-accent: #318513;
-  --color-text-secondary: #28342b;
+  --color-contrast: #000;
+  --color-text: #4a4e4b;
+  --color-accent: #286b10;
+  --color-link: #415cff;
+  --color-headline: #286b10;
 }
 
 html[data-mode='dark'] {
   --color-bg: #15202b;
-  --color-text-main: #fff;
-  --color-accent: #f4ceff;
-  --color-text-secondary: #c5c5dd;
+  --color-contrast: #fff;
+  --color-text: #dfdff0;
+  --color-accent: #cc97ff;
+  --color-link: #55aaef;
+  --color-headline: #ecd8ff;
 }
 
 body {
@@ -169,7 +173,7 @@ hr {
 }
 
 h1 {
-  color: var(--color-headline);
+  font-weight: 600;
 }
 
 h2,
@@ -177,10 +181,7 @@ h3,
 h4,
 h5,
 h6 {
-  color: var(--color-headline);
-  [data-mode='dark'] & {
-    color: var(--color-headline);
-  }
+  font-weight: 500;
 }
 
 h1,
@@ -189,8 +190,8 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-headline);
-  font-weight: 600;
+  color: var(--color-headline);
+  font-family: var(--font-alternate);
   margin-top: 0;
   margin-bottom: 1rem;
   line-height: 1.4;

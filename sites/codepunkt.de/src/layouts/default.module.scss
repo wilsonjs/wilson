@@ -28,12 +28,12 @@
   }
 
   [class~='wordmark'] {
-    color: var(--color-text-secondary);
+    color: var(--color-text);
     fill: currentColor;
     display: inline;
 
     [data-mode='dark'] & {
-      color: var(--color-text-main);
+      color: var(--color-contrast);
     }
   }
 
