@@ -120,7 +120,7 @@ export default function DefaultLayout(props: StaticPageProps) {
             {props.translations.length > 0 && (
               <div class={styles.translations}>
                 <div class={styles.translationsHeader}>
-                  {'language - select'}
+                  {props.translate('select-language')}
                 </div>
                 <ul>
                   {props.translations.map((t) => {
