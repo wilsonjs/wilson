@@ -18,7 +18,7 @@ interface Options {
   assetUrlPrefix: string
 }
 
-const replaceSimpleAttribute = (
+export const replaceSimpleAttribute = (
   attribute: string,
   assetUrls: string[],
   assetUrlPrefix: string,
@@ -34,7 +34,7 @@ const replaceSimpleAttribute = (
   }
 }
 
-const replaceSrcSet = (
+export const replaceSrcSet = (
   assetUrls: string[],
   assetUrlPrefix: string,
   properties: Properties,
@@ -44,6 +44,7 @@ const replaceSrcSet = (
     .map((s) => s.trim().split(' ')) as Array<
     [url: string, width?: string, density?: string]
   >
+
   for (const src of srcSet) {
     const srcSetUrl = src[0]
     const index = assetUrls.findIndex((url) => url === srcSetUrl)
