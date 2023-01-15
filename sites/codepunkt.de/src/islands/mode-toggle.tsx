@@ -1,14 +1,8 @@
 import type { FunctionalComponent } from 'preact'
 import { memo } from 'preact/compat'
 import { useEffect, useRef, useState } from 'preact/hooks'
+import useIsSsr from '../hooks/use-is-ssr'
 import styles from './mode-toggle.module.scss'
-
-const useIsSsr = () => {
-  // initialized with true so initial browser matches ssr render
-  const [isSsr, setIsSsr] = useState(true)
-  useEffect(() => setIsSsr(false), [])
-  return isSsr
-}
 
 const sunPath =
   'M 12 7 C 13.4 7 14.65 7.55 15.55 8.45 C 16.45 9.35 17 10.6 17 12 C 17 12.7 16.863 13.363 16.613 13.963 C 16.363 14.563 16 15.1 15.55 15.55 C 15.1 16 14.563 16.363 13.963 16.613 C 13.363 16.863 12.7 17 12 17 C 10.6 17 9.35 16.45 8.45 15.55 C 7.55 14.65 7 13.4 7 12 C 7 10.6 7.55 9.35 8.45 8.45 C 9.35 7.55 10.6 7 12 7 C 12 7 12 7 12 7 M 12 1 L 12 3 M 12 21 L 12 23 M 4.2 4.2 L 5.6 5.6 M 18.4 18.4 L 19.8 19.8 M 1 12 L 3 12 M 21 12 L 23 12 M 5.6 18.4 L 4.2 19.8 M 19.8 4.2 L 18.4 5.6'
@@ -20,14 +14,13 @@ type ColorMode = 'light' | 'dark'
 const colorModeStorageKey = '🌈'
 
 const ModeToggle: FunctionalComponent = memo(() => {
-  const isSsr = useIsSsr()
-  if (isSsr) return null
+  if (useIsSsr()) return null
 
   const sunRef = useRef<SVGAnimateElement>(null)
   const moonRef = useRef<SVGAnimateElement>(null)
 
   const [colorMode, setColorMode] = useState<ColorMode>(() => {
-    return localStorage.getItem(colorModeStorageKey) === 'dark'
+    return localStorage?.getItem(colorModeStorageKey) === 'dark'
       ? 'dark'
       : 'light'
   })

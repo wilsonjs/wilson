@@ -7,11 +7,12 @@
   color: var(--color-accent);
   cursor: pointer;
   transition: color 0.1s linear;
+  z-index: 3;
 
   &,
   svg {
-    width: var(--mode-size);
-    height: var(--mode-size);
+    width: var(--button-size);
+    height: var(--button-size);
   }
 
   path {

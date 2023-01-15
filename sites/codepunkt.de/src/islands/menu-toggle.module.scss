@@ -1,0 +1,230 @@
+@import '../assets/mixins.scss';
+
+.button {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  z-index: 3;
+  width: var(--button-size);
+  height: var(--button-size);
+  justify-content: center;
+  align-items: center;
+
+  margin-left: 0.3rem;
+  @include responsive(xs) {
+    margin-left: 0.75rem;
+  }
+
+  display: flex;
+  @include responsive(sm) {
+    display: none;
+  }
+
+  /* change bun size on hover and keyboard focus */
+  html:not([data-state='menu']) &:hover div::before,
+  html:not([data-state='menu']) &:hover div::after,
+  html[data-whatinput='keyboard']:not([data-state='menu']) &:focus div::before,
+  html[data-whatinput='keyboard']:not([data-state='menu']) &:focus div::after {
+    width: 28px;
+  }
+  /* change patty size on hover and keyboard focus */
+  &:hover span,
+  html[data-whatinput='keyboard'] &:focus span {
+    width: 16px;
+  }
+}
+
+.buns {
+  width: 28px;
+  height: 28px;
+  position: relative;
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    height: 2px;
+    left: 0;
+    z-index: 1;
+    background: var(--color-accent);
+    transition: transform 0.2s ease-out, width 0.2s ease-out;
+    will-change: transform, width;
+  }
+  &::before {
+    top: 3px;
+    width: 24px;
+  }
+  &::after {
+    bottom: 3px;
+    width: 18px;
+  }
+
+  &[data-open] {
+    &::before {
+      transform: translate3d(0, 10px, 0) rotate(45deg);
+      width: 30px;
+    }
+    &::after {
+      transform: translate3d(0, -10px, 0) rotate(135deg);
+      width: 30px;
+    }
+  }
+}
+
+.patty {
+  display: block;
+  background: var(--color-accent);
+  position: absolute;
+  left: 0;
+  top: 13px;
+  width: 100%;
+  height: 2px;
+  transition: width 0.2s ease-out;
+  will-change: width;
+
+  &[data-open] {
+    background: var(--color-bg);
+  }
+}
+
+.background {
+  width: 100vmax;
+  height: 100vmax;
+  position: fixed;
+  top: calc(-49.5vmax + var(--header-height) / 2);
+  right: calc(-50vmax + var(--content-padding) + var(--button-size) / 2);
+  background: var(--color-bg);
+  border-radius: 50%;
+  z-index: 2;
+  transform: scale(0.01);
+  @keyframes menu-bg {
+    0% {
+      transform: scale(0.01);
+    }
+    100% {
+      transform: scale(2.83);
+    }
+  }
+  animation: menu-bg 0.7s cubic-bezier(0.28, 0.81, 0.44, 1) 0s forwards;
+}
+
+.nav {
+  position: fixed;
+  width: 100vw;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  --padding: var(--content-padding);
+  --header-offset: calc((var(--header-height) - var(--logo-height) / 2));
+  padding: var(--padding);
+  padding-top: calc(var(--padding) + var(--header-offset));
+}
+
+.content {
+  height: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+}
+
+.menu {
+  flex-basis: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-bottom: 1.5rem !important;
+}
+
+.menuLink {
+  text-decoration: none;
+  margin-bottom: 1rem;
+  color: var(--color-text);
+  &[data-active] {
+    [data-mode='light'] & {
+      color: #318513;
+    }
+    [data-mode='dark'] & {
+      color: #f4ceff;
+    }
+  }
+  display: block;
+  font-size: var(--h1-size);
+  font-weight: 600;
+  font-family: var(--font-headline);
+  li:nth-child(1) & {
+    animation-delay: 100ms;
+  }
+  li:nth-child(2) & {
+    animation-delay: 150ms;
+  }
+  li:nth-child(3) & {
+    animation-delay: 200ms;
+  }
+}
+
+.menuFooter {
+  width: 100%;
+  color: #74af82;
+  [data-mode='dark'] & {
+    color: #3e576d;
+  }
+}
+
+.menuSocial {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin: 0 0.75rem 0.75rem 0 !important;
+  animation-delay: 200ms;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(40, 107, 16, 0.3) 50%,
+    transparent calc(50% + 1px),
+    transparent 100%
+  );
+  [data-mode='dark'] & {
+    background: linear-gradient(
+      to bottom,
+      transparent 50%,
+      rgba(255, 255, 255, 0.2) 50%,
+      transparent calc(50% + 1px),
+      transparent 100%
+    );
+  }
+  li {
+    background: var(--color-bg);
+  }
+  a {
+    display: flex;
+  }
+}
+
+.socialIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  margin-left: 1.5rem;
+  fill: currentColor;
+  li:nth-child(1) & {
+    animation-delay: 300ms;
+  }
+  li:nth-child(2) & {
+    animation-delay: 275ms;
+  }
+  li:nth-child(3) & {
+    animation-delay: 250ms;
+  }
+  li:nth-child(4) & {
+    animation-delay: 225ms;
+  }
+  li:nth-child(5) & {
+    animation-delay: 200ms;
+  }
+}

@@ -86,7 +86,7 @@ select {
     --text-size: 18px;
     --text-size-small: 16px;
     --h1-size: 2.4rem;
-    --logo-height: 44px;
+    --logo-height: 40px;
   }
 
   @include responsive(md) {
@@ -95,6 +95,7 @@ select {
     --text-size: 20px;
     --text-size-small: 18px;
     --h1-size: 2.6rem;
+    --logo-height: 45px;
   }
 
   @include responsive(lg) {

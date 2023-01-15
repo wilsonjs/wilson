@@ -23,7 +23,6 @@
   height: var(--logo-height);
 
   margin-right: -110px;
-  margin-top: 5px;
   @include responsive(sm) {
     margin-right: 0;
   }
@@ -31,14 +30,10 @@
   [class~='wordmark'] {
     color: var(--color-text-secondary);
     fill: currentColor;
+    display: inline;
 
     [data-mode='dark'] & {
       color: var(--color-text-main);
-    }
-
-    display: none;
-    @include responsive(sm) {
-      display: inline;
     }
   }
 

@@ -1,7 +1,7 @@
-import { PageFrontmatter } from '@wilson/types'
+import type { PageFrontmatter } from '@wilson/types'
 import type { ComponentType, RenderableProps } from 'preact'
-import { Router as Wouter, Route, Switch } from 'wouter-preact'
-// @ts-ignore
+import { Switch, Route as Woute, Router as Wouter } from 'wouter-preact'
+// @ts-expect-error wouter-preact/static-location is not typed
 import staticLocationHook from 'wouter-preact/static-location'
 import NotFound from './not-found'
 
@@ -84,7 +84,7 @@ export default function Router({ urlToBeRendered }: AppProps) {
     >
       <Switch>
         {routes.map(({ component: Page, props }) => (
-          <Route
+          <Woute
             {...props}
             component={(params) => <Page {...params} {...props} />}
           />
