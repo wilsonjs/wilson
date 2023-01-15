@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.7",
+    "@types/hast": "^2.3.4",
     "@types/prettier": "^2.7.0",
     "@types/unist": "^2.0.6",
     "@wilson/types": "workspace:^1.0.0",
@@ -42,6 +43,7 @@
     "@wilson/utils": "workspace:^1.0.0",
     "debug": "^4.3.4",
     "gray-matter": "^4.0.3",
+    "hast": "^1.0.0",
     "node-cache": "^5.1.2",
     "pathe": "^1.0.0",
     "prettier": "^2.7.1",
@@ -49,6 +51,7 @@
     "remark-parse": "^10.0.1",
     "remark-rehype": "^10.1.0",
     "remark-stringify": "^10.0.2",
-    "unified": "^10.1.2"
+    "unified": "^10.1.2",
+    "unist-util-visit": "^4.1.1"
   }
 }

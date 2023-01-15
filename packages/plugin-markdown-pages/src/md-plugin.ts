@@ -20,6 +20,7 @@ import {
   userToPageFrontmatter,
 } from '@wilson/utils'
 import { getTranslationKeys } from '@wilson/client-utils'
+import remarkRelativeAssets from './remark-plugins/relative-assets'
 
 /** Result of parsing markdown source code with frontmatter */
 interface MarkdownParseResult {
@@ -57,12 +58,20 @@ export function parseFrontmatter(markdownCode: string): MarkdownParseResult {
 }
 
 /**
- * Converts markdown to JSX
- * @param markdownCode
+ * Asset URL prefix.
+ */
+export const assetUrlPrefix = '_assetUrl_'
+
+/**
+ * Transforms a markdown string to JSX
+ * Returns a MarkdownTransformResult object with the resulting HTML code in the html property and additional information that was gathered during the transformation such as `headings` and `assetUrls`.
+ *
+ * @param markdownCode — The markdown code to parse
+ * @returns — The MarkdownTransformResult object
  */
 export async function processMarkdown(
   markdownCode: string,
-): Promise<{ jsx: string }> {
+): Promise<{ assetUrls: string[]; jsx: string }> {
   const processor = unified()
     .use(remarkParse)
     // apply plugins that change MDAST
@@ -70,6 +79,7 @@ export async function processMarkdown(
     .use(remarkToRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
     // apply plugins that change HAST and gather additional information
+    .use(remarkRelativeAssets, { assetUrlPrefix })
     .use(function stringifyToJsx(this: Processor): void {
       this.Compiler = (tree: Node) => toJsx(tree)
     })
@@ -79,7 +89,8 @@ export async function processMarkdown(
     .replace(/^<div>/, '')
     .replace(/<\/div>$/, '')
 
-  return { jsx }
+  const assetUrls = vfile.data.assetUrls as string[]
+  return { assetUrls, jsx }
 }
 
 /**
@@ -98,7 +109,38 @@ export default function markdownPagesPlugin(config: SiteConfig): PluginOption {
       const { markdown, frontmatter: userFrontmatter } = parseFrontmatter(
         code,
       ) as { markdown: string; frontmatter: UserFrontmatter }
-      const { jsx } = await processMarkdown(markdown)
+      let { jsx, assetUrls } = await processMarkdown(markdown)
+
+      // replace relative asset URL string attributes with react-style variable
+      // interpolations
+      assetUrls.forEach((_, i) => {
+        jsx = jsx.replace(
+          new RegExp(`"${assetUrlPrefix}${i}"`, 'g'),
+          `{${assetUrlPrefix}${i}}`,
+        )
+      })
+      jsx = jsx.replace(
+        /srcSet="((?:[^"\s,]+\s*(?:\s+(?:\d+w|[\d\.]+x))?(?:,\s*)?)+)"/g,
+        (_, value) => {
+          assetUrls.forEach((_, i) => {
+            value = value.replace(
+              new RegExp(`${assetUrlPrefix}${i}`, 'g'),
+              `$\{${assetUrlPrefix}${i}}`,
+            )
+          })
+          return `srcSet={\`${value}\`}`
+        },
+      )
+
+      // change assetUrls to URLs that work for relative javascript imports
+      const relativeAssetImports = assetUrls
+        .map((assetUrl) => {
+          return assetUrl.startsWith('./')
+            ? assetUrl
+            : `./${relative(relativePath, assetUrl)}`
+        })
+        .map((url, i) => `import ${assetUrlPrefix}${i} from '${url}';`)
+
       const frontmatter = await userToPageFrontmatter(
         userFrontmatter,
         id,
@@ -118,6 +160,7 @@ export default function markdownPagesPlugin(config: SiteConfig): PluginOption {
       const newCode = /* tsx */ `
         import { useTitle } from 'hoofd/preact';
         import Layout from '${layoutPath}';
+        ${relativeAssetImports.join('\n')}
 
         export const path = '${route}';
         export const language = '${languageId}';
