@@ -21,6 +21,7 @@
   "dependencies": {
     "@babel/plugin-transform-react-jsx": "^7.18.10",
     "@preact/preset-vite": "^2.3.0",
+    "@react-hook/previous": "^1.0.1",
     "@wilson/babel-plugin-island-path": "workspace:^1.0.0",
     "@wilson/island-hydration": "workspace:^1.0.0",
     "fast-equals": "^4.0.1",

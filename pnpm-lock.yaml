@@ -294,6 +294,7 @@ importers:
     specifiers:
       '@babel/plugin-transform-react-jsx': ^7.18.10
       '@preact/preset-vite': ^2.3.0
+      '@react-hook/previous': ^1.0.1
       '@types/html-minifier-terser': ^7.0.0
       '@wilson/babel-plugin-island-path': workspace:^1.0.0
       '@wilson/island-hydration': workspace:^1.0.0
@@ -315,6 +316,7 @@ importers:
     dependencies:
       '@babel/plugin-transform-react-jsx': 7.18.10_@babel+core@7.18.9
       '@preact/preset-vite': 2.3.0_ypvec6fzzt5prswrhkzq5mfoi4
+      '@react-hook/previous': 1.0.1_@preact+compat@17.1.2
       '@wilson/babel-plugin-island-path': link:../../packages/babel-plugin-island-path
       '@wilson/island-hydration': link:../../packages/island-hydration
       fast-equals: 4.0.1
@@ -951,6 +953,14 @@ packages:
       vite: 3.2.3_terser@5.16.1
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /@react-hook/previous/1.0.1_@preact+compat@17.1.2:
+    resolution: {integrity: sha512-O7VaRLDEHRy1hxh03CmtWRxDhCwIVQBBkf1kYdYqUP3KNrPnQMIVIYYYQpHIIiNcS1BO6zmBKM4bugFDNgP8Iw==}
+    peerDependencies:
+      react: '>=16.8'
+    dependencies:
+      react: /@preact/compat/17.1.2_preact@10.10.0
     dev: false
 
   /@rollup/pluginutils/4.2.1:

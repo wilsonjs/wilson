@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'preact/hooks'
 import useIsSsr from '../hooks/use-is-ssr'
 import { SOCIAL_LINKS } from '../constants'
-import usePrevious from '../hooks/use-previous'
+import usePrevious from '@react-hook/previous'
 import styles from './menu-toggle.module.scss'
 import useMedia from 'use-media'
 
