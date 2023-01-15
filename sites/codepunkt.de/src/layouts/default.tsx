@@ -7,10 +7,15 @@ import 'typeface-open-sans'
 import 'what-input'
 import Menu from '../components/menu'
 import Logo from '../assets/logo.svg?component'
-import { MAIN_MENU } from '../constants'
+import { MENU_ITEMS } from '../constants'
 import styles from './default.module.scss'
 
 export default function DefaultLayout(props: StaticPageProps) {
+  const menuItems = MENU_ITEMS.map(({ url, name }) => ({
+    name: props.translate(name),
+    url: props.localizeUrl(url),
+  }))
+
   return (
     <>
       <header class={styles.header}>
@@ -133,11 +138,10 @@ export default function DefaultLayout(props: StaticPageProps) {
             <div class={styles.sitemap}>
               <div class={styles.sitemapHeader}>Sitemap</div>
               <ul>
-                {MAIN_MENU.map(({ url, name }) => {
-                  name = props.translate(name)
+                {menuItems.map(({ name, url }) => {
                   return (
                     <li key={name}>
-                      <Link href={props.localizeUrl(url)}>{name}</Link>
+                      <Link href={url}>{name}</Link>
                     </li>
                   )
                 })}

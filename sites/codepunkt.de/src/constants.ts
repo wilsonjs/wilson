@@ -1,20 +1,8 @@
-export const MAIN_MENU = [
-  {
-    url: '/',
-    name: 'menu-home',
-  },
-  {
-    url: '/writing',
-    name: 'menu-writing',
-  },
-  {
-    url: '/workshops',
-    name: 'menu-workshops',
-  },
-  {
-    url: '/about',
-    name: 'menu-about',
-  },
+export const MENU_ITEMS = [
+  { url: '/', name: 'menu-home' },
+  { url: '/writing', name: 'menu-writing' },
+  { url: '/workshops', name: 'menu-workshops' },
+  { url: '/about', name: 'menu-about' },
 ]
 
 export const SOCIAL_LINKS = [

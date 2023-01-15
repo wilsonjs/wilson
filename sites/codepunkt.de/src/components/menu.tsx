@@ -1,13 +1,13 @@
 import type { FunctionalComponent } from 'preact'
 import type { StaticPageProps } from 'wilson'
-import { MAIN_MENU } from '../constants'
+import { MENU_ITEMS } from '../constants'
 import ModeToggle from '../islands/mode-toggle'
 import MenuToggle from '../islands/menu-toggle'
 import styles from './menu.module.scss'
 import Link from './link'
 
 const Menu: FunctionalComponent<StaticPageProps> = (props) => {
-  const menuItems = MAIN_MENU.map(({ url, name }) => ({
+  const menuItems = MENU_ITEMS.map(({ url, name }) => ({
     exact: url === '/',
     name: props.translate(name),
     url: props.localizeUrl(url),
