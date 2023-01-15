@@ -25,6 +25,7 @@
     "@wilson/island-hydration": "workspace:^1.0.0",
     "fast-equals": "^4.0.1",
     "hoofd": "1.5.2",
+    "html-minifier-terser": "^7.1.0",
     "preact": "^10.10.0",
     "react": "npm:@preact/compat",
     "react-dom": "npm:@preact/compat",
@@ -37,5 +38,8 @@
     "what-input": "^5.2.12",
     "wilson": "workspace:^1.0.0",
     "wouter-preact": "2.8.1"
+  },
+  "devDependencies": {
+    "@types/html-minifier-terser": "^7.0.0"
   }
 }

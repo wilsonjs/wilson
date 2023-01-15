@@ -1,5 +1,6 @@
 import type { UserConfig } from 'wilson'
-import { minify } from 'terser'
+import { minify as minifyJs } from 'terser'
+import { minify as minifyHtml } from 'html-minifier-terser'
 
 const darkModeScript = /* js */ `
   const colorModeStorageKey = '🌈'
@@ -19,9 +20,29 @@ const darkModeScript = /* js */ `
   document.documentElement.setAttribute('data-mode', colorMode)
 `
 
+const faviconHtml = /* html */ `
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=1" />
+  <link rel="icon" type="image/png" href="/favicon.png?v=1" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=1" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=1" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=1" />
+  <link rel="manifest" href="/site.webmanifest?v=1" />
+  <link rel="mask-icon" href="/safari-pinned-tab.svg?v=1" color="#286b10" />
+  <meta name="msapplication-TileColor" content="#00aba9" />
+  <meta name="theme-color" content="#ffffff" />
+`
+
 async function getHeadContent() {
-  const output = await minify(darkModeScript, { toplevel: true })
-  return `<script>${output.code}</script>`
+  const darkMode = await minifyJs(darkModeScript, { toplevel: true })
+  const favIcon = await minifyHtml(faviconHtml, {
+    collapseBooleanAttributes: true,
+    collapseWhitespace: true,
+    minifyURLs: true,
+    removeAttributeQuotes: true,
+    removeComments: true,
+    removeEmptyAttributes: true,
+  })
+  return /* html */ `${favIcon}<script>${darkMode.code}</script>`
 }
 
 export default {
@@ -38,11 +59,14 @@ export default {
       {
         languageName: 'English',
         translationKeys: {
-          'footer-about': 'Footer about',
+          'footer-about':
+            'Helping teams deliver better products in less time by using web and cloud technologies.',
+          'footer-copyright': 'All rights reserved',
           'menu-about': 'About me',
           'menu-home': 'Home',
           'menu-workshops': 'Workshops',
           'menu-writing': 'Writing',
+          'select-language': 'Select language',
         },
       },
     ],
@@ -51,11 +75,14 @@ export default {
       {
         languageName: 'Deutsch',
         translationKeys: {
-          'footer-about': 'hoee?',
+          'footer-about':
+            'Ich helfe Software-Entwicklern dabei, in kürzerer Zeit bessere Produkte zu entwickeln.',
+          'footer-copyright': 'Alle Rechte vorbehalten',
           'menu-about': 'Über mich',
           'menu-home': 'Startseite',
           'menu-workshops': 'Workshops',
           'menu-writing': 'Blog',
+          'select-language': 'Sprache wählen',
         },
       },
     ],
