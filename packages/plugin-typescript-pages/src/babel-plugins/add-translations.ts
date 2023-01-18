@@ -1,7 +1,7 @@
 import type { PluginObj } from '@babel/core'
 import types from '@babel/types'
 import z from 'zod'
-import validateOptions from '../util/validate-options'
+import validateOptions from '../utils/validate-options'
 
 const pluginOptions = z.object({
   translations: z.array(

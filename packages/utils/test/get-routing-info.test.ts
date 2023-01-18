@@ -1,8 +1,8 @@
-import getRoutingInfo from '../src/get-routing-info'
 import sinon from 'sinon'
 import test from 'ava'
 import glob from 'fast-glob'
-import { Languages } from '@wilson/types'
+import type { Languages } from '@wilson/types'
+import getRoutingInfo from '../src/get-routing-info'
 
 const pagesDir = '/codepunkt.de/src/pages'
 

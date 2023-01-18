@@ -1,12 +1,12 @@
 import { fileURLToPath } from 'url'
 import type { SiteConfig } from '@wilson/types'
-import { basename, dirname, join, relative, resolve } from 'pathe'
+import { basename, dirname, join, relative } from 'pathe'
 import type { UserConfig as ViteUserConfig } from 'vite'
 import { build, mergeConfig } from 'vite'
 import type { OutputOptions, RollupOutput } from 'rollup'
-import wilsonPlugins from '../plugins'
 import glob from 'fast-glob'
-import { isDynamicPagePath } from '@wilson/utils'
+import utils from '@wilson/utils'
+import wilsonPlugins from '../plugins'
 
 const _dirname = dirname(fileURLToPath(import.meta.url))
 export const DIST_CLIENT_PATH = join(_dirname, '../client')
@@ -63,7 +63,7 @@ export function getOutputFilename(
 async function bundleDynamicPages(config: SiteConfig) {
   const entrypoints = await (await glob(join(config.pagesDir, '**/*.tsx')))
     .map((file) => relative(config.root, file))
-    .filter((file) => isDynamicPagePath(file))
+    .filter((file) => utils.isDynamicPagePath(file))
 
   if (entrypoints.length > 0)
     await bundleWithVite(config, {

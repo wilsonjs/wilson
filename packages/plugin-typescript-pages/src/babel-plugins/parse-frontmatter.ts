@@ -1,10 +1,9 @@
 import type * as BabelCoreNamespace from '@babel/core'
-import type { PluginObj } from '@babel/core'
-import { generate } from '../util/babel-import'
 import * as types from '@babel/types'
-import { UserFrontmatter } from '@wilson/types'
+import type { UserFrontmatter } from '@wilson/types'
 import z from 'zod'
-import validateOptions from '../util/validate-options'
+import { generate } from '../utils/babel-import'
+import validateOptions from '../utils/validate-options'
 
 type Babel = typeof BabelCoreNamespace
 
@@ -14,7 +13,9 @@ const pluginOptions = z.object({
 
 export default function parseFrontmatterPlugin({
   traverse,
-}: Babel): PluginObj<{ opts: z.infer<typeof pluginOptions> }> {
+}: Babel): BabelCoreNamespace.PluginObj<{
+  opts: z.infer<typeof pluginOptions>
+}> {
   function findTitle(
     frontmatterObjectExpression: types.ObjectExpression,
   ): types.ObjectProperty | undefined {
@@ -114,6 +115,7 @@ export default function parseFrontmatterPlugin({
               )
             }
 
+            // eslint-disable-next-line no-new-func
             const userFrontmatter = new Function(
               `return ${generate(frontmatterBinding.path.node.init).code}`,
             )() as UserFrontmatter
