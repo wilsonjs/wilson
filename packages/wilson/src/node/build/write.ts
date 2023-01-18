@@ -1,15 +1,15 @@
 import { promises as fs } from 'fs'
-import type { SiteConfig, Island, IslandsByPath } from '@wilson/types'
-import { dirname, join, resolve } from 'pathe'
-import type { PageToRender } from './pages'
-import glob from 'fast-glob'
-import { VIRTUAL_PREFIX } from './islands'
-import { Manifest } from 'vite'
-import { uniq } from '../utils'
 import { posix } from 'path'
+import type { Island, IslandsByPath, SiteConfig } from '@wilson/types'
+import { dirname, join, resolve } from 'pathe'
+import glob from 'fast-glob'
+import type { Manifest } from 'vite'
 import MagicString from 'magic-string'
 import { init as initESLexer, parse as parseESModules } from 'es-module-lexer'
 import beautify from 'js-beautify'
+import { uniq } from '../utils'
+import { VIRTUAL_PREFIX } from './islands'
+import type { PageToRender } from './pages'
 
 export async function writePages(
   config: SiteConfig,
@@ -76,7 +76,7 @@ async function writePage(
     ),
     {
       indent_size: 2,
-      content_unformatted: ['script'],
+      content_unformatted: ['script', 'pre'],
     },
   )
   const filename = resolve(config.outDir, page.outputFilename)

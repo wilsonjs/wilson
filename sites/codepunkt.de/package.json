@@ -32,7 +32,6 @@
     "react-dom": "npm:@preact/compat",
     "slack-theme": "github:slack-theme/visual-studio-code",
     "terser": "^5.16.1",
-    "typeface-fira-code": "^1.1.13",
     "typeface-montserrat": "^1.1.13",
     "typeface-open-sans": "^1.1.13",
     "use-media": "^1.4.0",

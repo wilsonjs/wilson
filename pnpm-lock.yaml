@@ -324,7 +324,6 @@ importers:
       react-dom: npm:@preact/compat
       slack-theme: github:slack-theme/visual-studio-code
       terser: ^5.16.1
-      typeface-fira-code: ^1.1.13
       typeface-montserrat: ^1.1.13
       typeface-open-sans: ^1.1.13
       use-media: ^1.4.0
@@ -347,7 +346,6 @@ importers:
       react-dom: /@preact/compat/17.1.2_preact@10.10.0
       slack-theme: github.com/slack-theme/visual-studio-code/ae207bda0c2477fb609b21377ab0a7a40b1f4b0b
       terser: 5.16.1
-      typeface-fira-code: 1.1.13
       typeface-montserrat: 1.1.13
       typeface-open-sans: 1.1.13
       use-media: 1.4.0_@preact+compat@17.1.2
@@ -6328,10 +6326,6 @@ packages:
       qs: 6.11.0
       tunnel: 0.0.6
       underscore: 1.13.6
-    dev: false
-
-  /typeface-fira-code/1.1.13:
-    resolution: {integrity: sha512-8TRlYeIGAqwNajMHB3eSFs58VVfKsAsA0JRVu7z895s/FBl3nrh4PCvbH8tqxadU0UXEbCxNBvZtXn/Jpt7C3Q==}
     dev: false
 
   /typeface-montserrat/1.1.13:

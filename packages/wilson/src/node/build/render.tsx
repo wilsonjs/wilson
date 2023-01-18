@@ -74,18 +74,6 @@ export async function renderPage(
     `,
     islands,
   }
-
-  //   const { headTags, htmlAttrs, bodyAttrs } = renderHeadToString(head);
-  //   return `<!DOCTYPE html>
-  //   <html ${htmlAttrs}>
-  //     <head>
-  //       ${headTags}
-  //       ${stylesheetTagsFrom(config, clientChunks)}
-  //       ${await scriptTagsFrom(config, islandsByPath[route.path])}
-  //     </head>
-  //     <body ${bodyAttrs}>
-  //     </body>
-  //   </html>`;
 }
 
 function stylesheetTagsFrom(
