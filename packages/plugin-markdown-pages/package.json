@@ -33,6 +33,7 @@
     "@wilson/client-utils": "workspace:^1.0.0",
     "@wilson/utils": "workspace:^1.0.0",
     "debug": "^4.3.4",
+    "gatsby-remark-vscode": "^3.3.1",
     "gray-matter": "^4.0.3",
     "hast": "^1.0.0",
     "node-cache": "^5.1.2",

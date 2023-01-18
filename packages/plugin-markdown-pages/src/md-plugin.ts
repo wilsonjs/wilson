@@ -34,7 +34,10 @@ export default function markdownPagesPlugin(config: SiteConfig): PluginOption {
       }
 
       const parseResult = parseFrontmatter(code, grayMatter)
-      const { jsx, assetUrls } = await processMarkdown(parseResult.markdown)
+      const { jsx, assetUrls } = await processMarkdown(
+        parseResult.markdown,
+        config.syntaxHighlighting,
+      )
       const jsxWithReplacedAssetUrls = replaceAssetUrls(jsx, assetUrls)
 
       // change assetUrls to URLs that work for relative javascript imports

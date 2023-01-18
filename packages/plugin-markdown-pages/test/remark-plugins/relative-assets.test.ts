@@ -38,16 +38,23 @@ test('replaceSrcSet helper works', async (t) => {
 })
 
 test('relativeAssets remark plugin', async (t) => {
-  const result1 = await processMarkdown('# Headline\n![alt](./image.jpg)')
-  t.is(
-    result1.jsx,
-    '<h1>Headline</h1>\n<p><img src="_assetUrl_0" alt="alt" /></p>',
+  const result1 = await processMarkdown('# Headline\n![alt](./image.jpg)', {
+    extensions: [],
+    theme: 'Default Dark+',
+  })
+  t.assert(
+    result1.jsx.endsWith(
+      '<h1>Headline</h1>\n<p><img src="_assetUrl_0" alt="alt" /></p>',
+    ),
   )
   t.deepEqual(result1.assetUrls, ['./image.jpg'])
 
   const result2 = await processMarkdown(
     '<img srcSet="./a.jpg 480w, ./b.jpg 800w" />',
+    { extensions: [], theme: 'Default Dark+' },
   )
-  t.is(result2.jsx, '<img srcSet="_assetUrl_0 480w, _assetUrl_1 800w" />')
+  t.assert(
+    result2.jsx.endsWith('<img srcSet="_assetUrl_0 480w, _assetUrl_1 800w" />'),
+  )
   t.deepEqual(result2.assetUrls, ['./a.jpg', './b.jpg'])
 })

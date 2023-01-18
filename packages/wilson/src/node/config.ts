@@ -183,6 +183,10 @@ function siteConfigDefaults(
     extendFrontmatter(filename, frontmatter) {
       return frontmatter
     },
+    syntaxHighlighting: {
+      extensions: [],
+      theme: 'Default Dark+',
+    },
   }
 }
 
