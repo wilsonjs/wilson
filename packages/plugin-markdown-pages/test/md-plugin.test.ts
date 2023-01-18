@@ -21,7 +21,7 @@ test('markdownPagesPlugin', async (t) => {
       layout: '/Users/name/site/src/layouts/default.tsx',
       meta: {
         filename: 'src/pages/my-article/index.md',
-        lastUpdated: new Date('10/15/2020'),
+        lastUpdated: new Date(Date.UTC(2020, 10, 10, 10, 10, 10)),
       },
     })
 
