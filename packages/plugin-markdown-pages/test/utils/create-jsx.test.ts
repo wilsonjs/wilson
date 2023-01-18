@@ -1,7 +1,7 @@
 import test from 'ava'
 import utils from '../../src/utils/index'
 
-const createFinalJsxArgs: Parameters<typeof utils.createJsx> = [
+const createJsxArgs: Parameters<typeof utils.createJsx> = [
   '/Users/name/site/src/layouts/default.tsx',
   ['import _assetUrl_0 from "./hero.jpg"'],
   '/my-article',
@@ -12,7 +12,7 @@ const createFinalJsxArgs: Parameters<typeof utils.createJsx> = [
     layout: 'default',
     meta: {
       filename: 'src/pages/my-article/index.md',
-      lastUpdated: new Date('10/15/2020'),
+      lastUpdated: new Date(Date.UTC(2020, 10, 10, 10, 10, 10)),
     },
   },
   [],
@@ -21,12 +21,12 @@ const createFinalJsxArgs: Parameters<typeof utils.createJsx> = [
   '<div><h1>Hello world</h1><img src={_assetUrl_0} /></div>',
 ]
 
-test('createFinalJsx', async (t) => {
-  t.snapshot(utils.createJsx(...createFinalJsxArgs))
+test('creates jsx for pages in languages other than the default language', async (t) => {
+  t.snapshot(utils.createJsx(...createJsxArgs))
 })
 
-test('createFinalJsx #2', async (t) => {
-  const args: Parameters<typeof utils.createJsx> = [...createFinalJsxArgs]
+test('creates jsx for default language pages', async (t) => {
+  const args: Parameters<typeof utils.createJsx> = [...createJsxArgs]
   args.splice(3, 1, 'en')
   t.snapshot(utils.createJsx(...args))
 })
