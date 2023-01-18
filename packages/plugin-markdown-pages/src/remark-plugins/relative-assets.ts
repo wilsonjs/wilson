@@ -1,6 +1,11 @@
-import { visit, CONTINUE } from 'unist-util-visit'
-import { Element, Properties } from 'hast'
-import { Transformer } from 'unified'
+import { CONTINUE, visit } from 'unist-util-visit'
+import type { Element, Properties } from 'hast'
+import type { Transformer } from 'unified'
+
+/**
+ * Asset URL prefix.
+ */
+export const assetUrlPrefix = '_assetUrl_'
 
 /**
  * Defines attributes on HTML/SVG elements that should be considered when
@@ -14,14 +19,9 @@ export const assetUrlTagConfig: Record<string, string[]> = {
   use: ['xlink:href', 'href'],
 }
 
-interface Options {
-  assetUrlPrefix: string
-}
-
 export const replaceSimpleAttribute = (
   attribute: string,
   assetUrls: string[],
-  assetUrlPrefix: string,
   properties: Properties,
 ): void => {
   const attributeValue = properties[attribute] as string
@@ -34,11 +34,7 @@ export const replaceSimpleAttribute = (
   }
 }
 
-export const replaceSrcSet = (
-  assetUrls: string[],
-  assetUrlPrefix: string,
-  properties: Properties,
-) => {
+export const replaceSrcSet = (assetUrls: string[], properties: Properties) => {
   const srcSet = (properties.srcSet as string)
     .split(',')
     .map((s) => s.trim().split(' ')) as Array<
@@ -61,9 +57,7 @@ export const replaceSrcSet = (
 /**
  *
  */
-const remarkRelativeAssets: (options: Options) => Transformer = ({
-  assetUrlPrefix,
-}) => {
+const remarkRelativeAssets: () => Transformer = () => {
   return (tree, file) => {
     const assetUrls: string[] = []
     visit(tree, 'element', visitor)
@@ -79,14 +73,9 @@ const remarkRelativeAssets: (options: Options) => Transformer = ({
       attributes.forEach((attribute) => {
         if (typeof properties[attribute] !== 'string') return
         if (attribute === 'srcSet') {
-          replaceSrcSet(assetUrls, assetUrlPrefix, properties)
+          replaceSrcSet(assetUrls, properties)
         } else {
-          replaceSimpleAttribute(
-            attribute,
-            assetUrls,
-            assetUrlPrefix,
-            properties,
-          )
+          replaceSimpleAttribute(attribute, assetUrls, properties)
         }
       })
 

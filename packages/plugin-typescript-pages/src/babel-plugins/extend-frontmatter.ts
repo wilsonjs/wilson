@@ -1,7 +1,7 @@
 import template from '@babel/template'
 import type { PluginObj, types } from '@babel/core'
 import z from 'zod'
-import validateOptions from '../util/validate-options'
+import validateOptions from '../utils/validate-options'
 
 const pluginOptions = z.object({
   frontmatter: z.object({

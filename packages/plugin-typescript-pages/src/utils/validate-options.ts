@@ -8,7 +8,7 @@ export default function validateOptions(
     pluginOptions.parse(opts)
   } catch (e) {
     if (e instanceof z.ZodError) {
-      throw new Error(`Invalid plugin options: ${JSON.stringify(e.issues)}`)
+      throw new TypeError(`Invalid plugin options: ${JSON.stringify(e.issues)}`)
     }
   }
 }

@@ -4,7 +4,7 @@ import { loadConfigFromFile, mergeConfig as mergeViteConfig } from 'vite'
 import pc from 'picocolors'
 import { dirname, join, resolve } from 'pathe'
 import type { SiteConfig, UserConfig } from '@wilson/types'
-import { isObject } from '@wilson/utils'
+import utils from '@wilson/utils'
 import { debug } from './utils'
 
 const defaultSiteMeta = {
@@ -27,7 +27,7 @@ function mergeConfig<T extends Record<string, any> = Record<string, any>>(
       merged[key] = [...existing, ...value]
       continue
     }
-    if (isObject(existing) && isObject(value)) {
+    if (utils.isObject(existing) && utils.isObject(value)) {
       if (isRoot && key === 'vite')
         merged[key] = mergeViteConfig(existing, value)
       else merged[key] = mergeConfig(existing, value, false)

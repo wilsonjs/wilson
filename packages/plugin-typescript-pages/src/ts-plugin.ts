@@ -1,9 +1,4 @@
-import {
-  createComponentName,
-  getRoutingInfo,
-  isPage,
-  userToPageFrontmatter,
-} from '@wilson/utils'
+import utils from '@wilson/utils'
 import type { Plugin } from 'vite'
 import type { TransformResult } from 'rollup'
 import type { SiteConfig, UserFrontmatter } from '@wilson/types'
@@ -21,7 +16,7 @@ import extendFrontmatterPlugin from './babel-plugins/extend-frontmatter'
 import addStaticPathsPlugin from './babel-plugins/add-static-paths'
 import wrapPageComponentPlugin from './babel-plugins/wrap-page-component'
 import addTranslationsPlugin from './babel-plugins/add-translations'
-import format from './util/format'
+import format from './utils/format'
 
 function parse(code: string): ParseResult<File> {
   return parser.parse(code, {
@@ -49,18 +44,19 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
         root,
       } = config
 
-      if (!isPage(id, pagesDir, ['.tsx'])) {
+      if (!utils.isPage(id, pagesDir, ['.tsx'])) {
         return null
       }
 
       try {
         const syntaxTree = parse(code)
         const frontmatterOptions: { frontmatter?: object } = { frontmatter: {} }
+
         await transformFromAstAsync(syntaxTree, code, {
           plugins: [[parseFrontmatterPlugin, frontmatterOptions]],
         })
 
-        const frontmatter = await userToPageFrontmatter(
+        const frontmatter = await utils.userToPageFrontmatter(
           frontmatterOptions.frontmatter as UserFrontmatter,
           id,
           config,
@@ -71,13 +67,13 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
         const dynamicParameterMatches = [
           ...relativePath.matchAll(/\[([^\]]+)\]/g),
         ]
-        const { route, translations } = getRoutingInfo(
+        const { route, translations } = utils.getRoutingInfo(
           relative(pagesDir, id),
           config,
         )
 
         const isDynamic = dynamicParameterMatches.length > 0
-        const componentName = createComponentName(relativePath)
+        const componentName = utils.createComponentName(relativePath)
         const { languageId, translationKeys } = getTranslationKeys(
           id,
           config.languages,

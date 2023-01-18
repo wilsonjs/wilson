@@ -3,10 +3,9 @@ import type {
   SiteConfig,
   StaticPageExports,
 } from '@wilson/types'
-import { getRoutingInfo, isDynamicPagePath } from '@wilson/utils'
+import utils from '@wilson/utils'
 import glob from 'fast-glob'
 import { join, relative } from 'pathe'
-import { createPaginationHelper } from '..'
 import { getOutputFilename } from './bundle'
 
 /**
@@ -46,11 +45,11 @@ export async function getPagesToRender(
 
   for (const absolutePath of files) {
     const relativePath = relative(config.pagesDir, absolutePath)
-    const { route } = getRoutingInfo(relativePath, {
+    const { route } = utils.getRoutingInfo(relativePath, {
       ...config,
       replaceParams: false,
     })
-    const isDynamic = isDynamicPagePath(route)
+    const isDynamic = utils.isDynamicPagePath(route)
 
     if (isDynamic) {
       const { staticPaths } = await getPageExports<DynamicPageExports>(
