@@ -5,8 +5,11 @@ import remarkStringify from 'remark-stringify'
 import rehypeRaw from 'rehype-raw'
 import type { Processor } from 'unified'
 import { unified } from 'unified'
-// @ts-expect-error declaration file doesn't exist
+// @ts-expect-error declaration for hast-util-to-jsx doesn't exist
 import toJsx from '@mapbox/hast-util-to-jsx'
+// @ts-expect-error declaration for gatsby-remark-vscode doesn't exist
+import syntaxHighlighting from 'gatsby-remark-vscode'
+import type { SiteConfig } from '@wilson/types'
 import remarkRelativeAssets from '../remark-plugins/relative-assets'
 
 /**
@@ -18,11 +21,13 @@ import remarkRelativeAssets from '../remark-plugins/relative-assets'
  */
 export default async function processMarkdown(
   markdownCode: string,
+  syntaxHighlightingOptions: SiteConfig['syntaxHighlighting'],
 ): Promise<{ assetUrls: string[]; jsx: string }> {
   const processor = unified()
     .use(remarkParse)
     // apply plugins that change MDAST
     .use(remarkStringify)
+    .use(syntaxHighlighting.remarkPlugin, syntaxHighlightingOptions)
     .use(remarkToRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
     // apply plugins that change HAST and gather additional information
