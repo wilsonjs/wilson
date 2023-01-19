@@ -1,0 +1,84 @@
+@import '../assets/mixins.scss';
+
+.article {
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.introSection {
+  display: flex;
+  align-items: center;
+  max-height: min(80vw, 500px);
+
+  @include responsive(md) {
+    height: 55vh;
+    min-height: 250px;
+  }
+}
+
+.introContent {
+  position: relative;
+  width: 100%;
+  min-height: auto;
+  text-align: center;
+  padding: 20px 0;
+
+  @include responsive(md) {
+    min-height: 25vh;
+    text-align: left;
+    padding: 0;
+    max-width: 470px;
+  }
+  @include responsive(lg) {
+    max-width: 550px;
+  }
+}
+
+.introWelcome {
+  font-weight: 500;
+  font-size: 2.4rem;
+  line-height: 1.36;
+  font-family: var(--font-headline);
+  will-change: transform, opacity;
+  margin: 0 0 1rem 0;
+  color: var(--color-text);
+
+  [data-mode='dark'] & {
+    color: var(--color-headline);
+  }
+
+  @include responsive(md) {
+    font-size: 2.8rem;
+  }
+  @include responsive(lg) {
+    font-size: 3.4rem;
+  }
+
+  em {
+    font-weight: 700;
+    font-style: normal;
+    color: #318513;
+
+    [data-mode='dark'] & {
+      color: #cc97ff;
+    }
+  }
+}
+
+.introParagraph {
+  line-height: 1.65;
+  font-size: 1.5rem;
+  font-weight: 500;
+  will-change: transform, opacity;
+  margin: 0;
+  max-width: 70vw;
+  margin: 30px auto 0 auto;
+  display: none;
+  color: var(--color-text-light);
+  @include responsive(md) {
+    padding: 0;
+    max-width: none;
+    display: block;
+  }
+}

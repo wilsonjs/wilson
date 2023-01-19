@@ -1,16 +1,22 @@
 import { useEffect, useState } from 'preact/hooks'
-import useIsSsr from '../hooks/use-is-ssr'
-import { SOCIAL_LINKS } from '../constants'
 import usePrevious from '@react-hook/previous'
-import styles from './menu-toggle.module.scss'
 import useMedia from 'use-media'
+import useSsr from '../hooks/use-ssr'
+import { SOCIAL_LINKS } from '../constants'
+import Link from '../components/link'
+import styles from './menu-toggle.module.scss'
 
 interface MenuToggleButtonProps {
   menuItems: { exact: boolean; name: string; url: string }[]
 }
 
 export default function MenuToggleButton({ menuItems }: MenuToggleButtonProps) {
-  if (useIsSsr()) return null
+  const { isServer } = useSsr()
+
+  if (isServer) {
+    return null
+  }
+
   const [isOpen, setIsOpen] = useState(false)
 
   const wasOpen = usePrevious(isOpen, false)
@@ -60,9 +66,18 @@ export default function MenuToggleButton({ menuItems }: MenuToggleButtonProps) {
                 {menuItems.map(({ exact, name, url }) => {
                   return (
                     <li key={name}>
-                      <a href={url} onClick={closeMenu} class={styles.menuLink}>
+                      <Link
+                        href={url}
+                        exact={exact}
+                        usedInIsland={true}
+                        // onClick={closeMenu}
+                        class={styles.menuLink}
+                      >
                         {name}
-                      </a>
+                      </Link>
+                      {/* <a href={url} onClick={closeMenu} class={styles.menuLink}>
+                        {name}
+                      </a> */}
                     </li>
                   )
                 })}
