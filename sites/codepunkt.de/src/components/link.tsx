@@ -14,9 +14,11 @@ export default function Link(
   const exact = props.exact ?? false
   const isActive = exact ? active : path.startsWith(props.href)
 
-  console.log(process.env.NODE_ENV)
-  return props.usedInIsland === true ? (
-    isActive ? (
+  const useNormalLink =
+    process.env.NODE_ENV === 'production' && props.usedInIsland === true
+
+  if (useNormalLink) {
+    return isActive ? (
       <a data-active href={props.href} class={props.class}>
         {props.children}
       </a>
@@ -25,7 +27,9 @@ export default function Link(
         {props.children}
       </a>
     )
-  ) : (
+  }
+
+  return (
     <WouterLink {...(props as LinkProps)}>
       {isActive ? (
         <a data-active class={props.class}>

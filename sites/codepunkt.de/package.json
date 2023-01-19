@@ -50,6 +50,7 @@
   "devDependencies": {
     "@types/animejs": "^3.1.6",
     "@types/html-minifier-terser": "^7.0.0",
-    "@types/lodash": "^4.14.191"
+    "@types/lodash": "^4.14.191",
+    "@types/node": "^18.0.0"
   }
 }
