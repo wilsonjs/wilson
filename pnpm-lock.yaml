@@ -319,6 +319,7 @@ importers:
       '@types/animejs': ^3.1.6
       '@types/html-minifier-terser': ^7.0.0
       '@types/lodash': ^4.14.191
+      '@types/node': ^18.0.0
       '@wilson/babel-plugin-island-path': workspace:^1.0.0
       '@wilson/island-hydration': workspace:^1.0.0
       animejs: ^3.2.1
@@ -363,7 +364,7 @@ importers:
       typeface-montserrat: 1.1.13
       typeface-open-sans: 1.1.13
       use-media: 1.4.0_@preact+compat@17.1.2
-      vite: 4.0.4_terser@5.16.1
+      vite: 4.0.4_wrmaytedpjp3nghmqd4otwwfpa
       vscode-styled-components: github.com/styled-components/vscode-styled-components/e5b357a137e896097b361e8ae22758281497e9cd
       what-input: 5.2.12
       wilson: link:../../packages/wilson
@@ -372,6 +373,7 @@ importers:
       '@types/animejs': 3.1.6
       '@types/html-minifier-terser': 7.0.0
       '@types/lodash': 4.14.191
+      '@types/node': 18.6.2
 
   sites/docs:
     specifiers:
@@ -1128,7 +1130,7 @@ packages:
       debug: 4.3.4
       kolorist: 1.5.1
       resolve: 1.22.1
-      vite: 4.0.4_e7tl4y2a3m5pvpctkvgh6b2ekm
+      vite: 4.0.4_wrmaytedpjp3nghmqd4otwwfpa
     transitivePeerDependencies:
       - preact
       - supports-color
@@ -1162,7 +1164,7 @@ packages:
       '@prefresh/utils': 1.1.3
       '@rollup/pluginutils': 4.2.1
       preact: 10.10.0
-      vite: 4.0.4_e7tl4y2a3m5pvpctkvgh6b2ekm
+      vite: 4.0.4_wrmaytedpjp3nghmqd4otwwfpa
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -6753,7 +6755,7 @@ packages:
       fsevents: 2.3.2
     dev: false
 
-  /vite/4.0.4_terser@5.16.1:
+  /vite/4.0.4_wrmaytedpjp3nghmqd4otwwfpa:
     resolution: {integrity: sha512-xevPU7M8FU0i/80DMR+YhgrzR5KS2ORy1B4xcX/cXLsvnUWvfHuqMmVU6N0YiJ4JWGRJJsLCgjEzKjG9/GKoSw==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -6778,6 +6780,7 @@ packages:
       terser:
         optional: true
     dependencies:
+      '@types/node': 18.6.2
       esbuild: 0.16.17
       postcss: 8.4.21
       resolve: 1.22.1
