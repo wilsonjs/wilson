@@ -6,3 +6,4 @@ coverage/
 .pnpm-debug.log
 packages/.pnpm-debug.log
 .idea/
+yarn-error.log

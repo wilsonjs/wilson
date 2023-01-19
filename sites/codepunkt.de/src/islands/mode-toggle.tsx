@@ -1,7 +1,7 @@
 import type { FunctionalComponent } from 'preact'
 import { memo } from 'preact/compat'
 import { useEffect, useRef, useState } from 'preact/hooks'
-import useIsSsr from '../hooks/use-is-ssr'
+import useSsr from '../hooks/use-ssr'
 import styles from './mode-toggle.module.scss'
 
 const sunPath =
@@ -14,7 +14,11 @@ type ColorMode = 'light' | 'dark'
 const colorModeStorageKey = '🌈'
 
 const ModeToggle: FunctionalComponent = memo(() => {
-  if (useIsSsr()) return null
+  const { isServer } = useSsr()
+
+  if (isServer) {
+    return null
+  }
 
   const sunRef = useRef<SVGAnimateElement>(null)
   const moonRef = useRef<SVGAnimateElement>(null)
