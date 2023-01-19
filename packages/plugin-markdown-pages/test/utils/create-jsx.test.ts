@@ -21,7 +21,7 @@ const createJsxArgs: Parameters<typeof utils.createJsx> = [
   '<div><h1>Hello world</h1><img src={_assetUrl_0} /></div>',
 ]
 
-test('creates jsx for pages in languages other than the default language', async (t) => {
+test('creates jsx for pages other than the default language', async (t) => {
   t.snapshot(utils.createJsx(...createJsxArgs))
 })
 

@@ -1,7 +1,6 @@
 import type { StaticPageProps } from 'wilson'
 import { Link } from 'wouter-preact'
 import '../assets/global.scss'
-import 'typeface-fira-code'
 import 'typeface-montserrat'
 import 'typeface-open-sans'
 import 'what-input'

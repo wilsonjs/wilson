@@ -88,4 +88,20 @@ export default {
     ],
   ],
   extendFrontmatter() {},
+  syntaxHighlighting: {
+    theme: {
+      default: 'Slack Theme Ochin',
+      parentSelector: {
+        'html[data-mode=dark]': 'Slack Theme Dark Mode',
+      },
+    },
+    extensions: ['slack-theme', 'vscode-styled-components'],
+    inlineCode: {
+      marker: '•',
+    },
+    replaceColor: (oldColor) =>
+      ({
+        '#dcdcaa': '#b1bbf4',
+      }[oldColor.toLowerCase()] || oldColor),
+  },
 } as UserConfig

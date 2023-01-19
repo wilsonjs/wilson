@@ -1,5 +1,6 @@
 import type { UserConfig as ViteOptions } from 'vite'
 import type { FunctionComponent, RenderableProps } from 'preact'
+import type { SyntaxHighlightingOptions } from './syntax-highlighting'
 
 export type Awaitable<T> = T | Promise<T>
 
@@ -78,34 +79,6 @@ export interface UserConfig {
   /** Returns contnt that is injected into evert page's <head> */
   getHeadContent?: () => Promise<string>
   syntaxHighlighting?: SyntaxHighlightingOptions
-}
-
-// TODO get from gatsby-remark-vscode
-interface ThemeSettings {
-  default: string
-  dark?: string
-  parentSelector?: Record<string, string>
-  media?: Array<{ match: string; theme: string }>
-}
-
-interface CodeData {
-  language: string
-  node: Node
-}
-
-interface SyntaxHighlightingOptions {
-  theme?: string | ThemeSettings | ((data: CodeData) => string | ThemeSettings)
-  wrapperClassName?: string | ((data: CodeData) => string)
-  languageAliases?: Record<string, string>
-  extensions?: string[]
-  inlineCode?: {
-    marker: string
-    className: string | ((data: CodeData) => string)
-    theme: string | ThemeSettings | ((data: CodeData) => string | ThemeSettings)
-  }
-  injectStyles?: boolean
-  replaceColor?: (colorValue: string, theme: string) => string
-  logLevel?: 'trace' | 'debug' | 'info' | 'warn' | 'error'
 }
 
 export type Languages = Array<
