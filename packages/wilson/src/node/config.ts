@@ -187,6 +187,7 @@ function siteConfigDefaults(
       extensions: [],
       theme: 'Default Dark+',
     },
+    createOpengraphImage: () => null,
   }
 }
 

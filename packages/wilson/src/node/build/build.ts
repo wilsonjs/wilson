@@ -2,6 +2,7 @@ import { resolveConfig } from '../config'
 import { debug, rmDir, timeSince, withSpinner } from '../utils'
 import { bundle } from './bundle'
 import { bundleIslands } from './islands'
+import createOpengraphImages from './open-graph'
 import { renderPages } from './render'
 import { writePages } from './write'
 
@@ -39,6 +40,13 @@ export async function build(root: string = process.cwd()) {
     'writing pages',
     async () => await writePages(siteConfig, pagesToRender, islandsByPath),
   )
+
+  if (siteConfig.createOpengraphImage !== null) {
+    await withSpinner(
+      'creating open graph images',
+      async () => await createOpengraphImages(siteConfig, pagesToRender),
+    )
+  }
 
   rmDir(siteConfig.tempDir)
   console.info(`build complete in ${timeSince(startTime)}.`)

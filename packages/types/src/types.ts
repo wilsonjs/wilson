@@ -1,6 +1,7 @@
 import type { UserConfig as ViteOptions } from 'vite'
 import type { FunctionComponent, RenderableProps } from 'preact'
 import type { SyntaxHighlightingOptions } from './syntax-highlighting'
+import type { OpengraphImageText } from './open-graph'
 
 export type Awaitable<T> = T | Promise<T>
 
@@ -76,9 +77,15 @@ export interface UserConfig {
     filename: string,
     frontmatter: UserFrontmatter,
   ) => Awaitable<UserFrontmatter | void>
-  /** Returns contnt that is injected into evert page's <head> */
+  /** Returns content that is injected into <head> */
   getHeadContent?: () => Promise<string>
+  /** Syntax highlighting options */
   syntaxHighlighting?: SyntaxHighlightingOptions
+  /** Options to create open graph images on build */
+  createOpengraphImage?: (frontmatter: PageFrontmatter) => {
+    background: string
+    texts: OpengraphImageText[]
+  } | null
 }
 
 export type Languages = Array<

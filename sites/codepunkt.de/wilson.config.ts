@@ -88,6 +88,55 @@ export default {
     ],
   ],
   extendFrontmatter() {},
+  createOpengraphImage: (frontmatter) => {
+    if (
+      !frontmatter.date ||
+      !frontmatter.meta.filename.startsWith('src/pages/writing/')
+    ) {
+      return null
+    }
+    return {
+      background: './src/assets/og-image-background.png',
+      texts: [
+        {
+          text: frontmatter.title,
+          color: '#ffffff',
+          font: './src/assets/Montserrat-SemiBold.ttf',
+          maxWidth: 700,
+          maxHeight: 480,
+          x: 50,
+          y: 515,
+          verticalAlign: 'bottom',
+        },
+        {
+          text: 'Christoph Werner •',
+          color: '#c6c5dd',
+          fontSize: 32,
+          font: './src/assets/OpenSans-Regular.ttf',
+          maxWidth: 650,
+          maxHeight: 50,
+          x: 100,
+          y: 580,
+          verticalAlign: 'bottom',
+        },
+        {
+          text: new Date(frontmatter.date).toLocaleDateString('en', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          }),
+          color: '#ffffff',
+          fontSize: 32,
+          font: './src/assets/OpenSans-Regular.ttf',
+          maxWidth: 432,
+          maxHeight: 50,
+          x: 318,
+          y: 580,
+          verticalAlign: 'bottom',
+        },
+      ],
+    }
+  },
   syntaxHighlighting: {
     theme: {
       default: 'Slack Theme Ochin',
