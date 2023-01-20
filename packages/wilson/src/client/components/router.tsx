@@ -47,13 +47,15 @@ interface Route {
   props: Record<string, any>
   importPath?: string
   component: ComponentType<any>
+  frontmatter?: PageFrontmatter
 }
 
 const routes: Route[] = Object.entries(pages)
-  .map(([file, { path, default: Page }]) => {
+  .map(([file, { path, default: Page, frontmatter }]) => {
     return {
       importPath: file,
       component: Page,
+      frontmatter,
       props: { path },
     }
   })
@@ -83,10 +85,21 @@ export default function Router({ urlToBeRendered }: AppProps) {
         : { hook: staticLocationHook(urlToBeRendered) })}
     >
       <Switch>
-        {routes.map(({ component: Page, props }) => (
+        {routes.map(({ component: Page, frontmatter, props }) => (
           <Woute
             {...props}
-            component={(params) => <Page {...params} {...props} />}
+            component={(params) => (
+              <>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: `<!-- frontmatter ${JSON.stringify(
+                      frontmatter,
+                    )} -->`,
+                  }}
+                />
+                <Page {...params} {...props} />
+              </>
+            )}
           />
         ))}
       </Switch>

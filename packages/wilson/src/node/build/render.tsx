@@ -4,6 +4,7 @@ import { join } from 'pathe'
 import type { RollupOutput } from 'rollup'
 import type { RenderToStringFn } from '../../client/app.server'
 import { withSpinner } from '../utils'
+import type { PageFrontmatter } from '../../../../types/dist/types'
 import type { bundle } from './bundle'
 import type { PageToRender } from './pages'
 import { getPagesToRender } from './pages'
@@ -33,13 +34,14 @@ export async function renderPages(
 
   await withSpinner('rendering pages', async () => {
     for (const page of pagesToRender) {
-      const { rendered, islands } = await renderPage(
+      const { rendered, frontmatter, islands } = await renderPage(
         config,
         clientChunks,
         page,
         rendertoString,
       )
       page.rendered = rendered
+      page.frontmatter = frontmatter
       islandsByPath[page.route] = islands
     }
   })
@@ -47,13 +49,23 @@ export async function renderPages(
   return { pagesToRender, islandsByPath }
 }
 
+const frontmatterRegexp = /^<div><!-- frontmatter (?<json>.*?) --><\/div>/
+
 export async function renderPage(
   config: SiteConfig,
   clientChunks: RollupOutput['output'],
   page: PageToRender,
   renderToString: RenderToStringFn,
-): Promise<{ rendered: string; islands: Island[] }> {
+): Promise<{
+  rendered: string
+  islands: Island[]
+  frontmatter: PageFrontmatter
+}> {
   const { html, islands, head } = renderToString(page.route)
+  const match = html.match(frontmatterRegexp)
+  const frontmatter = JSON.parse(match!.groups!.json) as PageFrontmatter
+  html.replace(frontmatterRegexp, '')
+
   // TODO: links, scripts and meta
   return {
     rendered: /* html */ `
@@ -73,6 +85,7 @@ export async function renderPage(
       </html>
     `,
     islands,
+    frontmatter,
   }
 }
 
