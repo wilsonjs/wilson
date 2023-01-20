@@ -1,9 +1,8 @@
-/* eslint-disable no-restricted-syntax */
-import { build as viteBuild, mergeConfig as mergeViteConfig } from 'vite'
-import type { UserConfig as ViteUserConfig, Plugin } from 'vite'
-import type { SiteConfig, IslandsByPath } from '@wilson/types'
-import { extendManualChunks } from './chunks'
+import { mergeConfig as mergeViteConfig, build as viteBuild } from 'vite'
+import type { Plugin, UserConfig as ViteUserConfig } from 'vite'
+import type { IslandsByPath, SiteConfig } from '@wilson/types'
 import wilsonPlugins from '../plugins'
+import { extendManualChunks } from './chunks'
 
 export const VIRTUAL_PREFIX = 'wilson_island_'
 
@@ -44,7 +43,7 @@ export async function bundleIslands(
           output: {
             entryFileNames: chunkFileNames,
             chunkFileNames,
-            manualChunks: extendManualChunks(config),
+            manualChunks: extendManualChunks(),
           },
         },
       },

@@ -1,7 +1,6 @@
 import type { GetManualChunk, GetManualChunkApi } from 'rollup'
-import type { SiteConfig } from '@wilson/types'
 
-export function extendManualChunks(config: SiteConfig): GetManualChunk {
+export function extendManualChunks(): GetManualChunk {
   // const userChunks = config.ssg.manualChunks
   const cache = new Map<string, string | undefined>()
   const chunkForExtension = {
