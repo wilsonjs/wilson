@@ -42,6 +42,7 @@
     "dev:node": "npm run build:node -- --watch"
   },
   "dependencies": {
+    "@codepunkt/wasm-layout-text": "^3.0.0",
     "@preact/preset-vite": "^2.3.0",
     "@svgr/core": "^6.3.1",
     "@wilson/babel-plugin-island-path": "workspace:^1.0.0",
@@ -55,6 +56,7 @@
     "fast-equals": "^4.0.1",
     "fast-glob": "^3.2.11",
     "hoofd": "1.5.2",
+    "jimp": "^0.16.2",
     "js-beautify": "^1.14.4",
     "magic-string": "^0.27.0",
     "mico-spinner": "^1.4.0",
