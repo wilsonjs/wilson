@@ -1,5 +1,6 @@
 import type {
   DynamicPageExports,
+  PageFrontmatter,
   SiteConfig,
   StaticPageExports,
 } from '@wilson/types'
@@ -15,6 +16,7 @@ export interface PageToRender {
   route: string
   outputFilename: string
   rendered: string
+  frontmatter: PageFrontmatter | null
 }
 
 /**
@@ -67,6 +69,7 @@ export async function getPagesToRender(
           return {
             route: url.replace(/\/$/, ''),
             outputFilename,
+            frontmatter: null,
             rendered: '',
           }
         }),
@@ -76,6 +79,7 @@ export async function getPagesToRender(
       pagesToRender.push({
         route,
         outputFilename,
+        frontmatter: null,
         rendered: '',
       })
     }
