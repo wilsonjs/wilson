@@ -1,5 +1,3 @@
-import type { PageFrontmatter } from './types'
-
 export interface OpengraphImageText {
   text: string
   font: string
