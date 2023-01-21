@@ -87,7 +87,7 @@ export default async function createOpengraphImages(
 
           const buffer = wlt.render(
             new wlt.Text(
-              typeof text === 'function' ? text(page) : text,
+              text,
               fontSize,
               new wlt.RgbColor(...hexToRgb(color)),
               await fs.readFile(font),
