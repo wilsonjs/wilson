@@ -95,7 +95,10 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
                     source: layoutPath,
                   },
                   {
-                    identifiers: [{ default: false, name: 'useTitle' }],
+                    identifiers: [
+                      { default: false, name: 'useLang' },
+                      { default: false, name: 'useTitle' },
+                    ],
                     source: 'hoofd/preact',
                   },
                   ...(isDynamic

@@ -16,7 +16,7 @@ export default function createJsx(
   jsxWithReplacedAssetUrls: string,
 ) {
   return /* jsx */ `
-    import { useTitle } from 'hoofd/preact';
+    import { useLang, useTitle } from 'hoofd/preact';
     import Layout from '${layoutPath}';
     ${assetImports.join('\n')}
 
@@ -41,9 +41,15 @@ export default function createJsx(
       return null;
     };
 
+    function Meta({ language }) {
+      useLang(language);
+      return null;
+    }
+
     export default function ${componentName}Page({ url, params: matches }) {
       return <Layout url={url} {...props}>
         {frontmatter.title && <Title />}
+        <Meta language={language} />
         ${jsxWithReplacedAssetUrls}
       </Layout>;
     };
