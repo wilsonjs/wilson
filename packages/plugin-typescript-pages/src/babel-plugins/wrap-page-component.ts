@@ -193,6 +193,27 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                 types.returnStatement(types.nullLiteral()),
               ]),
             ),
+            types.functionDeclaration(
+              types.identifier('Meta'),
+              [
+                types.objectPattern([
+                  types.objectProperty(
+                    types.identifier('language'),
+                    types.identifier('language'),
+                    false,
+                    true,
+                  ),
+                ]),
+              ],
+              types.blockStatement([
+                types.expressionStatement(
+                  types.callExpression(types.identifier('useLang'), [
+                    types.identifier('language'),
+                  ]),
+                ),
+                types.returnStatement(types.nullLiteral()),
+              ]),
+            ),
             ...(opts.isDynamic
               ? [
                   types.variableDeclaration('const', [
@@ -375,6 +396,25 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                         [],
                       ),
                     ),
+                  ),
+                  types.jsxElement(
+                    types.jsxOpeningElement(
+                      types.jsxIdentifier('Meta'),
+                      [
+                        types.jsxAttribute(
+                          types.jsxIdentifier('language'),
+                          types.jsxExpressionContainer(
+                            types.memberExpression(
+                              types.identifier('props'),
+                              types.identifier('language'),
+                            ),
+                          ),
+                        ),
+                      ],
+                      true,
+                    ),
+                    null,
+                    [],
                   ),
                   types.jsxElement(
                     types.jsxOpeningElement(
