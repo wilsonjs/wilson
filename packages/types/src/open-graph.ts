@@ -1,7 +1,7 @@
 import type { PageFrontmatter } from './types'
 
 export interface OpengraphImageText {
-  text: (page: PageFrontmatter) => string
+  text: string
   font: string
   fontSize?: number
   color?: string
