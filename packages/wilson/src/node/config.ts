@@ -8,8 +8,8 @@ import utils from '@wilson/utils'
 import { debug } from './utils'
 
 const defaultSiteMeta = {
-  title: 'Welcome to Wilson!',
-  description: '',
+  description: 'This is a blazing-fast site built with https://wilsonjs.com/',
+  titleTemplate: '%s',
 }
 
 function mergeConfig<T extends Record<string, any> = Record<string, any>>(

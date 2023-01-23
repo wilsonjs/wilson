@@ -14,9 +14,10 @@ export default function createJsx(
   translationKeys: Record<string, string>,
   componentName: string,
   jsxWithReplacedAssetUrls: string,
+  titleTemplate: string,
 ) {
   return /* jsx */ `
-    import { useLang, useTitle } from 'hoofd/preact';
+    import { useLang, useTitle, useTitleTemplate } from 'hoofd/preact';
     import Layout from '${layoutPath}';
     ${assetImports.join('\n')}
 
@@ -47,6 +48,7 @@ export default function createJsx(
     }
 
     export default function ${componentName}Page({ url, params: matches }) {
+      useTitleTemplate('${titleTemplate}');
       return <Layout url={url} {...props}>
         {frontmatter.title && <Title />}
         <Meta language={language} />

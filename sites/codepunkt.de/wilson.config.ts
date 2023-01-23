@@ -45,14 +45,14 @@ async function getHeadContent() {
   return /* html */ `${favIcon}<script>${darkMode.code}</script>`
 }
 
-export default {
+const config: UserConfig = {
   siteUrl: 'https://codepunkt.de/',
   site: {
-    title: 'Wat the wat',
-    description: 'Something something',
+    defaultTitle: 'Codepunkt',
+    description: 'Musings aout web development and cloud technology',
+    titleTemplate: '%s | Codepunkt',
   },
-  defaultContentLanguage: 'en',
-  getHeadContent,
+  defaultLanguage: 'en',
   languages: [
     [
       'en',
@@ -88,6 +88,7 @@ export default {
     ],
   ],
   extendFrontmatter() {},
+  getHeadContent,
   createOpengraphImage: (frontmatter) => {
     if (
       !frontmatter.date ||
@@ -153,4 +154,6 @@ export default {
         '#dcdcaa': '#b1bbf4',
       }[oldColor.toLowerCase()] || oldColor),
   },
-} as UserConfig
+}
+
+export default config

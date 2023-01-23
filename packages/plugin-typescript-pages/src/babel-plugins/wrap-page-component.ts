@@ -94,6 +94,7 @@ const pluginOptions = z.object({
   isDynamic: z.boolean(),
   languageId: z.string(),
   translationKeys: z.object({}),
+  titleTemplate: z.string(),
 })
 
 export default function wrapPageComponentPlugin(): PluginObj<{
@@ -372,6 +373,11 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                     ),
                   ]),
                 ]),
+            types.expressionStatement(
+              types.callExpression(types.identifier('useTitleTemplate'), [
+                types.stringLiteral(opts.titleTemplate),
+              ]),
+            ),
             types.returnStatement(
               types.jsxElement(
                 types.jsxOpeningElement(types.jsxIdentifier('Layout'), [
