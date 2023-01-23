@@ -51,6 +51,15 @@ export async function renderPages(
 
 const frontmatterRegexp = /^<div><!-- frontmatter (?<json>.*?) --><\/div>/
 
+function createMetaTags(metas: Record<string, string>[]) {
+  return metas
+    .map((meta) => {
+      const entries = Object.entries(meta)
+      return `<meta ${entries[0][0]}="${entries[0][1]}" ${entries[1][0]}="${entries[1][1]}" />`
+    })
+    .join('\n')
+}
+
 export async function renderPage(
   config: SiteConfig,
   clientChunks: RollupOutput['output'],
@@ -76,8 +85,9 @@ export async function renderPage(
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
           <title>${head.title}</title>
+          ${createMetaTags(head.metas)}
           ${stylesheetTagsFrom(config, clientChunks)}
-          ${await config.getHeadContent()}
+          ${await config.getAdditionalHeadContent()}
         </head>
         <body>
           <div id="site">${html}</div>

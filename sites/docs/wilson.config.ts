@@ -2,7 +2,7 @@ import type { UserConfig } from 'wilson'
 
 const config: UserConfig = {
   site: {
-    title: 'Wilson',
+    titleTemplate: '%s - Wilson',
     description: '',
   },
   siteUrl: 'https://wilsonjs.com/',

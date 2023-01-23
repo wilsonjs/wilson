@@ -66,13 +66,12 @@ export default function markdownPagesPlugin(config: SiteConfig): PluginOption {
         assetImports,
         route,
         languageId,
-        config.defaultLanguage,
+        config,
         frontmatter,
         translatedPages,
         translationKeys,
         componentName,
         jsxWithReplacedAssetUrls,
-        config.site.titleTemplate,
       )
 
       return format(newCode, { filepath: 'markdown.tsx' })

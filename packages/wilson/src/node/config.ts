@@ -179,7 +179,7 @@ function siteConfigDefaults(
     // TODO validate that translationKeys values are all strings
     languages: [],
     vite: viteConfigDefaults(root),
-    getHeadContent: async () => '',
+    getAdditionalHeadContent: async () => '',
     extendFrontmatter(filename, frontmatter) {
       return frontmatter
     },
