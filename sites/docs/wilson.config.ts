@@ -1,5 +1,11 @@
-import { UserConfig } from 'wilson'
+import type { UserConfig } from 'wilson'
 
-export default {
+const config: UserConfig = {
+  site: {
+    title: 'Wilson',
+    description: '',
+  },
   siteUrl: 'https://wilsonjs.com/',
-} as UserConfig
+}
+
+export default config

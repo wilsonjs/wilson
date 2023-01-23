@@ -3,7 +3,7 @@ import { Link } from 'wouter-preact'
 import styles from './[pagination].module.scss'
 
 export const frontmatter = {
-  title: 'Articles',
+  title: 'Writing',
 }
 
 export const getStaticPaths: GetStaticPaths = async ({

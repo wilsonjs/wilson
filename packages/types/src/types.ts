@@ -61,8 +61,10 @@ export interface UserConfig {
   drafts?: boolean
   /** Provide site-wide meta information. */
   site: {
-    title: string
+    /** A short and accurate summary of the content of the page. Several browsers use this as the default description of bookmarked pages. */
     description: string
+    /** Accepts a `%s` placeholder that will be replaced with the title from each page's frontmatter. */
+    titleTemplate: string
   }
   /** Default content language. Defaults to 'en'. */
   defaultLanguage?: string

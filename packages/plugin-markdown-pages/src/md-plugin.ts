@@ -72,6 +72,7 @@ export default function markdownPagesPlugin(config: SiteConfig): PluginOption {
         translationKeys,
         componentName,
         jsxWithReplacedAssetUrls,
+        config.site.titleTemplate,
       )
 
       return format(newCode, { filepath: 'markdown.tsx' })

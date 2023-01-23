@@ -75,7 +75,7 @@ export async function renderPage(
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-          <title>${head.title ?? config.site.title}</title>
+          <title>${head.title}</title>
           ${stylesheetTagsFrom(config, clientChunks)}
           ${await config.getHeadContent()}
         </head>

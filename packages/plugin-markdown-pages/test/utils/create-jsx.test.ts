@@ -19,6 +19,7 @@ const createJsxArgs: Parameters<typeof utils.createJsx> = [
   { 'footer-copyright': 'Alle Rechte vorbehalten' },
   'MyArticleIndex',
   '<div><h1>Hello world</h1><img src={_assetUrl_0} /></div>',
+  '%s | Wilson Testsite',
 ]
 
 test('creates jsx for pages other than the default language', async (t) => {
