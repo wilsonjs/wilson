@@ -95,6 +95,7 @@ const pluginOptions = z.object({
   languageId: z.string(),
   translationKeys: z.object({}),
   titleTemplate: z.string(),
+  description: z.string(),
 })
 
 export default function wrapPageComponentPlugin(): PluginObj<{
@@ -179,42 +180,6 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                 ),
               ),
             ]),
-            types.functionDeclaration(
-              types.identifier('Title'),
-              [],
-              types.blockStatement([
-                types.expressionStatement(
-                  types.callExpression(types.identifier('useTitle'), [
-                    types.memberExpression(
-                      types.identifier('frontmatter'),
-                      types.identifier('title'),
-                    ),
-                  ]),
-                ),
-                types.returnStatement(types.nullLiteral()),
-              ]),
-            ),
-            types.functionDeclaration(
-              types.identifier('Meta'),
-              [
-                types.objectPattern([
-                  types.objectProperty(
-                    types.identifier('language'),
-                    types.identifier('language'),
-                    false,
-                    true,
-                  ),
-                ]),
-              ],
-              types.blockStatement([
-                types.expressionStatement(
-                  types.callExpression(types.identifier('useLang'), [
-                    types.identifier('language'),
-                  ]),
-                ),
-                types.returnStatement(types.nullLiteral()),
-              ]),
-            ),
             ...(opts.isDynamic
               ? [
                   types.variableDeclaration('const', [
@@ -378,6 +343,42 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                 types.stringLiteral(opts.titleTemplate),
               ]),
             ),
+            types.expressionStatement(
+              types.callExpression(types.identifier('useTitle'), [
+                types.memberExpression(
+                  types.identifier('frontmatter'),
+                  types.identifier('title'),
+                ),
+              ]),
+            ),
+            types.expressionStatement(
+              types.callExpression(types.identifier('useHead'), [
+                types.objectExpression([
+                  types.objectProperty(
+                    types.identifier('language'),
+                    types.memberExpression(
+                      types.identifier('props'),
+                      types.identifier('language'),
+                    ),
+                  ),
+                  types.objectProperty(
+                    types.identifier('metas'),
+                    types.arrayExpression([
+                      types.objectExpression([
+                        types.objectProperty(
+                          types.identifier('name'),
+                          types.stringLiteral('description'),
+                        ),
+                        types.objectProperty(
+                          types.identifier('content'),
+                          types.stringLiteral(opts.description),
+                        ),
+                      ]),
+                    ]),
+                  ),
+                ]),
+              ]),
+            ),
             types.returnStatement(
               types.jsxElement(
                 types.jsxOpeningElement(types.jsxIdentifier('Layout'), [
@@ -385,43 +386,6 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                 ]),
                 types.jsxClosingElement(types.jsxIdentifier('Layout')),
                 [
-                  types.jsxExpressionContainer(
-                    types.logicalExpression(
-                      '&&',
-                      types.memberExpression(
-                        types.identifier('frontmatter'),
-                        types.identifier('title'),
-                      ),
-                      types.jsxElement(
-                        types.jsxOpeningElement(
-                          types.jsxIdentifier('Title'),
-                          [],
-                          true,
-                        ),
-                        null,
-                        [],
-                      ),
-                    ),
-                  ),
-                  types.jsxElement(
-                    types.jsxOpeningElement(
-                      types.jsxIdentifier('Meta'),
-                      [
-                        types.jsxAttribute(
-                          types.jsxIdentifier('language'),
-                          types.jsxExpressionContainer(
-                            types.memberExpression(
-                              types.identifier('props'),
-                              types.identifier('language'),
-                            ),
-                          ),
-                        ),
-                      ],
-                      true,
-                    ),
-                    null,
-                    [],
-                  ),
                   types.jsxElement(
                     types.jsxOpeningElement(
                       types.jsxIdentifier('OriginalPage'),

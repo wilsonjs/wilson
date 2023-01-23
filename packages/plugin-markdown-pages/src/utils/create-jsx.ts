@@ -1,4 +1,4 @@
-import type { PageFrontmatter, Translation } from '@wilson/types'
+import type { PageFrontmatter, SiteConfig, Translation } from '@wilson/types'
 
 /**
  * Creates the JSX code for a markdown page.
@@ -8,28 +8,28 @@ export default function createJsx(
   assetImports: string[],
   route: string,
   languageId: string,
-  defaultLanguage: string,
+  config: Pick<SiteConfig, 'defaultLanguage' | 'site'>,
   frontmatter: PageFrontmatter,
   translatedPages: Translation[],
   translationKeys: Record<string, string>,
   componentName: string,
   jsxWithReplacedAssetUrls: string,
-  titleTemplate: string,
 ) {
   return /* jsx */ `
-    import { useLang, useTitle, useTitleTemplate } from 'hoofd/preact';
+    import { useHead, useTitle, useTitleTemplate } from 'hoofd/preact';
     import Layout from '${layoutPath}';
     ${assetImports.join('\n')}
 
     export const path = '${route}';
     export const language = '${languageId}';
     export const frontmatter = ${JSON.stringify(frontmatter)};
+
     const props = {
       frontmatter,
       path,
       language: '${languageId}',
       localizeUrl: (url) => ${
-        languageId === defaultLanguage
+        languageId === config.defaultLanguage
           ? 'url'
           : `'/${languageId}' + url.replace(/\\/$/, '')`
       },
@@ -37,23 +37,21 @@ export default function createJsx(
       translate: (key) => (${JSON.stringify(translationKeys)}[key] ?? key),
     };
 
-    function Title() {
-      useTitle(frontmatter.title);
-      return null;
-    };
-
-    function Meta({ language }) {
-      useLang(language);
-      return null;
-    }
-
     export default function ${componentName}Page({ url, params: matches }) {
-      useTitleTemplate('${titleTemplate}');
-      return <Layout url={url} {...props}>
-        {frontmatter.title && <Title />}
-        <Meta language={language} />
-        ${jsxWithReplacedAssetUrls}
-      </Layout>;
+      useTitleTemplate('${config.site.titleTemplate}');
+      useTitle(frontmatter.title);
+      useHead({
+        language,
+        metas: [
+          { name: 'description', content: '${config.site.description}' }
+        ]
+      });
+
+      return (
+        <Layout url={url} {...props}>
+          ${jsxWithReplacedAssetUrls}
+        </Layout>
+      );
     };
   `
 }

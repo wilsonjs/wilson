@@ -32,7 +32,7 @@ const faviconHtml = /* html */ `
   <meta name="theme-color" content="#ffffff" />
 `
 
-async function getHeadContent() {
+async function getAdditionalHeadContent() {
   const darkMode = await minifyJs(darkModeScript, { toplevel: true })
   const favIcon = await minifyHtml(faviconHtml, {
     collapseBooleanAttributes: true,
@@ -48,8 +48,7 @@ async function getHeadContent() {
 const config: UserConfig = {
   siteUrl: 'https://codepunkt.de/',
   site: {
-    defaultTitle: 'Codepunkt',
-    description: 'Musings aout web development and cloud technology',
+    description: 'Musings about web development and cloud technology',
     titleTemplate: '%s | Codepunkt',
   },
   defaultLanguage: 'en',
@@ -88,7 +87,7 @@ const config: UserConfig = {
     ],
   ],
   extendFrontmatter() {},
-  getHeadContent,
+  getAdditionalHeadContent,
   createOpengraphImage: (frontmatter) => {
     if (
       !frontmatter.date ||

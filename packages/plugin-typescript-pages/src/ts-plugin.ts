@@ -42,7 +42,7 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
         layoutsDir,
         pagesDir,
         root,
-        site: { titleTemplate },
+        site: { description, titleTemplate },
       } = config
 
       if (!utils.isPage(id, pagesDir, ['.tsx'])) {
@@ -97,7 +97,7 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
                   },
                   {
                     identifiers: [
-                      { default: false, name: 'useLang' },
+                      { default: false, name: 'useHead' },
                       { default: false, name: 'useTitle' },
                       { default: false, name: 'useTitleTemplate' },
                     ],
@@ -148,6 +148,7 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
                 isDynamic,
                 translationKeys,
                 titleTemplate,
+                description,
               },
             ],
           ].filter(Boolean) as PluginItem[],

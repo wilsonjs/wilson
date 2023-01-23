@@ -79,8 +79,8 @@ export interface UserConfig {
     filename: string,
     frontmatter: UserFrontmatter,
   ) => Awaitable<UserFrontmatter | void>
-  /** Returns content that is injected into <head> */
-  getHeadContent?: () => Promise<string>
+  /** Returns additional content that is injected into <head> */
+  getAdditionalHeadContent?: () => Promise<string>
   /** Syntax highlighting options */
   syntaxHighlighting?: SyntaxHighlightingOptions
   /** Options to create open graph images on build */
