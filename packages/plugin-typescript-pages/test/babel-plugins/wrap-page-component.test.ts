@@ -44,6 +44,8 @@ test('throws when invoked with invalid options', async (t) => {
             isDefaultLanguage: true,
             translationKeys: {},
             isDynamic: true,
+            title: 'Hello world',
+            titleMeta: { properties: ['og:title'], useTemplate: true },
             titleTemplate: '%s',
             description: 'Interesting test page',
           },
@@ -65,6 +67,8 @@ test('throws without default export', async (t) => {
             isDefaultLanguage: true,
             translationKeys: {},
             isDynamic: true,
+            title: 'Hello world',
+            titleMeta: { properties: ['og:title'], useTemplate: true },
             titleTemplate: '%s',
             description: 'Interesting test page',
           },
@@ -90,6 +94,8 @@ test('throws when default export is not a function', async (t) => {
             isDefaultLanguage: true,
             translationKeys: {},
             isDynamic: true,
+            title: 'Hello world',
+            titleMeta: { properties: ['og:title'], useTemplate: true },
             titleTemplate: '%s',
             description: 'Interesting test page',
           },
@@ -102,7 +108,7 @@ test('throws when default export is not a function', async (t) => {
   )
 })
 
-test('wraps exported page', async (t) => {
+test('wraps exported static page', async (t) => {
   const staticResult = await transformAsync(
     `export default function Page() { return <h1>Hello world</h1> }`,
     {
@@ -116,7 +122,9 @@ test('wraps exported page', async (t) => {
             isDefaultLanguage: true,
             translationKeys: { foo: 'bar' },
             isDynamic: false,
-            titleTemplate: '%s',
+            title: 'Hello world',
+            titleMeta: { properties: ['og:title'], useTemplate: true },
+            titleTemplate: '%s - Foo',
             description: 'Interesting test page',
           },
         ],
@@ -124,7 +132,9 @@ test('wraps exported page', async (t) => {
     },
   )
   t.snapshot(staticResult?.code)
+})
 
+test('wraps exported dynamic page', async (t) => {
   const dynamicResult = await transformAsync(
     `export default function Page() { return <h1>Hello world</h1> }`,
     {
@@ -138,7 +148,12 @@ test('wraps exported page', async (t) => {
             isDefaultLanguage: false,
             translationKeys: { bar: 'baz' },
             isDynamic: true,
-            titleTemplate: '%s',
+            title: 'Hello world',
+            titleMeta: {
+              properties: ['og:title', 'twitter:title'],
+              useTemplate: false,
+            },
+            titleTemplate: '%s - Foo',
             description: 'Interesting test page',
           },
         ],

@@ -10,6 +10,10 @@ import { debug } from './utils'
 const defaultSiteMeta = {
   description: 'This is a blazing-fast site built with https://wilsonjs.com/',
   titleTemplate: '%s',
+  titleMeta: {
+    properties: [],
+    useTemplate: true,
+  },
 }
 
 function mergeConfig<T extends Record<string, any> = Record<string, any>>(

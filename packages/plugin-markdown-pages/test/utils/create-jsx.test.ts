@@ -11,6 +11,9 @@ const createJsxArgs: Parameters<typeof utils.createJsx> = [
     site: {
       description: 'An amazing site to test Wilson',
       titleTemplate: '%s | Wilson Testsite',
+      titleMeta: {
+        properties: ['og:title'],
+      }
     },
   },
   {
