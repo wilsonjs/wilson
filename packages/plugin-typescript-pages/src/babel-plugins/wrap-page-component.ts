@@ -94,7 +94,12 @@ const pluginOptions = z.object({
   isDynamic: z.boolean(),
   languageId: z.string(),
   translationKeys: z.object({}),
+  title: z.string(),
   titleTemplate: z.string(),
+  titleMeta: z.object({
+    properties: z.array(z.string()),
+    useTemplate: z.boolean(),
+  }),
   description: z.string(),
 })
 
@@ -374,6 +379,22 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                           types.stringLiteral(opts.description),
                         ),
                       ]),
+                      ...opts.titleMeta.properties.map((property) => {
+                        return types.objectExpression([
+                          types.objectProperty(
+                            types.identifier('property'),
+                            types.stringLiteral(property),
+                          ),
+                          types.objectProperty(
+                            types.identifier('content'),
+                            types.stringLiteral(
+                              opts.titleMeta.useTemplate
+                                ? opts.titleTemplate.replace('%s', opts.title)
+                                : opts.title,
+                            ),
+                          ),
+                        ])
+                      }),
                     ]),
                   ),
                 ]),

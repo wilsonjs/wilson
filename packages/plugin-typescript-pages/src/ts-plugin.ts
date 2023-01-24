@@ -1,7 +1,7 @@
+import type { SiteConfig, UserFrontmatter } from '@wilson/types'
 import utils from '@wilson/utils'
 import type { Plugin } from 'vite'
 import type { TransformResult } from 'rollup'
-import type { SiteConfig, UserFrontmatter } from '@wilson/types'
 import type { PluginItem } from '@babel/core'
 import { transformFromAstAsync } from '@babel/core'
 import parser from '@babel/parser'
@@ -9,10 +9,10 @@ import type { File } from '@babel/types'
 import type { ParseResult } from '@babel/parser'
 import { relative } from 'pathe'
 import { getTranslationKeys } from '@wilson/client-utils'
+import extendFrontmatterPlugin from './babel-plugins/extend-frontmatter'
 import parseFrontmatterPlugin from './babel-plugins/parse-frontmatter'
 import prependImportsPlugin from './babel-plugins/prepend-imports'
 import addNamedStringExportPlugin from './babel-plugins/add-named-string-export'
-import extendFrontmatterPlugin from './babel-plugins/extend-frontmatter'
 import addStaticPathsPlugin from './babel-plugins/add-static-paths'
 import wrapPageComponentPlugin from './babel-plugins/wrap-page-component'
 import addTranslationsPlugin from './babel-plugins/add-translations'
@@ -42,16 +42,16 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
         layoutsDir,
         pagesDir,
         root,
-        site: { description, titleTemplate },
+        site: { description, titleMeta, titleTemplate },
       } = config
 
       if (!utils.isPage(id, pagesDir, ['.tsx'])) {
         return null
       }
+      const frontmatterOptions: { frontmatter?: object } = { frontmatter: {} }
 
       try {
         const syntaxTree = parse(code)
-        const frontmatterOptions: { frontmatter?: object } = { frontmatter: {} }
 
         await transformFromAstAsync(syntaxTree, code, {
           plugins: [[parseFrontmatterPlugin, frontmatterOptions]],
@@ -147,7 +147,9 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
                 isDefaultLanguage,
                 isDynamic,
                 translationKeys,
+                title: frontmatter.title,
                 titleTemplate,
+                titleMeta,
                 description,
               },
             ],

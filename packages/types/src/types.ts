@@ -65,6 +65,13 @@ export interface UserConfig {
     description: string
     /** Accepts a `%s` placeholder that will be replaced with the title from each page's frontmatter. */
     titleTemplate: string
+    /** Defines additional `<meta>` elements in the page's head that will reflect the page's title */
+    titleMeta?: {
+      /** One `<meta>` element will be inserted for each property, e.g. `og:title` or `twitter:title` */
+      properties: string[]
+      /** If the meta tags content should be set to the titleTemplate or just the frontmatter title. Defaults to `true`. */
+      useTemplate?: boolean
+    }
   }
   /** Default content language. Defaults to 'en'. */
   defaultLanguage?: string
@@ -115,6 +122,10 @@ export interface Translation {
  * Based on `wilson.config.ts` on top of default values, enriched with some runtime computations.
  */
 export interface SiteConfig extends Required<UserConfig> {
+  /** Provide site-wide meta information. */
+  site: Required<UserConfig['site']> & {
+    titleMeta: Required<UserConfig['site']['titleMeta']>
+  }
   /**
    * Folder the site is hosted in. Determined based on `siteUrl` at runtime, useful when the site is hosted inside a folder like `https://example.com/site`.
    * @default '/'

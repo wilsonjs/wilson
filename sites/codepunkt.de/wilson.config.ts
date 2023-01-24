@@ -32,9 +32,17 @@ const faviconHtml = /* html */ `
   <meta name="theme-color" content="#ffffff" />
 `
 
+const additionalMeta = /* html */ `
+  <meta name="color-scheme" content="dark light" />
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:creator" content="@code_punkt" />
+  <meta property="twitter:site" content="@code_punkt" />
+  <!-- og:title twitter:title og:url og:site_name og:description og:type og:image og:image:secure_url og:image:width og:image:height -->
+`
+
 async function getAdditionalHeadContent() {
   const darkMode = await minifyJs(darkModeScript, { toplevel: true })
-  const favIcon = await minifyHtml(faviconHtml, {
+  const favIcon = await minifyHtml(additionalMeta + faviconHtml, {
     collapseBooleanAttributes: true,
     collapseWhitespace: true,
     minifyURLs: true,
@@ -50,6 +58,10 @@ const config: UserConfig = {
   site: {
     description: 'Musings about web development and cloud technology',
     titleTemplate: '%s | Codepunkt',
+    titleMeta: {
+      properties: ['og:title', 'twitter:title'],
+      useTemplate: false,
+    },
   },
   defaultLanguage: 'en',
   languages: [

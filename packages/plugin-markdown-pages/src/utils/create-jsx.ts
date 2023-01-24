@@ -1,4 +1,5 @@
 import type { PageFrontmatter, SiteConfig, Translation } from '@wilson/types'
+import createTitleMetas from './create-title-metas'
 
 /**
  * Creates the JSX code for a markdown page.
@@ -43,7 +44,8 @@ export default function createJsx(
       useHead({
         language,
         metas: [
-          { name: 'description', content: '${config.site.description}' }
+          { name: 'description', content: '${config.site.description}' },
+          ${createTitleMetas(frontmatter.title, config.site)}
         ]
       });
 
