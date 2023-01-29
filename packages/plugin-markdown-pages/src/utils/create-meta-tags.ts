@@ -7,7 +7,7 @@ import { isPropertyMeta } from '@wilson/utils'
  */
 export function createDescriptionMetaTags(
   frontmatterDescription: any,
-  config: Pick<SiteConfig['site'], 'descriptionMeta' | 'defaultDescription'>,
+  config: Pick<SiteConfig['meta'], 'descriptionMeta' | 'defaultDescription'>,
 ) {
   return config.descriptionMeta.names
     .map((name) =>
@@ -23,7 +23,7 @@ export function createDescriptionMetaTags(
  * Creates static meta tags for usage with hoofd `useHead`.
  */
 export function createStaticMetaTags(
-  config: Pick<SiteConfig['site'], 'staticMeta'>,
+  config: Pick<SiteConfig['meta'], 'staticMeta'>,
 ) {
   return config.staticMeta
     .map((meta) =>
@@ -42,7 +42,7 @@ export function createStaticMetaTags(
  */
 export function createTitleMetaTags(
   frontmatterTitle: string,
-  config: Pick<SiteConfig['site'], 'titleMeta' | 'titleTemplate'>,
+  config: Pick<SiteConfig['meta'], 'titleMeta' | 'titleTemplate'>,
 ) {
   return config.titleMeta.names
     .map((name) =>

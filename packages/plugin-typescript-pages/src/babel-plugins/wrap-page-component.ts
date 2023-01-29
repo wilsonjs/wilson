@@ -98,7 +98,7 @@ const pluginOptions = z.object({
   isDefaultLanguage: z.boolean(),
   isDynamic: z.boolean(),
   languageId: z.string(),
-  metaConfig: z.object({
+  meta: z.object({
     defaultDescription: z.string(),
     descriptionMeta: z.object({
       names: z.array(z.string()),
@@ -355,7 +355,7 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                 ]),
             types.expressionStatement(
               types.callExpression(types.identifier('useTitleTemplate'), [
-                types.stringLiteral(opts.metaConfig.titleTemplate),
+                types.stringLiteral(opts.meta.titleTemplate),
               ]),
             ),
             types.expressionStatement(
@@ -379,7 +379,7 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                   types.objectProperty(
                     types.identifier('metas'),
                     types.arrayExpression([
-                      ...opts.metaConfig.titleMeta.names.map((property) => {
+                      ...opts.meta.titleMeta.names.map((property) => {
                         return types.objectExpression([
                           types.objectProperty(
                             types.identifier(
@@ -390,8 +390,8 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                           types.objectProperty(
                             types.identifier('content'),
                             types.stringLiteral(
-                              opts.metaConfig.titleMeta.useTitleTemplate
-                                ? opts.metaConfig.titleTemplate.replace(
+                              opts.meta.titleMeta.useTitleTemplate
+                                ? opts.meta.titleTemplate.replace(
                                     '%s',
                                     opts.frontmatter.title,
                                   )
@@ -400,26 +400,24 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                           ),
                         ])
                       }),
-                      ...opts.metaConfig.descriptionMeta.names.map(
-                        (property) => {
-                          return types.objectExpression([
-                            types.objectProperty(
-                              types.identifier(
-                                isPropertyMeta(property) ? 'property' : 'name',
-                              ),
-                              types.stringLiteral(property),
+                      ...opts.meta.descriptionMeta.names.map((property) => {
+                        return types.objectExpression([
+                          types.objectProperty(
+                            types.identifier(
+                              isPropertyMeta(property) ? 'property' : 'name',
                             ),
-                            types.objectProperty(
-                              types.identifier('content'),
-                              types.stringLiteral(
-                                opts.frontmatter.description ??
-                                  opts.metaConfig.defaultDescription,
-                              ),
+                            types.stringLiteral(property),
+                          ),
+                          types.objectProperty(
+                            types.identifier('content'),
+                            types.stringLiteral(
+                              opts.frontmatter.description ??
+                                opts.meta.defaultDescription,
                             ),
-                          ])
-                        },
-                      ),
-                      ...opts.metaConfig.staticMeta.map((meta) => {
+                          ),
+                        ])
+                      }),
+                      ...opts.meta.staticMeta.map((meta) => {
                         return types.objectExpression([
                           types.objectProperty(
                             types.identifier(

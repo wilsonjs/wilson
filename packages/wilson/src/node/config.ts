@@ -7,7 +7,7 @@ import type { SiteConfig, UserConfig } from '@wilson/types'
 import utils from '@wilson/utils'
 import { debug } from './utils'
 
-const defaultSiteMeta = {
+const defaultMeta = {
   defaultDescription:
     'This is a blazing-fast site built with https://wilsonjs.com/',
   descriptionMeta: {
@@ -54,15 +54,14 @@ async function resolveUserConfig(root: string, env: ConfigEnv) {
   config = mergeConfig(config, siteConfigDefaults(config, userConfig, env))
   config = mergeConfig(config, userConfig)
 
-  const siteUrl = config.siteUrl || ''
-  const protocolIndex = siteUrl.indexOf('//')
-  const baseIndex = siteUrl.indexOf(
-    '/',
-    protocolIndex > -1 ? protocolIndex + 2 : 0,
-  )
-  config.siteUrl = baseIndex > -1 ? siteUrl.slice(0, baseIndex) : siteUrl
-  config.base = baseIndex > -1 ? siteUrl.slice(baseIndex) : '/'
+  const url = config.url || ''
+  const protocolIndex = url.indexOf('//')
+  const baseIndex = url.indexOf('/', protocolIndex > -1 ? protocolIndex + 2 : 0)
+
+  config.url = baseIndex > -1 ? url.slice(0, baseIndex) : url
+  config.base = baseIndex > -1 ? url.slice(baseIndex) : '/'
   if (!config.base.endsWith('/')) config.base = `${config.base}/`
+
   config.vite.base = config.base
   config.vite.build!.assetsDir = config.assetsDir
 
@@ -92,7 +91,7 @@ async function loadUserConfigFile(
   } catch (error) {
     if (error instanceof Error && error.message.includes('Could not resolve')) {
       debug.config('no wilson.config.ts file found.')
-      return { site: defaultSiteMeta }
+      return { meta: defaultMeta }
     }
     throw error
   }
@@ -167,6 +166,8 @@ function siteConfigDefaults(
   const { drafts = isDevelopmentMode, srcDir = 'src' } = userConfig
 
   return {
+    url: '',
+    meta: defaultMeta,
     assetsDir: 'assets',
     base: '/',
     configPath: resolve(root, 'wilson.config.ts'),
@@ -179,10 +180,8 @@ function siteConfigDefaults(
     tempDir: '.wilson',
     prettyUrls: true,
     root,
-    siteUrl: '',
     srcDir,
     pageExtensions: ['.md', '.tsx'],
-    site: defaultSiteMeta,
     defaultLanguage: 'en',
     defaultLanguageInSubdir: false,
     // TODO validate that translationKeys values are all strings

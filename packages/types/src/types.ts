@@ -7,12 +7,8 @@ export type Awaitable<T> = T | Promise<T>
 
 /** User config, defined in `wilson.config.ts` */
 export interface UserConfig {
-  /**
-   * URL for site in production, used to generate absolute URLs for sitemap.xml
-   * and social meta tags. Available as `site.url` and `site.canonical`.
-   * @type {string}
-   */
-  siteUrl?: string
+  /** URL for site in production, used to generate absolute URLs for sitemap.xml and social meta tags. */
+  url?: string
   /** Whether to output more information about wilson in development. Defaults to `true`. */
   debug?: boolean
   /** Whether to skip `.html` in hrefs and router paths. Defaults to `true`. */
@@ -34,7 +30,7 @@ export interface UserConfig {
   /** Whether to display drafts in documents and pages. */
   drafts?: boolean
   /** Provide site-wide meta information. */
-  site: {
+  meta: {
     /** The default summary of the content of a page on your site that is used whenever you don't have a specific description in your page's frontmatter. */
     defaultDescription: string
     /** Defines  `<meta>` elements in the page's head that will reflect the page's description. */
@@ -104,9 +100,9 @@ export interface Translation {
  */
 export interface SiteConfig extends Required<UserConfig> {
   /** Provide site-wide meta information. */
-  site: Required<UserConfig['site']> & {
-    descriptionMeta: Required<UserConfig['site']['descriptionMeta']>
-    titleMeta: Required<UserConfig['site']['titleMeta']>
+  meta: Required<UserConfig['meta']> & {
+    descriptionMeta: Required<UserConfig['meta']['descriptionMeta']>
+    titleMeta: Required<UserConfig['meta']['titleMeta']>
   }
   /**
    * Folder the site is hosted in. Determined based on `siteUrl` at runtime, useful when the site is hosted inside a folder like `https://example.com/site`.

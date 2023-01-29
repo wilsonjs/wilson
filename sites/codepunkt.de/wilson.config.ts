@@ -48,8 +48,8 @@ async function getAdditionalHeadContent() {
 }
 
 const config: UserConfig = {
-  siteUrl: 'https://codepunkt.de/',
-  site: {
+  url: 'https://codepunkt.de/',
+  meta: {
     defaultDescription: 'Musings about web development and cloud technology',
     descriptionMeta: {
       names: ['description', 'og:description'],

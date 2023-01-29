@@ -8,7 +8,7 @@ const defaultOptions = {
   isDefaultLanguage: true,
   isDynamic: true,
   languageId: 'en',
-  metaConfig: {
+  meta: {
     defaultDescription: 'Interesting test page',
     descriptionMeta: { names: ['description', 'og:description'] },
     staticMeta: [],
@@ -115,8 +115,8 @@ test('wraps exported dynamic page', async (t) => {
             ...defaultOptions,
             isDefaultLanguage: false,
             languageId: 'de',
-            metaConfig: {
-              ...defaultOptions.metaConfig,
+            meta: {
+              ...defaultOptions.meta,
               staticMeta: [
                 { name: 'color-scheme', content: 'dark light' },
                 { name: 'og:type', content: 'website' },

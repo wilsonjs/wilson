@@ -8,7 +8,7 @@ const createJsxArgs: Parameters<typeof utils.createJsx> = [
   'de',
   {
     defaultLanguage: 'en',
-    site: {
+    meta: {
       defaultDescription: `An amazing site to test Wilson's abilities`,
       descriptionMeta: { names: ['description'] },
       staticMeta: [{ name: 'color-scheme', content: 'dark light' }],

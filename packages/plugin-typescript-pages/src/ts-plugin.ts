@@ -42,7 +42,7 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
         layoutsDir,
         pagesDir,
         root,
-        site: metaConfig,
+        meta,
       } = config
 
       if (!utils.isPage(id, pagesDir, ['.tsx'])) {
@@ -147,7 +147,7 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
                 isDefaultLanguage,
                 isDynamic,
                 languageId,
-                metaConfig,
+                meta,
                 translationKeys,
               },
             ],

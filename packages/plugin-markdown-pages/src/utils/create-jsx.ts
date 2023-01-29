@@ -14,8 +14,8 @@ export default function createJsx(
   route: string,
   languageId: string,
   config: Pick<SiteConfig, 'defaultLanguage'> & {
-    site: Pick<
-      SiteConfig['site'],
+    meta: Pick<
+      SiteConfig['meta'],
       | 'defaultDescription'
       | 'descriptionMeta'
       | 'staticMeta'
@@ -52,14 +52,14 @@ export default function createJsx(
     };
 
     export default function ${componentName}Page({ url, params: matches }) {
-      useTitleTemplate('${config.site.titleTemplate}');
+      useTitleTemplate('${config.meta.titleTemplate}');
       useTitle(frontmatter.title);
       useHead({
         language,
         metas: [
-          ${createTitleMetaTags(frontmatter.title, config.site)},
-          ${createDescriptionMetaTags(frontmatter.description, config.site)},
-          ${createStaticMetaTags(config.site)}
+          ${createTitleMetaTags(frontmatter.title, config.meta)},
+          ${createDescriptionMetaTags(frontmatter.description, config.meta)},
+          ${createStaticMetaTags(config.meta)}
         ]
       });
 
