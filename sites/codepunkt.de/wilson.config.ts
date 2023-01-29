@@ -28,21 +28,15 @@ const faviconHtml = /* html */ `
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=1" />
   <link rel="manifest" href="/site.webmanifest?v=1" />
   <link rel="mask-icon" href="/safari-pinned-tab.svg?v=1" color="#286b10" />
-  <meta name="msapplication-TileColor" content="#00aba9" />
-  <meta name="theme-color" content="#ffffff" />
 `
 
-const additionalMeta = /* html */ `
-  <meta name="color-scheme" content="dark light" />
-  <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:creator" content="@code_punkt" />
-  <meta property="twitter:site" content="@code_punkt" />
-  <!-- og:title twitter:title og:url og:site_name og:description og:type og:image og:image:secure_url og:image:width og:image:height -->
-`
+// TODO og:url
+// TODO og:image
+// TODO og:image:secure_url
 
 async function getAdditionalHeadContent() {
   const darkMode = await minifyJs(darkModeScript, { toplevel: true })
-  const favIcon = await minifyHtml(additionalMeta + faviconHtml, {
+  const favIcon = await minifyHtml(faviconHtml, {
     collapseBooleanAttributes: true,
     collapseWhitespace: true,
     minifyURLs: true,
@@ -56,11 +50,26 @@ async function getAdditionalHeadContent() {
 const config: UserConfig = {
   siteUrl: 'https://codepunkt.de/',
   site: {
-    description: 'Musings about web development and cloud technology',
+    defaultDescription: 'Musings about web development and cloud technology',
+    descriptionMeta: {
+      names: ['description', 'og:description'],
+    },
+    staticMeta: [
+      { name: 'color-scheme', content: 'dark light' },
+      { name: 'msapplication-TileColor', content: '#00aba9' },
+      { name: 'theme-color', content: '#ffffff' },
+      { name: 'og:site_name', content: 'Codepunkt' },
+      { name: 'og:type', content: 'website' },
+      { name: 'og:image:width', content: '1200' },
+      { name: 'og:image:height', content: '630' },
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:creator', content: '@code_punkt' },
+      { name: 'twitter:site', content: '@code_punkt' },
+    ],
     titleTemplate: '%s | Codepunkt',
     titleMeta: {
-      properties: ['og:title', 'twitter:title'],
-      useTemplate: false,
+      names: ['og:title', 'twitter:title'],
+      useTitleTemplate: false,
     },
   },
   defaultLanguage: 'en',

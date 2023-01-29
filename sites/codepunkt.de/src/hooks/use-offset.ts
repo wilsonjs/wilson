@@ -56,7 +56,7 @@ const useOffset = () => {
           : null
     }
     // otherwise, use orientation
-    // TODO: only if orientation timestamps are fresh. otherwise, fall back
+    // TODO only if orientation timestamps are fresh. otherwise, fall back
     // to latest mx and my regardless of age
     else {
       offset = {

@@ -95,7 +95,7 @@
   }
 
   p {
-    // TODO: make larger font size that is always 2px larger than the normal, use that here!
+    // TODO make larger font size that is always 2px larger than the normal, use that here!
     @include responsive(md) {
       font-size: 22px;
     }

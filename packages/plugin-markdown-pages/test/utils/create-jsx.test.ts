@@ -9,11 +9,14 @@ const createJsxArgs: Parameters<typeof utils.createJsx> = [
   {
     defaultLanguage: 'en',
     site: {
-      description: 'An amazing site to test Wilson',
+      defaultDescription: `An amazing site to test Wilson's abilities`,
+      descriptionMeta: { names: ['description'] },
+      staticMeta: [{ name: 'color-scheme', content: 'dark light' }],
       titleTemplate: '%s | Wilson Testsite',
       titleMeta: {
-        properties: ['og:title'],
-      }
+        names: ['og:title'],
+        useTitleTemplate: false,
+      },
     },
   },
   {

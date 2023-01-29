@@ -42,7 +42,7 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
         layoutsDir,
         pagesDir,
         root,
-        site: { description, titleMeta, titleTemplate },
+        site: metaConfig,
       } = config
 
       if (!utils.isPage(id, pagesDir, ['.tsx'])) {
@@ -143,14 +143,12 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
               wrapPageComponentPlugin,
               {
                 componentName,
-                languageId,
+                frontmatter,
                 isDefaultLanguage,
                 isDynamic,
+                languageId,
+                metaConfig,
                 translationKeys,
-                title: frontmatter.title,
-                titleTemplate,
-                titleMeta,
-                description,
               },
             ],
           ].filter(Boolean) as PluginItem[],

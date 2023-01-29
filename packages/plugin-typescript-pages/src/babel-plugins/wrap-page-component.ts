@@ -1,6 +1,7 @@
 import type { PluginObj } from '@babel/core'
 import types from '@babel/types'
 import z from 'zod'
+import { isPropertyMeta } from '@wilson/utils'
 import validateOptions from '../utils/validate-options'
 
 function buildTranslateFunction(translationKeys: Record<string, string>) {
@@ -90,17 +91,26 @@ let exportDefault: types.ExportDefaultDeclaration
 
 const pluginOptions = z.object({
   componentName: z.string(),
+  frontmatter: z.object({
+    description: z.string().optional(),
+    title: z.string(),
+  }),
   isDefaultLanguage: z.boolean(),
   isDynamic: z.boolean(),
   languageId: z.string(),
-  translationKeys: z.object({}),
-  title: z.string(),
-  titleTemplate: z.string(),
-  titleMeta: z.object({
-    properties: z.array(z.string()),
-    useTemplate: z.boolean(),
+  metaConfig: z.object({
+    defaultDescription: z.string(),
+    descriptionMeta: z.object({
+      names: z.array(z.string()),
+    }),
+    staticMeta: z.array(z.object({ name: z.string(), content: z.string() })),
+    titleMeta: z.object({
+      names: z.array(z.string()),
+      useTitleTemplate: z.boolean(),
+    }),
+    titleTemplate: z.string(),
   }),
-  description: z.string(),
+  translationKeys: z.object({}),
 })
 
 export default function wrapPageComponentPlugin(): PluginObj<{
@@ -345,7 +355,7 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                 ]),
             types.expressionStatement(
               types.callExpression(types.identifier('useTitleTemplate'), [
-                types.stringLiteral(opts.titleTemplate),
+                types.stringLiteral(opts.metaConfig.titleTemplate),
               ]),
             ),
             types.expressionStatement(
@@ -369,29 +379,57 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                   types.objectProperty(
                     types.identifier('metas'),
                     types.arrayExpression([
-                      types.objectExpression([
-                        types.objectProperty(
-                          types.identifier('name'),
-                          types.stringLiteral('description'),
-                        ),
-                        types.objectProperty(
-                          types.identifier('content'),
-                          types.stringLiteral(opts.description),
-                        ),
-                      ]),
-                      ...opts.titleMeta.properties.map((property) => {
+                      ...opts.metaConfig.titleMeta.names.map((property) => {
                         return types.objectExpression([
                           types.objectProperty(
-                            types.identifier('property'),
+                            types.identifier(
+                              isPropertyMeta(property) ? 'property' : 'name',
+                            ),
                             types.stringLiteral(property),
                           ),
                           types.objectProperty(
                             types.identifier('content'),
                             types.stringLiteral(
-                              opts.titleMeta.useTemplate
-                                ? opts.titleTemplate.replace('%s', opts.title)
-                                : opts.title,
+                              opts.metaConfig.titleMeta.useTitleTemplate
+                                ? opts.metaConfig.titleTemplate.replace(
+                                    '%s',
+                                    opts.frontmatter.title,
+                                  )
+                                : opts.frontmatter.title,
                             ),
+                          ),
+                        ])
+                      }),
+                      ...opts.metaConfig.descriptionMeta.names.map(
+                        (property) => {
+                          return types.objectExpression([
+                            types.objectProperty(
+                              types.identifier(
+                                isPropertyMeta(property) ? 'property' : 'name',
+                              ),
+                              types.stringLiteral(property),
+                            ),
+                            types.objectProperty(
+                              types.identifier('content'),
+                              types.stringLiteral(
+                                opts.frontmatter.description ??
+                                  opts.metaConfig.defaultDescription,
+                              ),
+                            ),
+                          ])
+                        },
+                      ),
+                      ...opts.metaConfig.staticMeta.map((meta) => {
+                        return types.objectExpression([
+                          types.objectProperty(
+                            types.identifier(
+                              isPropertyMeta(meta.name) ? 'property' : 'name',
+                            ),
+                            types.stringLiteral(meta.name),
+                          ),
+                          types.objectProperty(
+                            types.identifier('content'),
+                            types.stringLiteral(meta.content),
                           ),
                         ])
                       }),

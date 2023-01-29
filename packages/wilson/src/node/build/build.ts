@@ -41,12 +41,7 @@ export async function build(root: string = process.cwd()) {
     async () => await writePages(siteConfig, pagesToRender, islandsByPath),
   )
 
-  if (siteConfig.createOpengraphImage !== null) {
-    await withSpinner(
-      'creating open graph images',
-      async () => await createOpengraphImages(siteConfig, pagesToRender),
-    )
-  }
+  await createOpengraphImages(siteConfig, pagesToRender)
 
   rmDir(siteConfig.tempDir)
   console.info(`build complete in ${timeSince(startTime)}.`)

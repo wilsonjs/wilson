@@ -2,6 +2,22 @@ import { transformAsync } from '@babel/core'
 import test from 'ava'
 import plugin from '../../src/babel-plugins/wrap-page-component'
 
+const defaultOptions = {
+  componentName: 'Dynamic',
+  frontmatter: { title: 'Hello world' },
+  isDefaultLanguage: true,
+  isDynamic: true,
+  languageId: 'en',
+  metaConfig: {
+    defaultDescription: 'Interesting test page',
+    descriptionMeta: { names: ['description', 'og:description'] },
+    staticMeta: [],
+    titleMeta: { names: ['og:title'], useTitleTemplate: true },
+    titleTemplate: '%s - Foo',
+  },
+  translationKeys: { foo: 'bar' },
+}
+
 test('throws when invoked with invalid options', async (t) => {
   await t.throwsAsync(
     transformAsync('export default function Page() {}', { plugins: [plugin] }),
@@ -35,22 +51,7 @@ test('throws when invoked with invalid options', async (t) => {
 
   await t.notThrowsAsync(
     transformAsync('export default function Page() {}', {
-      plugins: [
-        [
-          plugin,
-          {
-            componentName: 'Foo',
-            languageId: 'en',
-            isDefaultLanguage: true,
-            translationKeys: {},
-            isDynamic: true,
-            title: 'Hello world',
-            titleMeta: { properties: ['og:title'], useTemplate: true },
-            titleTemplate: '%s',
-            description: 'Interesting test page',
-          },
-        ],
-      ],
+      plugins: [[plugin, defaultOptions]],
     }),
   )
 })
@@ -58,22 +59,7 @@ test('throws when invoked with invalid options', async (t) => {
 test('throws without default export', async (t) => {
   await t.throwsAsync(
     transformAsync(`const foo = [];`, {
-      plugins: [
-        [
-          plugin,
-          {
-            componentName: 'Foo',
-            languageId: 'en',
-            isDefaultLanguage: true,
-            translationKeys: {},
-            isDynamic: true,
-            title: 'Hello world',
-            titleMeta: { properties: ['og:title'], useTemplate: true },
-            titleTemplate: '%s',
-            description: 'Interesting test page',
-          },
-        ],
-      ],
+      plugins: [[plugin, defaultOptions]],
     }),
     {
       message:
@@ -85,22 +71,7 @@ test('throws without default export', async (t) => {
 test('throws when default export is not a function', async (t) => {
   await t.throwsAsync(
     transformAsync(`export default []`, {
-      plugins: [
-        [
-          plugin,
-          {
-            componentName: 'Foo',
-            languageId: 'en',
-            isDefaultLanguage: true,
-            translationKeys: {},
-            isDynamic: true,
-            title: 'Hello world',
-            titleMeta: { properties: ['og:title'], useTemplate: true },
-            titleTemplate: '%s',
-            description: 'Interesting test page',
-          },
-        ],
-      ],
+      plugins: [[plugin, defaultOptions]],
     }),
     {
       message: /Default export must be FunctionDeclaration./,
@@ -117,15 +88,13 @@ test('wraps exported static page', async (t) => {
         [
           plugin,
           {
+            ...defaultOptions,
             componentName: 'Static',
-            languageId: 'en',
-            isDefaultLanguage: true,
-            translationKeys: { foo: 'bar' },
+            frontmatter: {
+              ...defaultOptions.frontmatter,
+              description: 'Interesting test page',
+            },
             isDynamic: false,
-            title: 'Hello world',
-            titleMeta: { properties: ['og:title'], useTemplate: true },
-            titleTemplate: '%s - Foo',
-            description: 'Interesting test page',
           },
         ],
       ],
@@ -143,18 +112,20 @@ test('wraps exported dynamic page', async (t) => {
         [
           plugin,
           {
-            componentName: 'Dynamic',
-            languageId: 'de',
+            ...defaultOptions,
             isDefaultLanguage: false,
-            translationKeys: { bar: 'baz' },
-            isDynamic: true,
-            title: 'Hello world',
-            titleMeta: {
-              properties: ['og:title', 'twitter:title'],
-              useTemplate: false,
+            languageId: 'de',
+            metaConfig: {
+              ...defaultOptions.metaConfig,
+              staticMeta: [
+                { name: 'color-scheme', content: 'dark light' },
+                { name: 'og:type', content: 'website' },
+              ],
+              titleMeta: {
+                names: ['og:title', 'twitter:title'],
+                useTitleTemplate: false,
+              },
             },
-            titleTemplate: '%s - Foo',
-            description: 'Interesting test page',
           },
         ],
       ],

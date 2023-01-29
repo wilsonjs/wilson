@@ -8,11 +8,16 @@ import utils from '@wilson/utils'
 import { debug } from './utils'
 
 const defaultSiteMeta = {
-  description: 'This is a blazing-fast site built with https://wilsonjs.com/',
+  defaultDescription:
+    'This is a blazing-fast site built with https://wilsonjs.com/',
+  descriptionMeta: {
+    names: ['description'],
+  },
+  staticMeta: [],
   titleTemplate: '%s',
   titleMeta: {
-    properties: [],
-    useTemplate: true,
+    names: [],
+    useTitleTemplate: true,
   },
 }
 

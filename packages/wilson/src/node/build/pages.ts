@@ -12,11 +12,14 @@ import { getOutputFilename } from './bundle'
 /**
  * A page that is about to be rendered to a static .html file.
  */
-export interface PageToRender {
+export interface PageToRenderBase {
   route: string
   outputFilename: string
+}
+
+export interface PageToRender extends PageToRenderBase {
+  frontmatter: PageFrontmatter
   rendered: string
-  frontmatter: PageFrontmatter | null
 }
 
 /**
@@ -41,7 +44,7 @@ function pathToFilename(cleanedPath: string) {
  */
 export async function getPagesToRender(
   config: SiteConfig,
-): Promise<PageToRender[]> {
+): Promise<PageToRenderBase[]> {
   const files = await glob(join(config.pagesDir, `**/*.{md,tsx}`))
   const pagesToRender = []
 
@@ -69,8 +72,6 @@ export async function getPagesToRender(
           return {
             route: url.replace(/\/$/, ''),
             outputFilename,
-            frontmatter: null,
-            rendered: '',
           }
         }),
       )
@@ -79,8 +80,6 @@ export async function getPagesToRender(
       pagesToRender.push({
         route,
         outputFilename,
-        frontmatter: null,
-        rendered: '',
       })
     }
   }
