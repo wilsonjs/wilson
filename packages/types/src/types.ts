@@ -5,73 +5,40 @@ import type { OpengraphImageText } from './open-graph'
 
 export type Awaitable<T> = T | Promise<T>
 
-/**
- * User config, defined in `wilson.config.ts`
- */
+/** User config, defined in `wilson.config.ts` */
 export interface UserConfig {
-  /**
-   * URL for site in production, used to generate absolute URLs for sitemap.xml
-   * and social meta tags. Available as `site.url` and `site.canonical`.
-   * @type {string}
-   */
-  siteUrl?: string
-  /**
-   * Whether to output more information about wilson in development.
-   * @default true
-   */
+  /** URL for site in production, used to generate absolute URLs for sitemap.xml and social meta tags. */
+  url?: string
+  /** Whether to output more information about wilson in development. Defaults to `true`. */
   debug?: boolean
-  /**
-   * Whether to skip `.html` in hrefs and router paths.
-   * @default true
-   */
+  /** Whether to skip `.html` in hrefs and router paths. Defaults to `true`. */
   prettyUrls?: boolean
-  /**
-   * Specify the output directory (relative to project root).
-   * @default 'dist'
-   */
+  /** Specify the output directory (relative to project root). Defaults to "dist". */
   outDir?: string
-  /**
-   * Specify the pages directory (relative to srcDir).
-   * @default 'pages'
-   */
+  /** Specify the pages directory (relative to srcDir). Defaults to "pages". */
   pagesDir?: string
-  /**
-   * Specify the layouts directory (relative to srcDir).
-   * @default 'layouts'
-   */
+  /** Specify the layouts directory (relative to srcDir). Defaults to "layouts". */
   layoutsDir?: string
-  /**
-   * Specify the islands directory (relative to srcDir).
-   * @default 'islands'
-   */
+  /** Specify the islands directory (relative to srcDir). Defaults to "islands". */
   islandsDir?: string
-  /**
-   * Specify the directory where the app source is located (relative to project root).
-   * @default 'src'
-   */
+  /** Specify the directory where the app source is located (relative to project root). Defaults to "src". */
   srcDir?: string
   /** Specify the directory where temporary files during build are stored. */
   tempDir?: string
-  /**
-   * Specify the directory to nest generated assets under (relative to outDir).
-   * @default 'assets'
-   */
+  /** Specify the directory to nest generated assets under (relative to outDir). Defaults to "assets". */
   assetsDir?: string
   /** Whether to display drafts in documents and pages. */
   drafts?: boolean
   /** Provide site-wide meta information. */
-  site: {
-    /** A short and accurate summary of the content of the page. Several browsers use this as the default description of bookmarked pages. */
-    description: string
+  meta: {
+    /** Define `<meta>` tags in the page's head based on the page's frontmatter and canonical URL. */
+    tags?: (
+      frontmatter: PageFrontmatter,
+      /** Wat */
+      canonicalUrl: string,
+    ) => Array<{ name: string; content: string }>
     /** Accepts a `%s` placeholder that will be replaced with the title from each page's frontmatter. */
     titleTemplate: string
-    /** Defines additional `<meta>` elements in the page's head that will reflect the page's title */
-    titleMeta?: {
-      /** One `<meta>` element will be inserted for each property, e.g. `og:title` or `twitter:title` */
-      properties: string[]
-      /** If the meta tags content should be set to the titleTemplate or just the frontmatter title. Defaults to `true`. */
-      useTemplate?: boolean
-    }
   }
   /** Default content language. Defaults to 'en'. */
   defaultLanguage?: string
@@ -123,9 +90,7 @@ export interface Translation {
  */
 export interface SiteConfig extends Required<UserConfig> {
   /** Provide site-wide meta information. */
-  site: Required<UserConfig['site']> & {
-    titleMeta: Required<UserConfig['site']['titleMeta']>
-  }
+  meta: Required<UserConfig['meta']>
   /**
    * Folder the site is hosted in. Determined based on `siteUrl` at runtime, useful when the site is hosted inside a folder like `https://example.com/site`.
    * @default '/'

@@ -1,5 +1,19 @@
 import type { PageFrontmatter, SiteConfig, Translation } from '@wilson/types'
-import createTitleMetas from './create-title-metas'
+
+function createMetaTags(
+  frontmatter: PageFrontmatter,
+  config: Pick<SiteConfig, 'meta' | 'url'>,
+  route: string,
+) {
+  return [
+    JSON.stringify(
+      config.meta.tags(
+        frontmatter,
+        `${config.url}/${route}`.replace(/(?<!https?:)\/{2}/g, '/'),
+      ),
+    ),
+  ].join('\n,')
+}
 
 /**
  * Creates the JSX code for a markdown page.
@@ -9,7 +23,7 @@ export default function createJsx(
   assetImports: string[],
   route: string,
   languageId: string,
-  config: Pick<SiteConfig, 'defaultLanguage' | 'site'>,
+  config: Pick<SiteConfig, 'defaultLanguage' | 'meta' | 'url'>,
   frontmatter: PageFrontmatter,
   translatedPages: Translation[],
   translationKeys: Record<string, string>,
@@ -39,14 +53,11 @@ export default function createJsx(
     };
 
     export default function ${componentName}Page({ url, params: matches }) {
-      useTitleTemplate('${config.site.titleTemplate}');
+      useTitleTemplate('${config.meta.titleTemplate}');
       useTitle(frontmatter.title);
       useHead({
         language,
-        metas: [
-          { name: 'description', content: '${config.site.description}' },
-          ${createTitleMetas(frontmatter.title, config.site)}
-        ]
+        metas: ${createMetaTags(frontmatter, config, route)},
       });
 
       return (

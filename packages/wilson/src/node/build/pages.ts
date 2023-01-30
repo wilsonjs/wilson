@@ -12,11 +12,14 @@ import { getOutputFilename } from './bundle'
 /**
  * A page that is about to be rendered to a static .html file.
  */
-export interface PageToRender {
+export interface PageToRenderBase {
   route: string
   outputFilename: string
+}
+
+export interface PageToRender extends PageToRenderBase {
+  frontmatter: PageFrontmatter
   rendered: string
-  frontmatter: PageFrontmatter | null
 }
 
 /**
@@ -29,7 +32,7 @@ export interface PageToRender {
 function pathToFilename(cleanedPath: string) {
   return `${(cleanedPath.endsWith('/')
     ? `${cleanedPath}index`
-    : cleanedPath
+    : `${cleanedPath}/index`
   ).replace(/^\//g, '')}.html`
 }
 
@@ -41,17 +44,18 @@ function pathToFilename(cleanedPath: string) {
  */
 export async function getPagesToRender(
   config: SiteConfig,
-): Promise<PageToRender[]> {
+): Promise<PageToRenderBase[]> {
   const files = await glob(join(config.pagesDir, `**/*.{md,tsx}`))
   const pagesToRender = []
 
   for (const absolutePath of files) {
+    const isTypeScript = absolutePath.endsWith('.tsx')
     const relativePath = relative(config.pagesDir, absolutePath)
     const { route } = utils.getRoutingInfo(relativePath, {
       ...config,
       replaceParams: false,
     })
-    const isDynamic = utils.isDynamicPagePath(route)
+    const isDynamic = isTypeScript && utils.isDynamicPagePath(route)
 
     if (isDynamic) {
       const { staticPaths } = await getPageExports<DynamicPageExports>(
@@ -69,8 +73,6 @@ export async function getPagesToRender(
           return {
             route: url.replace(/\/$/, ''),
             outputFilename,
-            frontmatter: null,
-            rendered: '',
           }
         }),
       )
@@ -79,8 +81,6 @@ export async function getPagesToRender(
       pagesToRender.push({
         route,
         outputFilename,
-        frontmatter: null,
-        rendered: '',
       })
     }
   }

@@ -1,4 +1,4 @@
-import type { UserConfig } from 'wilson'
+import type { PageFrontmatter, UserConfig } from 'wilson'
 import { minify as minifyJs } from 'terser'
 import { minify as minifyHtml } from 'html-minifier-terser'
 
@@ -28,21 +28,11 @@ const faviconHtml = /* html */ `
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=1" />
   <link rel="manifest" href="/site.webmanifest?v=1" />
   <link rel="mask-icon" href="/safari-pinned-tab.svg?v=1" color="#286b10" />
-  <meta name="msapplication-TileColor" content="#00aba9" />
-  <meta name="theme-color" content="#ffffff" />
-`
-
-const additionalMeta = /* html */ `
-  <meta name="color-scheme" content="dark light" />
-  <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:creator" content="@code_punkt" />
-  <meta property="twitter:site" content="@code_punkt" />
-  <!-- og:title twitter:title og:url og:site_name og:description og:type og:image og:image:secure_url og:image:width og:image:height -->
 `
 
 async function getAdditionalHeadContent() {
   const darkMode = await minifyJs(darkModeScript, { toplevel: true })
-  const favIcon = await minifyHtml(additionalMeta + faviconHtml, {
+  const favIcon = await minifyHtml(faviconHtml, {
     collapseBooleanAttributes: true,
     collapseWhitespace: true,
     minifyURLs: true,
@@ -53,15 +43,41 @@ async function getAdditionalHeadContent() {
   return /* html */ `${favIcon}<script>${darkMode.code}</script>`
 }
 
+function hasOpengraphImage(frontmatter: PageFrontmatter): boolean {
+  return (
+    frontmatter.date &&
+    frontmatter.meta.filename.startsWith('src/pages/writing/')
+  )
+}
+
 const config: UserConfig = {
-  siteUrl: 'https://codepunkt.de/',
-  site: {
-    description: 'Musings about web development and cloud technology',
-    titleTemplate: '%s | Codepunkt',
-    titleMeta: {
-      properties: ['og:title', 'twitter:title'],
-      useTemplate: false,
+  url: 'https://codepunkt.de/',
+  meta: {
+    tags: (fm, canonical) => {
+      const description = fm.description ?? 'Musings about web development and cloud technology'
+      const ogImage = `${hasOpengraphImage(fm) ? canonical : 'https://codepunkt.de'}/og-image.jpg`
+
+      return [
+        { name: 'description', content: description },
+        { name: 'color-scheme', content: 'dark light' },
+        { name: 'og:title', content: fm.title },
+        { name: 'og:description', content: description },
+        { name: 'og:url', content: canonical },
+        { name: 'og:image', content: ogImage },
+        { name: 'og:image:secure_url', content: ogImage },
+        { name: 'og:image:width', content: '1200' },
+        { name: 'og:image:height', content: '630' },
+        { name: 'og:site_name', content: 'Codepunkt' },
+        { name: 'og:type', content: 'website' },
+        { name: 'twitter:title', content: fm.title },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:creator', content: '@code_punkt' },
+        { name: 'twitter:site', content: '@code_punkt' },
+        { name: 'theme-color', content: '#ffffff' },
+        { name: 'msapplication-TileColor', content: '#00aba9' },
+      ]
     },
+    titleTemplate: '%s | Codepunkt',
   },
   defaultLanguage: 'en',
   languages: [
@@ -101,12 +117,10 @@ const config: UserConfig = {
   extendFrontmatter() {},
   getAdditionalHeadContent,
   createOpengraphImage: (frontmatter) => {
-    if (
-      !frontmatter.date ||
-      !frontmatter.meta.filename.startsWith('src/pages/writing/')
-    ) {
+    if (!hasOpengraphImage(frontmatter)) {
       return null
     }
+
     return {
       background: './src/assets/og-image-background.png',
       texts: [

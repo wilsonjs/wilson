@@ -1,4 +1,4 @@
-import { Languages } from '@wilson/types'
+import type { Languages } from '@wilson/types'
 import getLanguage from './get-language'
 
 export function removeExtension(str: string): string {
@@ -10,7 +10,7 @@ export function removeSlashWrap(str: string): string {
 }
 
 export function prefixSlash(str: string): string {
-  return '/' + str
+  return `/${str}`
 }
 
 export function prefixLanguage(

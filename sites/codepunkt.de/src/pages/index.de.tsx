@@ -3,6 +3,7 @@ import styles from './index.module.scss'
 
 export const frontmatter = {
   title: 'Startseite',
+  description: "Wat the wat's",
 }
 
 export default function IndexDePage() {
