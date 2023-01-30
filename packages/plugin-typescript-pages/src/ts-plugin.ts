@@ -43,6 +43,7 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
         pagesDir,
         root,
         meta,
+        url,
       } = config
 
       if (!utils.isPage(id, pagesDir, ['.tsx'])) {
@@ -72,6 +73,13 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
           relative(pagesDir, id),
           config,
         )
+
+        const canonical = `${url}/${
+          utils.getRoutingInfo(relative(pagesDir, id), {
+            replaceParams: false,
+            ...config,
+          }).route
+        }`.replace(/(?<!https?:)\/{2}/g, '/')
 
         const isDynamic = dynamicParameterMatches.length > 0
         const componentName = utils.createComponentName(relativePath)
@@ -142,6 +150,7 @@ export default function typescriptPagesPlugin(config: SiteConfig): Plugin {
             [
               wrapPageComponentPlugin,
               {
+                canonical,
                 componentName,
                 frontmatter,
                 isDefaultLanguage,

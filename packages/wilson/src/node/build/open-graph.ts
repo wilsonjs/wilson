@@ -18,7 +18,7 @@ export const hexToRgb = (hex: string): [r: number, g: number, b: number] => {
   return [r, g, b]
 }
 
-type PageToRenderToOpengraphConfigurationMap = Map<
+type PageToOpengraphConfiguration = Map<
   PageToRender,
   NonNullable<ReturnType<SiteConfig['createOpengraphImage']>>
 >
@@ -27,8 +27,7 @@ export default async function createOpengraphImages(
   siteConfig: SiteConfig,
   pagesToRender: PageToRender[],
 ) {
-  const opengraphConfigurations: PageToRenderToOpengraphConfigurationMap =
-    new Map()
+  const opengraphConfigurations: PageToOpengraphConfiguration = new Map()
 
   for (const page of pagesToRender) {
     const result = siteConfig.createOpengraphImage(page.frontmatter)
@@ -47,7 +46,7 @@ export default async function createOpengraphImages(
 
 async function createImages(
   siteConfig: SiteConfig,
-  opengraphConfigurations: PageToRenderToOpengraphConfigurationMap,
+  opengraphConfigurations: PageToOpengraphConfiguration,
 ) {
   const width = 1200
   const height = 630
@@ -129,11 +128,13 @@ async function createImages(
       composite = composite.composite(textLayer, 0, 0)
     })
     const result = composite.quality(100)
+    const pageOutputPath = resolve(siteConfig.outDir, page.outputFilename)
+    const isIndexPage = pageOutputPath.endsWith('index.html')
+
     await result.writeAsync(
-      resolve(siteConfig.outDir, page.outputFilename).replace(
-        /\.html$/,
-        '.jpg',
-      ),
+      isIndexPage
+        ? pageOutputPath.replace(/index\.html$/, 'og-image.jpg')
+        : pageOutputPath.replace(/\.html$/, '/og-image.jpg'),
     )
   }
 }

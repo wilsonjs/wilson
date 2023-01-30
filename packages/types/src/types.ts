@@ -31,24 +31,14 @@ export interface UserConfig {
   drafts?: boolean
   /** Provide site-wide meta information. */
   meta: {
-    /** The default summary of the content of a page on your site that is used whenever you don't have a specific description in your page's frontmatter. */
-    defaultDescription: string
-    /** Defines  `<meta>` elements in the page's head that will reflect the page's description. */
-    descriptionMeta?: {
-      /** One `<meta>` element will be inserted for each name, e.g. `description` or `og:description` */
-      names: string[]
-    }
-    /** Define  `<meta>` elements in the page's head that are the same for every page. */
-    staticMeta?: Array<{ name: string; content: string }>
+    /** Define `<meta>` tags in the page's head based on the page's frontmatter and canonical URL. */
+    tags?: (
+      frontmatter: PageFrontmatter,
+      /** Wat */
+      canonicalUrl: string,
+    ) => Array<{ name: string; content: string }>
     /** Accepts a `%s` placeholder that will be replaced with the title from each page's frontmatter. */
     titleTemplate: string
-    /** Defines  `<meta>` elements in the page's head that will reflect the page's title. */
-    titleMeta?: {
-      /** One `<meta>` element will be inserted for each name, e.g. `og:title` or `twitter:title` */
-      names: string[]
-      /** If the meta tags content should be set to the titleTemplate or just the frontmatter title. Defaults to `true`. */
-      useTitleTemplate?: boolean
-    }
   }
   /** Default content language. Defaults to 'en'. */
   defaultLanguage?: string
@@ -100,10 +90,7 @@ export interface Translation {
  */
 export interface SiteConfig extends Required<UserConfig> {
   /** Provide site-wide meta information. */
-  meta: Required<UserConfig['meta']> & {
-    descriptionMeta: Required<UserConfig['meta']['descriptionMeta']>
-    titleMeta: Required<UserConfig['meta']['titleMeta']>
-  }
+  meta: Required<UserConfig['meta']>
   /**
    * Folder the site is hosted in. Determined based on `siteUrl` at runtime, useful when the site is hosted inside a folder like `https://example.com/site`.
    * @default '/'

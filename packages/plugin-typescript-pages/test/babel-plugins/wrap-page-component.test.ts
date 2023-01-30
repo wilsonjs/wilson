@@ -3,16 +3,16 @@ import test from 'ava'
 import plugin from '../../src/babel-plugins/wrap-page-component'
 
 const defaultOptions = {
+  canonical: 'https://wilsonjs.com/docs',
   componentName: 'Dynamic',
   frontmatter: { title: 'Hello world' },
   isDefaultLanguage: true,
   isDynamic: true,
   languageId: 'en',
   meta: {
-    defaultDescription: 'Interesting test page',
-    descriptionMeta: { names: ['description', 'og:description'] },
-    staticMeta: [],
-    titleMeta: { names: ['og:title'], useTitleTemplate: true },
+    tags: () => [
+      { name: 'description', content: 'This is an awesome wilson site!' },
+    ],
     titleTemplate: '%s - Foo',
   },
   translationKeys: { foo: 'bar' },
@@ -117,14 +117,33 @@ test('wraps exported dynamic page', async (t) => {
             languageId: 'de',
             meta: {
               ...defaultOptions.meta,
-              staticMeta: [
+              tags: () => [
                 { name: 'color-scheme', content: 'dark light' },
                 { name: 'og:type', content: 'website' },
               ],
-              titleMeta: {
-                names: ['og:title', 'twitter:title'],
-                useTitleTemplate: false,
-              },
+            },
+          },
+        ],
+      ],
+    },
+  )
+  t.snapshot(dynamicResult?.code)
+})
+
+test('wat', async (t) => {
+  const dynamicResult = await transformAsync(
+    `export default function Page() { return <h1>Hello world</h1> }`,
+    {
+      plugins: [
+        '@babel/plugin-syntax-jsx',
+        [
+          plugin,
+          {
+            ...defaultOptions,
+            canonical: `${defaultOptions.canonical}/[page]`,
+            meta: {
+              ...defaultOptions.meta,
+              tags: (fm, canonical) => [{ name: 'og:url', content: canonical }],
             },
           },
         ],

@@ -1,5 +1,4 @@
 import type { StaticPageProps } from 'wilson'
-import { frontmatter } from '../pages/about.de'
 import DefaultLayout from './default'
 import styles from './markdown.module.scss'
 
@@ -20,7 +19,7 @@ export default function MarkdownLayout(props: StaticPageProps) {
           {formatPostDate(props.frontmatter.date, props.language)}
         </time>
         <h1>{props.frontmatter.title}</h1>
-        {props.frontmatter.taxonomies.topics.length && (
+        {props.frontmatter.taxonomies?.topics?.length && (
           <ol class={styles.topics}>
             {(props.frontmatter.taxonomies.topics as string[]).map((topic) => (
               <li>{topic}</li>

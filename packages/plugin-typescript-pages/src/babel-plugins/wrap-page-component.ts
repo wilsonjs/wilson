@@ -89,25 +89,23 @@ function buildLocalizeUrlFunction(
 let program: types.Program
 let exportDefault: types.ExportDefaultDeclaration
 
+const frontmatter = z.object({
+  description: z.string().optional(),
+  title: z.string(),
+})
+
 const pluginOptions = z.object({
+  canonical: z.string(),
   componentName: z.string(),
-  frontmatter: z.object({
-    description: z.string().optional(),
-    title: z.string(),
-  }),
+  frontmatter,
   isDefaultLanguage: z.boolean(),
   isDynamic: z.boolean(),
   languageId: z.string(),
   meta: z.object({
-    defaultDescription: z.string(),
-    descriptionMeta: z.object({
-      names: z.array(z.string()),
-    }),
-    staticMeta: z.array(z.object({ name: z.string(), content: z.string() })),
-    titleMeta: z.object({
-      names: z.array(z.string()),
-      useTitleTemplate: z.boolean(),
-    }),
+    tags: z
+      .function()
+      .args(frontmatter, z.string())
+      .returns(z.array(z.object({ name: z.string(), content: z.string() }))),
     titleTemplate: z.string(),
   }),
   translationKeys: z.object({}),
@@ -227,6 +225,26 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                       ),
                     ),
                   ]),
+
+                  // types.expressionStatement(
+                  //   types.callExpression(
+                  //     types.memberExpression(
+                  //       types.identifier('console'),
+                  //       types.identifier('log'),
+                  //     ),
+                  //     [
+                  //       types.objectExpression([
+                  //         types.objectProperty(
+                  //           types.identifier('staticPath'),
+                  //           types.identifier('staticPath'),
+                  //           false,
+                  //           true,
+                  //         ),
+                  //       ]),
+                  //     ],
+                  //   ),
+                  // ),
+
                   types.variableDeclaration('const', [
                     types.variableDeclarator(
                       types.identifier('props'),
@@ -379,58 +397,138 @@ export default function wrapPageComponentPlugin(): PluginObj<{
                   types.objectProperty(
                     types.identifier('metas'),
                     types.arrayExpression([
-                      ...opts.meta.titleMeta.names.map((property) => {
-                        return types.objectExpression([
-                          types.objectProperty(
-                            types.identifier(
-                              isPropertyMeta(property) ? 'property' : 'name',
+                      ...opts.meta
+                        .tags(opts.frontmatter, opts.canonical)
+                        .map((meta) => {
+                          return types.objectExpression([
+                            types.objectProperty(
+                              types.identifier(
+                                isPropertyMeta(meta.name) ? 'property' : 'name',
+                              ),
+                              types.stringLiteral(meta.name),
                             ),
-                            types.stringLiteral(property),
-                          ),
-                          types.objectProperty(
-                            types.identifier('content'),
-                            types.stringLiteral(
-                              opts.meta.titleMeta.useTitleTemplate
-                                ? opts.meta.titleTemplate.replace(
-                                    '%s',
-                                    opts.frontmatter.title,
+                            types.objectProperty(
+                              types.identifier('content'),
+                              meta.content.match(/\[[^\]]+\]/) !== null
+                                ? types.callExpression(
+                                    types.arrowFunctionExpression(
+                                      [],
+                                      types.blockStatement(
+                                        [
+                                          types.variableDeclaration('let', [
+                                            types.variableDeclarator(
+                                              types.identifier('path'),
+                                              types.stringLiteral(meta.content),
+                                            ),
+                                          ]),
+                                          types.forOfStatement(
+                                            types.variableDeclaration('let', [
+                                              types.variableDeclarator(
+                                                types.identifier('param'),
+                                              ),
+                                            ]),
+                                            types.callExpression(
+                                              types.memberExpression(
+                                                types.identifier('Object'),
+                                                types.identifier('keys'),
+                                              ),
+                                              [
+                                                types.memberExpression(
+                                                  types.identifier(
+                                                    'staticPath',
+                                                  ),
+                                                  types.identifier('params'),
+                                                ),
+                                              ],
+                                            ),
+                                            types.blockStatement(
+                                              [
+                                                types.expressionStatement(
+                                                  types.assignmentExpression(
+                                                    '=',
+                                                    types.identifier('path'),
+                                                    types.callExpression(
+                                                      types.memberExpression(
+                                                        types.identifier(
+                                                          'path',
+                                                        ),
+                                                        types.identifier(
+                                                          'replace',
+                                                        ),
+                                                      ),
+                                                      [
+                                                        types.newExpression(
+                                                          types.identifier(
+                                                            'RegExp',
+                                                          ),
+                                                          [
+                                                            types.templateLiteral(
+                                                              [
+                                                                types.templateElement(
+                                                                  {
+                                                                    raw: '\\\\\\[',
+                                                                  },
+                                                                  false,
+                                                                ),
+                                                                types.templateElement(
+                                                                  {
+                                                                    raw: '\\\\\\]',
+                                                                  },
+                                                                  true,
+                                                                ),
+                                                              ],
+                                                              [
+                                                                types.identifier(
+                                                                  'param',
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        types.memberExpression(
+                                                          types.memberExpression(
+                                                            types.identifier(
+                                                              'staticPath',
+                                                            ),
+                                                            types.identifier(
+                                                              'params',
+                                                            ),
+                                                          ),
+                                                          types.identifier(
+                                                            'param',
+                                                          ),
+                                                          true,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                              [],
+                                            ),
+                                          ),
+                                          types.returnStatement(
+                                            types.callExpression(
+                                              types.memberExpression(
+                                                types.identifier('path'),
+                                                types.identifier('replace'),
+                                              ),
+                                              [
+                                                types.regExpLiteral('\\/$'),
+                                                types.stringLiteral(''),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                        [],
+                                      ),
+                                    ),
+                                    [],
                                   )
-                                : opts.frontmatter.title,
+                                : types.stringLiteral(meta.content),
                             ),
-                          ),
-                        ])
-                      }),
-                      ...opts.meta.descriptionMeta.names.map((property) => {
-                        return types.objectExpression([
-                          types.objectProperty(
-                            types.identifier(
-                              isPropertyMeta(property) ? 'property' : 'name',
-                            ),
-                            types.stringLiteral(property),
-                          ),
-                          types.objectProperty(
-                            types.identifier('content'),
-                            types.stringLiteral(
-                              opts.frontmatter.description ??
-                                opts.meta.defaultDescription,
-                            ),
-                          ),
-                        ])
-                      }),
-                      ...opts.meta.staticMeta.map((meta) => {
-                        return types.objectExpression([
-                          types.objectProperty(
-                            types.identifier(
-                              isPropertyMeta(meta.name) ? 'property' : 'name',
-                            ),
-                            types.stringLiteral(meta.name),
-                          ),
-                          types.objectProperty(
-                            types.identifier('content'),
-                            types.stringLiteral(meta.content),
-                          ),
-                        ])
-                      }),
+                          ])
+                        }),
                     ]),
                   ),
                 ]),

@@ -32,7 +32,7 @@ export interface PageToRender extends PageToRenderBase {
 function pathToFilename(cleanedPath: string) {
   return `${(cleanedPath.endsWith('/')
     ? `${cleanedPath}index`
-    : cleanedPath
+    : `${cleanedPath}/index`
   ).replace(/^\//g, '')}.html`
 }
 
@@ -49,12 +49,13 @@ export async function getPagesToRender(
   const pagesToRender = []
 
   for (const absolutePath of files) {
+    const isTypeScript = absolutePath.endsWith('.tsx')
     const relativePath = relative(config.pagesDir, absolutePath)
     const { route } = utils.getRoutingInfo(relativePath, {
       ...config,
       replaceParams: false,
     })
-    const isDynamic = utils.isDynamicPagePath(route)
+    const isDynamic = isTypeScript && utils.isDynamicPagePath(route)
 
     if (isDynamic) {
       const { staticPaths } = await getPageExports<DynamicPageExports>(

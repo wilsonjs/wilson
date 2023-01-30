@@ -1,6 +1,6 @@
 import { getRoute } from '@wilson/client-utils'
-import getTranslations from './get-translations'
 import type { Languages, Translation } from '@wilson/types'
+import getTranslations from './get-translations'
 
 /**
  * Returns route path for a given page.

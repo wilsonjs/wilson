@@ -1,10 +1,14 @@
 import { existsSync } from 'fs'
-import type { Island, IslandsByPath, SiteConfig } from '@wilson/types'
+import type {
+  Island,
+  IslandsByPath,
+  PageFrontmatter,
+  SiteConfig,
+} from '@wilson/types'
 import { join } from 'pathe'
 import type { RollupOutput } from 'rollup'
 import type { RenderToStringFn } from '../../client/app.server'
 import { withSpinner } from '../utils'
-import type { PageFrontmatter } from '../../../../types/dist/types'
 import type { bundle } from './bundle'
 import type { PageToRender, PageToRenderBase } from './pages'
 import { getPagesToRender } from './pages'
@@ -78,7 +82,7 @@ export async function renderPage(
           <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
           <meta http-equiv="x-ua-compatible" content="ie=edge" />
           <title>${head.title}</title>
-          ${metaTagsFrom(head.metas)}
+          ${metaTagsFrom(head.metas.reverse())}
           ${stylesheetTagsFrom(config, clientChunks)}
           ${await config.getAdditionalHeadContent()}
         </head>
