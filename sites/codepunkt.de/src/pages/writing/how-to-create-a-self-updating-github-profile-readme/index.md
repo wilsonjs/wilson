@@ -3,7 +3,7 @@ title: How to create a self-updating GitHub profile README
 date: 2021-03-04
 layout: markdown
 draft: false
-description: Profile READMEs are a new GitHub feature that allows user-defined content to be displayed on top of your GitHub profile page. This article explains how to create a basic README, shows few beautiful examples and explains how I've built mine to automatically update with my latest blog posts.
+description: How to create a self-updating GitHub profile README - a new feature that allows user-defined content on top of your GitHub profile page.
 taxonomies:
   categories:
     - writing
@@ -230,12 +230,12 @@ To combine all of these steps to replace the blog posts currently listed in the 
 The code that performs these steps looks like this:
 
 ```js {numberLines}
-const RssParser = require('rss-parser')
-const vfile = require('to-vfile')
-const remark = require('remark')
 const { promisify } = require('util')
 const { writeFile } = require('fs')
 const { join } = require('path')
+const RssParser = require('rss-parser')
+const vfile = require('to-vfile')
+const remark = require('remark')
 
 const rssParser = new RssParser()
 const readmePath = join(__dirname, '..', 'README.md')

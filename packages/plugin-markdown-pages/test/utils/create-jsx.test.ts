@@ -7,13 +7,11 @@ const createJsxArgs: Parameters<typeof utils.createJsx> = [
   '/my-article',
   'de',
   {
+    url: 'https://wilsonjs.com/',
     defaultLanguage: 'en',
-    site: {
-      description: 'An amazing site to test Wilson',
+    meta: {
+      tags: () => [{ name: 'color-scheme', content: 'dark light' }],
       titleTemplate: '%s | Wilson Testsite',
-      titleMeta: {
-        properties: ['og:title'],
-      }
     },
   },
   {

@@ -1,12 +1,16 @@
 import { existsSync } from 'fs'
-import type { Island, IslandsByPath, SiteConfig } from '@wilson/types'
+import type {
+  Island,
+  IslandsByPath,
+  PageFrontmatter,
+  SiteConfig,
+} from '@wilson/types'
 import { join } from 'pathe'
 import type { RollupOutput } from 'rollup'
 import type { RenderToStringFn } from '../../client/app.server'
 import { withSpinner } from '../utils'
-import type { PageFrontmatter } from '../../../../types/dist/types'
 import type { bundle } from './bundle'
-import type { PageToRender } from './pages'
+import type { PageToRender, PageToRenderBase } from './pages'
 import { getPagesToRender } from './pages'
 
 export async function renderPages(
@@ -24,7 +28,7 @@ export async function renderPages(
 
   const rendertoString: RenderToStringFn = (await import(appPath)).default
 
-  const pagesToRender = await withSpinner(
+  const pagesToRenderBases = await withSpinner(
     'resolving static paths',
     getPagesToRender,
     config,
@@ -32,18 +36,20 @@ export async function renderPages(
   const clientChunks = clientResult.output
   const islandsByPath: IslandsByPath = {}
 
-  await withSpinner('rendering pages', async () => {
-    for (const page of pagesToRender) {
-      const { rendered, frontmatter, islands } = await renderPage(
-        config,
-        clientChunks,
-        page,
-        rendertoString,
-      )
-      page.rendered = rendered
-      page.frontmatter = frontmatter
-      islandsByPath[page.route] = islands
-    }
+  const pagesToRender = await withSpinner('rendering pages', async () => {
+    return await Promise.all(
+      pagesToRenderBases.map(async (pageBase): Promise<PageToRender> => {
+        const { rendered, frontmatter, islands } = await renderPage(
+          config,
+          clientChunks,
+          pageBase,
+          rendertoString,
+        )
+        const page: PageToRender = { ...pageBase, rendered, frontmatter }
+        islandsByPath[page.route] = islands
+        return page
+      }),
+    )
   })
 
   return { pagesToRender, islandsByPath }
@@ -54,7 +60,7 @@ const frontmatterRegexp = /^<div><!-- frontmatter (?<json>.*?) --><\/div>/
 export async function renderPage(
   config: SiteConfig,
   clientChunks: RollupOutput['output'],
-  page: PageToRender,
+  page: PageToRenderBase,
   renderToString: RenderToStringFn,
 ): Promise<{
   rendered: string
@@ -66,7 +72,7 @@ export async function renderPage(
   const frontmatter = JSON.parse(match!.groups!.json) as PageFrontmatter
   html.replace(frontmatterRegexp, '')
 
-  // TODO: links, scripts and meta
+  // TODO: links and scripts
   return {
     rendered: /* html */ `
       <!DOCTYPE html>
@@ -76,7 +82,7 @@ export async function renderPage(
           <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
           <meta http-equiv="x-ua-compatible" content="ie=edge" />
           <title>${head.title}</title>
-          ${metaTagsFrom(head.metas)}
+          ${metaTagsFrom(head.metas.reverse())}
           ${stylesheetTagsFrom(config, clientChunks)}
           ${await config.getAdditionalHeadContent()}
         </head>

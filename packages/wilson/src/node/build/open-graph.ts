@@ -3,6 +3,8 @@ import { resolve } from 'path'
 import type { SiteConfig } from '@wilson/types'
 import Jimp from 'jimp'
 import wlt from '@codepunkt/wasm-layout-text'
+import { withSpinner } from '../utils'
+import type { PageToRender } from './pages'
 
 /**
  * Converts a 6-digit hex string to an RGB array.
@@ -16,22 +18,40 @@ export const hexToRgb = (hex: string): [r: number, g: number, b: number] => {
   return [r, g, b]
 }
 
+type PageToOpengraphConfiguration = Map<
+  PageToRender,
+  NonNullable<ReturnType<SiteConfig['createOpengraphImage']>>
+>
+
 export default async function createOpengraphImages(
-  config: SiteConfig,
-  pagesToRender: any[],
+  siteConfig: SiteConfig,
+  pagesToRender: PageToRender[],
+) {
+  const opengraphConfigurations: PageToOpengraphConfiguration = new Map()
+
+  for (const page of pagesToRender) {
+    const result = siteConfig.createOpengraphImage(page.frontmatter)
+    if (result !== null) {
+      opengraphConfigurations.set(page, result)
+    }
+  }
+
+  if (opengraphConfigurations.size === 0) return
+
+  await withSpinner(
+    'creating open graph images',
+    async () => await createImages(siteConfig, opengraphConfigurations),
+  )
+}
+
+async function createImages(
+  siteConfig: SiteConfig,
+  opengraphConfigurations: PageToOpengraphConfiguration,
 ) {
   const width = 1200
   const height = 630
 
-  for (const page of pagesToRender) {
-    const ogConfig = config.createOpengraphImage(page.frontmatter)
-
-    if (ogConfig === null) {
-      continue
-    }
-
-    const { background, texts } = ogConfig
-
+  for (const [page, { background, texts }] of opengraphConfigurations) {
     const backgroundLayer = background.match(/[0-9A-Fa-f]{6}/g)
       ? new Jimp(width, height, background)
       : await Jimp.read(background)
@@ -108,8 +128,13 @@ export default async function createOpengraphImages(
       composite = composite.composite(textLayer, 0, 0)
     })
     const result = composite.quality(100)
+    const pageOutputPath = resolve(siteConfig.outDir, page.outputFilename)
+    const isIndexPage = pageOutputPath.endsWith('index.html')
+
     await result.writeAsync(
-      resolve(config.outDir, page.outputFilename).replace(/\.html$/, '.jpg'),
+      isIndexPage
+        ? pageOutputPath.replace(/index\.html$/, 'og-image.jpg')
+        : pageOutputPath.replace(/\.html$/, '/og-image.jpg'),
     )
   }
 }

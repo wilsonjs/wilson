@@ -1,11 +1,10 @@
 import type { UserConfig } from 'wilson'
 
 const config: UserConfig = {
-  site: {
+  url: 'https://wilsonjs.com/',
+  meta: {
     titleTemplate: '%s - Wilson',
-    description: '',
   },
-  siteUrl: 'https://wilsonjs.com/',
 }
 
 export default config

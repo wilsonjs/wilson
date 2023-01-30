@@ -27,5 +27,6 @@
   },
   "todo-tree.general.enableFileWatcher": true,
   "todo-tree.general.debug": false,
-  "todo-tree.general.rootFolder": "${workspaceFolder}"
+  "todo-tree.general.rootFolder": "${workspaceFolder}",
+  "todo-tree.filtering.excludeGlobs": ["**/node_modules/*/**", "**/*.md"]
 }
