@@ -161,6 +161,10 @@ I published the resulting package as [@codepunkt/wasm-layout-text](https://www.n
 In order to use the package, call the `render` method and create new configuration objects for text, image dimensions, text bounding box, text position and text alignment with the `js•new` keyword.
 
 ```js {numberLines}
+const response = await fetch('https://site-b.com')
+```
+
+```js {numberLines}
 const { readFileSync } = require('fs')
 const { join } = require('path')
 const wlt = require('@codepunkt/wasm-layout-text')

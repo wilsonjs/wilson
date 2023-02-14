@@ -4,14 +4,9 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - 'packages/**'
-      - 'tsconfig.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - 'package.json'
-      - 'turbo.json'
-      - '.github/workflows/pr-tests.yml'
+  merge_group:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
