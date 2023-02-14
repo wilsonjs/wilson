@@ -56,7 +56,7 @@
     "fast-equals": "^4.0.1",
     "fast-glob": "^3.2.11",
     "hoofd": "1.5.2",
-    "jimp": "^0.16.2",
+    "jimp": "^0.22.0",
     "js-beautify": "^1.14.4",
     "magic-string": "^0.29.0",
     "mico-spinner": "^1.4.0",
