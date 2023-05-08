@@ -44,7 +44,7 @@
   "dependencies": {
     "@codepunkt/wasm-layout-text": "^3.0.0",
     "@preact/preset-vite": "^2.3.0",
-    "@svgr/core": "^6.3.1",
+    "@svgr/core": "^7.0.0",
     "@wilson/babel-plugin-island-path": "workspace:^1.0.0",
     "@wilson/client-utils": "workspace:^1.0.0",
     "@wilson/island-hydration": "workspace:^1.0.0",
