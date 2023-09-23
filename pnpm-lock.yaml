@@ -253,7 +253,7 @@ importers:
       es-module-lexer: ^1.0.0
       fast-equals: ^4.0.1
       fast-glob: ^3.2.11
-      hoofd: 1.5.2
+      hoofd: 1.7.1
       jimp: ^0.22.0
       js-beautify: ^1.14.4
       magic-string: ^0.29.0
@@ -285,7 +285,7 @@ importers:
       es-module-lexer: 1.0.1
       fast-equals: 4.0.1
       fast-glob: 3.2.11
-      hoofd: 1.5.2_react@18.2.0
+      hoofd: 1.7.1_react@18.2.0
       jimp: 0.22.0
       js-beautify: 1.14.4
       magic-string: 0.29.0
@@ -329,7 +329,7 @@ importers:
       animejs: ^3.2.1
       fast-equals: ^4.0.1
       gl-matrix: ^3.4.3
-      hoofd: 1.5.2
+      hoofd: 1.7.1
       html-minifier-terser: ^7.1.0
       lodash: ^4.17.21
       preact: ^10.10.0
@@ -357,7 +357,7 @@ importers:
       animejs: 3.2.1
       fast-equals: 4.0.1
       gl-matrix: 3.4.3
-      hoofd: 1.5.2_@preact+compat@17.1.2
+      hoofd: 1.7.1_@preact+compat@17.1.2
       html-minifier-terser: 7.1.0
       lodash: 4.17.21
       preact: 10.10.0
@@ -369,7 +369,7 @@ importers:
       typeface-open-sans: 1.1.13
       use-media: 1.4.0_@preact+compat@17.1.2
       vite: 4.1.3_wrmaytedpjp3nghmqd4otwwfpa
-      vscode-styled-components: github.com/styled-components/vscode-styled-components/e5b357a137e896097b361e8ae22758281497e9cd
+      vscode-styled-components: github.com/styled-components/vscode-styled-components/8c7a6fb71a2e5b733a21f0f4b899cc519c43c801
       what-input: 5.2.12
       wilson: link:../../packages/wilson
       wouter-preact: 2.8.1_preact@10.10.0
@@ -386,7 +386,7 @@ importers:
       '@wilson/babel-plugin-island-path': workspace:^1.0.0
       '@wilson/island-hydration': workspace:^1.0.0
       fast-equals: ^4.0.1
-      hoofd: 1.5.2
+      hoofd: 1.7.1
       preact: ^10.10.0
       react: npm:@preact/compat
       react-dom: npm:@preact/compat
@@ -399,7 +399,7 @@ importers:
       '@wilson/babel-plugin-island-path': link:../../packages/babel-plugin-island-path
       '@wilson/island-hydration': link:../../packages/island-hydration
       fast-equals: 4.0.1
-      hoofd: 1.5.2_@preact+compat@17.1.2
+      hoofd: 1.7.1_@preact+compat@17.1.2
       preact: 10.10.0
       react: /@preact/compat/17.1.2_preact@10.10.0
       react-dom: /@preact/compat/17.1.2_preact@10.10.0
@@ -1634,14 +1634,14 @@ packages:
     resolution: {integrity: sha512-sXXKG+uL9IrKqViTtao2Ws6dy0znu9sOaP1di/jKGW1M6VssO8vlpXCQcpZ+jisQ1tTFAC5Jo/EOzFbggBagFQ==}
     dev: true
 
-  /@styled/typescript-styled-plugin/0.20.0:
-    resolution: {integrity: sha512-qUqFB5VFIDX9FipzrGGgQuCKU6jftCxEhMXtBUsxM+M8a6OKWAIZnhEvQn+IaUjFrSGumIoR4b+5zlHUjHrMTA==}
+  /@styled/typescript-styled-plugin/1.0.0:
+    resolution: {integrity: sha512-TGAZrTPPglyzdO6mWyC1QWNN3G2zZHy2/YrPGE2aie06p1MgtyEWc3GXUa5Xkb/pH7ftinX63mbQTipzVjrTRw==}
     dependencies:
       '@vscode/emmet-helper': 2.8.6
-      typescript-template-language-service-decorator: 2.3.1
-      vscode-css-languageservice: 6.2.1
+      typescript-template-language-service-decorator: 2.3.2
+      vscode-css-languageservice: 6.2.7
       vscode-languageserver-textdocument: 1.0.8
-      vscode-languageserver-types: 3.17.2
+      vscode-languageserver-types: 3.17.4
     dev: false
 
   /@svgr/babel-plugin-add-jsx-attribute/6.3.1_@babel+core@7.18.9:
@@ -2057,12 +2057,16 @@ packages:
       emmet: 2.3.6
       jsonc-parser: 2.3.1
       vscode-languageserver-textdocument: 1.0.8
-      vscode-languageserver-types: 3.17.2
+      vscode-languageserver-types: 3.17.4
       vscode-uri: 2.1.2
     dev: false
 
   /@vscode/l10n/0.0.10:
     resolution: {integrity: sha512-E1OCmDcDWa0Ya7vtSjp/XfHFGqYJfh+YPC1RkATU71fTac+j1JjCcB3qwSzmlKAighx2WxhLlfhS0RwAN++PFQ==}
+    dev: false
+
+  /@vscode/l10n/0.0.16:
+    resolution: {integrity: sha512-JT5CvrIYYCrmB+dCana8sUqJEcGB1ZDXNLMQ2+42bW995WmNoenijWMUdZfwmuQUTQcEVVIa2OecZzTYWUW9Cg==}
     dev: false
 
   /abbrev/1.1.1:
@@ -4303,16 +4307,16 @@ packages:
       space-separated-tokens: 2.0.1
     dev: false
 
-  /hoofd/1.5.2_@preact+compat@17.1.2:
-    resolution: {integrity: sha512-zzxE0JmS6KbbRDrCVqcH6VJMNGKnphuQlQHO08EBSlAyT/+e895c6PswOj7wscbk3S4uV1pkApBZU2OOrMzDjg==}
+  /hoofd/1.7.1_@preact+compat@17.1.2:
+    resolution: {integrity: sha512-G+RUtbwR/nPRoJu33Fu/agPXax3J3tRZvs/AZ/8eWWqXPfAvhOWETBJRsRZC2dIzJvXZnMiO+6ui5vi+ftKRqw==}
     peerDependencies:
       react: '>= 16.8.0'
     dependencies:
       react: /@preact/compat/17.1.2_preact@10.10.0
     dev: false
 
-  /hoofd/1.5.2_react@18.2.0:
-    resolution: {integrity: sha512-zzxE0JmS6KbbRDrCVqcH6VJMNGKnphuQlQHO08EBSlAyT/+e895c6PswOj7wscbk3S4uV1pkApBZU2OOrMzDjg==}
+  /hoofd/1.7.1_react@18.2.0:
+    resolution: {integrity: sha512-G+RUtbwR/nPRoJu33Fu/agPXax3J3tRZvs/AZ/8eWWqXPfAvhOWETBJRsRZC2dIzJvXZnMiO+6ui5vi+ftKRqw==}
     peerDependencies:
       react: '>= 16.8.0'
     dependencies:
@@ -7166,8 +7170,8 @@ packages:
     resolution: {integrity: sha512-lVGVHvYl7UJDFB9vN8r7NHw3sVm7Rjeow6b9AeABc/J+2mDaCkmcdVtw3QZnsJW39P+xm5zeggIj9gLHYGn9Iw==}
     dev: false
 
-  /typescript-template-language-service-decorator/2.3.1:
-    resolution: {integrity: sha512-+Q5+cvBtPO4VKNyyI6O+XnIne+/hq/WfNhBaF4hJP8nB8TbikTg+2h9uBMsqduwX1+kVfwG9SBSwMTtvi2Ep7w==}
+  /typescript-template-language-service-decorator/2.3.2:
+    resolution: {integrity: sha512-hN0zNkr5luPCeXTlXKxsfBPlkAzx86ZRM1vPdL7DbEqqWoeXSxplACy98NpKpLmXsdq7iePUzAXloCAoPKBV6A==}
     dev: false
 
   /typescript/5.0.2:
@@ -7569,12 +7573,25 @@ packages:
       vscode-uri: 3.0.7
     dev: false
 
+  /vscode-css-languageservice/6.2.7:
+    resolution: {integrity: sha512-Jd8wpIg5kJ15CfrieoEPvu3gGFc36sbM3qXCtjVq5zrnLEX5NhHxikMDtf8AgQsYklXiDqiZLKoBnzkJtRbTHQ==}
+    dependencies:
+      '@vscode/l10n': 0.0.16
+      vscode-languageserver-textdocument: 1.0.8
+      vscode-languageserver-types: 3.17.4
+      vscode-uri: 3.0.7
+    dev: false
+
   /vscode-languageserver-textdocument/1.0.8:
     resolution: {integrity: sha512-1bonkGqQs5/fxGT5UchTgjGVnfysL0O8v1AYMBjqTbWQTFn721zaPGDYFkOKtfDgFiSgXM3KwaG3FMGfW4Ed9Q==}
     dev: false
 
   /vscode-languageserver-types/3.17.2:
     resolution: {integrity: sha512-zHhCWatviizPIq9B7Vh9uvrH6x3sK8itC84HkamnBWoDFJtzBf7SWlpLCZUit72b3os45h6RWQNC9xHRDF8dRA==}
+    dev: false
+
+  /vscode-languageserver-types/3.17.4:
+    resolution: {integrity: sha512-9YXi5pA3XF2V+NUQg6g+lulNS0ncRCKASYdK3Cs7kiH9sVFXWq27prjkC/B8M/xJLRPPRSPCHVMuBTgRNFh2sQ==}
     dev: false
 
   /vscode-oniguruma/1.7.0:
@@ -7868,15 +7885,15 @@ packages:
       vsce: 1.103.1
     dev: false
 
-  github.com/styled-components/vscode-styled-components/e5b357a137e896097b361e8ae22758281497e9cd:
-    resolution: {tarball: https://codeload.github.com/styled-components/vscode-styled-components/tar.gz/e5b357a137e896097b361e8ae22758281497e9cd}
+  github.com/styled-components/vscode-styled-components/8c7a6fb71a2e5b733a21f0f4b899cc519c43c801:
+    resolution: {tarball: https://codeload.github.com/styled-components/vscode-styled-components/tar.gz/8c7a6fb71a2e5b733a21f0f4b899cc519c43c801}
     name: vscode-styled-components
-    version: 1.7.6
-    engines: {vscode: ^1.70.0}
+    version: 1.7.8
+    engines: {vscode: ^1.73.0}
     prepare: true
     requiresBuild: true
     dependencies:
-      '@styled/typescript-styled-plugin': 0.20.0
+      '@styled/typescript-styled-plugin': 1.0.0
       d3-color: 3.1.0
       vscode-css-languageservice: 6.2.1
     dev: false
