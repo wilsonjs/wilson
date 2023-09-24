@@ -58,7 +58,7 @@
     "hoofd": "1.7.1",
     "jimp": "^0.22.0",
     "js-beautify": "^1.14.4",
-    "magic-string": "^0.29.0",
+    "magic-string": "^0.30.0",
     "mico-spinner": "^1.4.0",
     "minimist": "^1.2.6",
     "pathe": "^1.0.0",
