@@ -23,7 +23,7 @@
     "@wilson/babel-plugin-island-path": "workspace:^1.0.0",
     "@wilson/island-hydration": "workspace:^1.0.0",
     "fast-equals": "^4.0.1",
-    "hoofd": "1.5.2",
+    "hoofd": "1.7.1",
     "preact": "^10.10.0",
     "react": "npm:@preact/compat",
     "react-dom": "npm:@preact/compat",
