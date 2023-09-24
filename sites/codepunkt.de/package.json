@@ -28,7 +28,7 @@
     "@wilson/babel-plugin-island-path": "workspace:^1.0.0",
     "@wilson/island-hydration": "workspace:^1.0.0",
     "animejs": "^3.2.1",
-    "fast-equals": "^4.0.1",
+    "fast-equals": "^5.0.0",
     "gl-matrix": "^3.4.3",
     "hoofd": "1.7.1",
     "html-minifier-terser": "^7.1.0",
