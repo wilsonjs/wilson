@@ -50,7 +50,7 @@
     "@babel/plugin-syntax-jsx": "^7.18.6",
     "@babel/plugin-syntax-typescript": "^7.18.6",
     "@babel/template": "^7.18.10",
-    "@babel/traverse": "^7.18.9",
+    "@babel/traverse": "^7.23.2",
     "@babel/types": "^7.18.9",
     "@wilson/client-utils": "workspace:^1.0.0",
     "@wilson/utils": "workspace:^1.0.0",
