@@ -45,7 +45,7 @@
     "vscode-styled-components": "github:styled-components/vscode-styled-components",
     "what-input": "^5.2.12",
     "wilson": "workspace:^1.0.0",
-    "wouter-preact": "2.8.1"
+    "wouter-preact": "2.12.2"
   },
   "devDependencies": {
     "@types/animejs": "^3.1.6",
