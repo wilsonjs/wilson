@@ -365,8 +365,8 @@ importers:
         specifier: ^3.2.11
         version: 3.2.11
       hoofd:
-        specifier: 1.7.1
-        version: 1.7.1(react@18.2.0)
+        specifier: 1.7.3
+        version: 1.7.3(react@18.2.0)
       jimp:
         specifier: ^0.22.0
         version: 0.22.0
@@ -451,16 +451,16 @@ importers:
         version: 2.3.0(@babel/core@7.18.9)(preact@10.10.0)(vite@4.1.5)
       '@react-hook/media-query':
         specifier: ^1.1.1
-        version: 1.1.1(@preact/compat@17.1.2)
+        version: 1.1.1(@preact/compat@18.3.2)
       '@react-hook/previous':
         specifier: ^1.0.1
-        version: 1.0.1(@preact/compat@17.1.2)
+        version: 1.0.1(@preact/compat@18.3.2)
       '@react-hook/window-scroll':
         specifier: ^1.3.0
-        version: 1.3.0(@preact/compat@17.1.2)
+        version: 1.3.0(@preact/compat@18.3.2)
       '@react-hook/window-size':
         specifier: ^3.1.1
-        version: 3.1.1(@preact/compat@17.1.2)
+        version: 3.1.1(@preact/compat@18.3.2)
       '@wilson/babel-plugin-island-path':
         specifier: workspace:^1.0.0
         version: link:../../packages/babel-plugin-island-path
@@ -477,8 +477,8 @@ importers:
         specifier: ^3.4.3
         version: 3.4.3
       hoofd:
-        specifier: 1.7.1
-        version: 1.7.1(@preact/compat@17.1.2)
+        specifier: 1.7.3
+        version: 1.7.3(@preact/compat@18.3.2)
       html-minifier-terser:
         specifier: ^7.1.0
         version: 7.1.0
@@ -490,10 +490,10 @@ importers:
         version: 10.10.0
       react:
         specifier: npm:@preact/compat
-        version: /@preact/compat@17.1.2(preact@10.10.0)
+        version: /@preact/compat@18.3.2(preact@10.10.0)
       react-dom:
         specifier: npm:@preact/compat
-        version: /@preact/compat@17.1.2(preact@10.10.0)
+        version: /@preact/compat@18.3.2(preact@10.10.0)
       slack-theme:
         specifier: github:slack-theme/visual-studio-code
         version: github.com/slack-theme/visual-studio-code/ae207bda0c2477fb609b21377ab0a7a40b1f4b0b
@@ -508,13 +508,13 @@ importers:
         version: 1.1.13
       use-media:
         specifier: ^1.4.0
-        version: 1.4.0(@preact/compat@17.1.2)
+        version: 1.4.0(@preact/compat@18.3.2)
       vite:
         specifier: 4.1.5
         version: 4.1.5(@types/node@18.6.2)(terser@5.16.1)
       vscode-styled-components:
         specifier: github:styled-components/vscode-styled-components
-        version: github.com/styled-components/vscode-styled-components/8c7a6fb71a2e5b733a21f0f4b899cc519c43c801
+        version: github.com/styled-components/vscode-styled-components/fe0107ead786d36411bc7609eb3cc73a76e43e60
       what-input:
         specifier: ^5.2.12
         version: 5.2.12
@@ -556,17 +556,17 @@ importers:
         specifier: ^5.0.0
         version: 5.0.1
       hoofd:
-        specifier: 1.7.1
-        version: 1.7.1(@preact/compat@17.1.2)
+        specifier: 1.7.3
+        version: 1.7.3(@preact/compat@18.3.2)
       preact:
         specifier: ^10.10.0
         version: 10.10.0
       react:
         specifier: npm:@preact/compat
-        version: /@preact/compat@17.1.2(preact@10.10.0)
+        version: /@preact/compat@18.3.2(preact@10.10.0)
       react-dom:
         specifier: npm:@preact/compat
-        version: /@preact/compat@17.1.2(preact@10.10.0)
+        version: /@preact/compat@18.3.2(preact@10.10.0)
       vite:
         specifier: 4.1.5
         version: 4.1.5(@types/node@18.6.2)(terser@5.16.1)
@@ -1657,8 +1657,8 @@ packages:
     resolution: {integrity: sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==}
     dev: false
 
-  /@preact/compat@17.1.2(preact@10.10.0):
-    resolution: {integrity: sha512-7pOZN9lMDDRQ+6aWvjwTp483KR8/zOpfS83wmOo3zfuLKdngS8/5RLbsFWzFZMGdYlotAhX980hJ75bjOHTwWg==}
+  /@preact/compat@18.3.2(preact@10.10.0):
+    resolution: {integrity: sha512-5vSl55K5yLMvocT7PBKxDOHGgYPjMrKQqqr6roSNjIXcJOtSgDDMjpiCAF3s7klRdmGrN75b/Przmjw8gmlg/w==}
     peerDependencies:
       preact: '*'
     dependencies:
@@ -1719,75 +1719,75 @@ packages:
       - supports-color
     dev: false
 
-  /@react-hook/debounce@3.0.0(@preact/compat@17.1.2):
+  /@react-hook/debounce@3.0.0(@preact/compat@18.3.2):
     resolution: {integrity: sha512-ir/kPrSfAzY12Gre0sOHkZ2rkEmM4fS5M5zFxCi4BnCeXh2nvx9Ujd+U4IGpKCuPA+EQD0pg1eK2NGLvfWejag==}
     peerDependencies:
       react: '>=16.8'
     dependencies:
-      '@react-hook/latest': 1.0.3(@preact/compat@17.1.2)
-      react: /@preact/compat@17.1.2(preact@10.10.0)
+      '@react-hook/latest': 1.0.3(@preact/compat@18.3.2)
+      react: /@preact/compat@18.3.2(preact@10.10.0)
     dev: false
 
-  /@react-hook/event@1.2.6(@preact/compat@17.1.2):
+  /@react-hook/event@1.2.6(@preact/compat@18.3.2):
     resolution: {integrity: sha512-JUL5IluaOdn5w5Afpe/puPa1rj8X6udMlQ9dt4hvMuKmTrBS1Ya6sb4sVgvfe2eU4yDuOfAhik8xhbcCekbg9Q==}
     peerDependencies:
       react: '>=16.8'
     dependencies:
-      react: /@preact/compat@17.1.2(preact@10.10.0)
+      react: /@preact/compat@18.3.2(preact@10.10.0)
     dev: false
 
-  /@react-hook/latest@1.0.3(@preact/compat@17.1.2):
+  /@react-hook/latest@1.0.3(@preact/compat@18.3.2):
     resolution: {integrity: sha512-dy6duzl+JnAZcDbNTfmaP3xHiKtbXYOaz3G51MGVljh548Y8MWzTr+PHLOfvpypEVW9zwvl+VyKjbWKEVbV1Rg==}
     peerDependencies:
       react: '>=16.8'
     dependencies:
-      react: /@preact/compat@17.1.2(preact@10.10.0)
+      react: /@preact/compat@18.3.2(preact@10.10.0)
     dev: false
 
-  /@react-hook/media-query@1.1.1(@preact/compat@17.1.2):
+  /@react-hook/media-query@1.1.1(@preact/compat@18.3.2):
     resolution: {integrity: sha512-VM14wDOX5CW5Dn6b2lTiMd79BFMTut9AZj2+vIRT3LCKgMCYmdqruTtzDPSnIVDQdtxdPgtOzvU9oK20LopuOw==}
     peerDependencies:
       react: '>=16.8'
     dependencies:
-      react: /@preact/compat@17.1.2(preact@10.10.0)
+      react: /@preact/compat@18.3.2(preact@10.10.0)
     dev: false
 
-  /@react-hook/previous@1.0.1(@preact/compat@17.1.2):
+  /@react-hook/previous@1.0.1(@preact/compat@18.3.2):
     resolution: {integrity: sha512-O7VaRLDEHRy1hxh03CmtWRxDhCwIVQBBkf1kYdYqUP3KNrPnQMIVIYYYQpHIIiNcS1BO6zmBKM4bugFDNgP8Iw==}
     peerDependencies:
       react: '>=16.8'
     dependencies:
-      react: /@preact/compat@17.1.2(preact@10.10.0)
+      react: /@preact/compat@18.3.2(preact@10.10.0)
     dev: false
 
-  /@react-hook/throttle@2.2.0(@preact/compat@17.1.2):
+  /@react-hook/throttle@2.2.0(@preact/compat@18.3.2):
     resolution: {integrity: sha512-LJ5eg+yMV8lXtqK3lR+OtOZ2WH/EfWvuiEEu0M3bhR7dZRfTyEJKxH1oK9uyBxiXPtWXiQggWbZirMCXam51tg==}
     peerDependencies:
       react: '>=16.8'
     dependencies:
-      '@react-hook/latest': 1.0.3(@preact/compat@17.1.2)
-      react: /@preact/compat@17.1.2(preact@10.10.0)
+      '@react-hook/latest': 1.0.3(@preact/compat@18.3.2)
+      react: /@preact/compat@18.3.2(preact@10.10.0)
     dev: false
 
-  /@react-hook/window-scroll@1.3.0(@preact/compat@17.1.2):
+  /@react-hook/window-scroll@1.3.0(@preact/compat@18.3.2):
     resolution: {integrity: sha512-LdYnCL22pFI+LTs85Fi2OQHSKWkzIuHFgv8lA+wwuaPxLOEhWR5bzJ21iygUH9X4meeLVRZKEbfpYi3OWWD4GQ==}
     peerDependencies:
       react: '>=16.8'
     dependencies:
-      '@react-hook/event': 1.2.6(@preact/compat@17.1.2)
-      '@react-hook/throttle': 2.2.0(@preact/compat@17.1.2)
-      react: /@preact/compat@17.1.2(preact@10.10.0)
+      '@react-hook/event': 1.2.6(@preact/compat@18.3.2)
+      '@react-hook/throttle': 2.2.0(@preact/compat@18.3.2)
+      react: /@preact/compat@18.3.2(preact@10.10.0)
     dev: false
 
-  /@react-hook/window-size@3.1.1(@preact/compat@17.1.2):
+  /@react-hook/window-size@3.1.1(@preact/compat@18.3.2):
     resolution: {integrity: sha512-yWnVS5LKnOUIrEsI44oz3bIIUYqflamPL27n+k/PC//PsX/YeWBky09oPeAoc9As6jSH16Wgo8plI+ECZaHk3g==}
     peerDependencies:
       react: '>=16.8'
     dependencies:
-      '@react-hook/debounce': 3.0.0(@preact/compat@17.1.2)
-      '@react-hook/event': 1.2.6(@preact/compat@17.1.2)
-      '@react-hook/throttle': 2.2.0(@preact/compat@17.1.2)
-      react: /@preact/compat@17.1.2(preact@10.10.0)
+      '@react-hook/debounce': 3.0.0(@preact/compat@18.3.2)
+      '@react-hook/event': 1.2.6(@preact/compat@18.3.2)
+      '@react-hook/throttle': 2.2.0(@preact/compat@18.3.2)
+      react: /@preact/compat@18.3.2(preact@10.10.0)
     dev: false
 
   /@rollup/pluginutils@4.2.1:
@@ -3752,6 +3752,7 @@ packages:
   /eslint-plugin-i@2.28.1(@typescript-eslint/parser@6.7.2)(eslint@8.20.0):
     resolution: {integrity: sha512-a4oVt0j3ixNhGhvV4XF6NS7OWRFK2rrJ0Q5C4S2dSRb8FxZi31J0uUd5WJLL58wnVJ/OiQ1BxiXnFA4dWQO1Cg==}
     engines: {node: '>=12'}
+    deprecated: Please migrate to the brand new `eslint-plugin-import-x` instead
     peerDependencies:
       eslint: ^7.2.0 || ^8
     dependencies:
@@ -4608,16 +4609,16 @@ packages:
       space-separated-tokens: 2.0.1
     dev: false
 
-  /hoofd@1.7.1(@preact/compat@17.1.2):
-    resolution: {integrity: sha512-G+RUtbwR/nPRoJu33Fu/agPXax3J3tRZvs/AZ/8eWWqXPfAvhOWETBJRsRZC2dIzJvXZnMiO+6ui5vi+ftKRqw==}
+  /hoofd@1.7.3(@preact/compat@18.3.2):
+    resolution: {integrity: sha512-ssVCn3i3w97C4ubB6Xf4oGbil5lj/r9rn7ZRlY5p1JmLa6i7ZviCk9Huo9WDK2OvP6K7HTga5+SRnw07e2uKOw==}
     peerDependencies:
       react: '>= 16.8.0'
     dependencies:
-      react: /@preact/compat@17.1.2(preact@10.10.0)
+      react: /@preact/compat@18.3.2(preact@10.10.0)
     dev: false
 
-  /hoofd@1.7.1(react@18.2.0):
-    resolution: {integrity: sha512-G+RUtbwR/nPRoJu33Fu/agPXax3J3tRZvs/AZ/8eWWqXPfAvhOWETBJRsRZC2dIzJvXZnMiO+6ui5vi+ftKRqw==}
+  /hoofd@1.7.3(react@18.2.0):
+    resolution: {integrity: sha512-ssVCn3i3w97C4ubB6Xf4oGbil5lj/r9rn7ZRlY5p1JmLa6i7ZviCk9Huo9WDK2OvP6K7HTga5+SRnw07e2uKOw==}
     peerDependencies:
       react: '>= 16.8.0'
     dependencies:
@@ -5950,6 +5951,7 @@ packages:
 
   /osenv@0.1.5:
     resolution: {integrity: sha512-0CWcCECdMVc2Rw3U5w9ZjqX6ga6ubk1xDVKxtBQPK7wis/0F2r9T6k4ydGYhecl7YUBxBVxhL5oisPsNxAPe2g==}
+    deprecated: This package is no longer supported.
     dependencies:
       os-homedir: 1.0.2
       os-tmpdir: 1.0.2
@@ -6335,6 +6337,7 @@ packages:
   /prebuild-install@7.1.1:
     resolution: {integrity: sha512-jAXscXWMcCK8GgCoHOfIr0ODh5ai8mj63L2nWrjuAgXE6tDyYGnx4/8o/rCgU+B4JSyZBKbeZqzhtwtC3ovxjw==}
     engines: {node: '>=10'}
+    deprecated: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
     hasBin: true
     dependencies:
       detect-libc: 2.0.1
@@ -7614,12 +7617,12 @@ packages:
     resolution: {integrity: sha512-zz1wZk4Lb5PTVwZ3HWDmm8XnlPvmOof6/fjdDPA5yBrUcbtV64U6bV832Zf1BtU2WkBBWaUT46wCs+l0HP5nhg==}
     dev: false
 
-  /use-media@1.4.0(@preact/compat@17.1.2):
+  /use-media@1.4.0(@preact/compat@18.3.2):
     resolution: {integrity: sha512-XsgyUAf3nhzZmEfhc5MqLHwyaPjs78bgytpVJ/xDl0TF4Bptf3vEpBNBBT/EIKOmsOc8UbuECq3mrP3mt1QANA==}
     peerDependencies:
       react: ^16.8.1
     dependencies:
-      react: /@preact/compat@17.1.2(preact@10.10.0)
+      react: /@preact/compat@18.3.2(preact@10.10.0)
     dev: false
 
   /utif2@4.0.1:
@@ -8110,8 +8113,8 @@ packages:
       vsce: 1.103.1
     dev: false
 
-  github.com/styled-components/vscode-styled-components/8c7a6fb71a2e5b733a21f0f4b899cc519c43c801:
-    resolution: {tarball: https://codeload.github.com/styled-components/vscode-styled-components/tar.gz/8c7a6fb71a2e5b733a21f0f4b899cc519c43c801}
+  github.com/styled-components/vscode-styled-components/fe0107ead786d36411bc7609eb3cc73a76e43e60:
+    resolution: {tarball: https://codeload.github.com/styled-components/vscode-styled-components/tar.gz/fe0107ead786d36411bc7609eb3cc73a76e43e60}
     name: vscode-styled-components
     version: 1.7.8
     engines: {vscode: ^1.73.0}
