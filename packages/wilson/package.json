@@ -55,7 +55,7 @@
     "es-module-lexer": "^1.0.0",
     "fast-equals": "^5.0.0",
     "fast-glob": "^3.2.11",
-    "hoofd": "1.7.1",
+    "hoofd": "1.7.3",
     "jimp": "^0.22.0",
     "js-beautify": "^1.14.4",
     "magic-string": "^0.30.0",
