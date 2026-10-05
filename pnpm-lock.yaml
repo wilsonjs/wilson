@@ -156,8 +156,8 @@ importers:
         specifier: ^4.1.7
         version: 4.1.7
       '@types/hast':
-        specifier: ^2.3.4
-        version: 2.3.4
+        specifier: ^3.0.0
+        version: 3.0.5
       '@types/prettier':
         specifier: ^2.7.0
         version: 2.7.0
@@ -2035,6 +2035,13 @@ packages:
     resolution: {integrity: sha512-wLEm0QvaoawEDoTRwzTXp4b4jpwiJDvR5KMnFnVodm3scufTlBOWRD6N1OBf9TZMhjlNsSfcO5V+7AF4+Vy+9g==}
     dependencies:
       '@types/unist': 2.0.6
+    dev: false
+
+  /@types/hast@3.0.5:
+    resolution: {integrity: sha512-rp/ezSWaD1m44dPKICGhiskI13nVr7qTloFwDa/IYkhhf5nzwP+zIQcIJh3WIFSBOy/H1PzB40jPjMDksN4F+g==}
+    dependencies:
+      '@types/unist': 2.0.6
+    dev: true
 
   /@types/html-minifier-terser@7.0.0:
     resolution: {integrity: sha512-hw3bhStrg5e3FQT8qZKCJTrzt/UbEaunU1xRWJ+aNOTmeBMvE3S4Ml2HiiNnZgL8izu0LFVkHUoPFXL1s5QNpQ==}
@@ -3752,6 +3759,7 @@ packages:
   /eslint-plugin-i@2.28.1(@typescript-eslint/parser@6.7.2)(eslint@8.20.0):
     resolution: {integrity: sha512-a4oVt0j3ixNhGhvV4XF6NS7OWRFK2rrJ0Q5C4S2dSRb8FxZi31J0uUd5WJLL58wnVJ/OiQ1BxiXnFA4dWQO1Cg==}
     engines: {node: '>=12'}
+    deprecated: Please migrate to the brand new `eslint-plugin-import-x` instead
     peerDependencies:
       eslint: ^7.2.0 || ^8
     dependencies:
@@ -8115,7 +8123,6 @@ packages:
     name: vscode-styled-components
     version: 1.7.8
     engines: {vscode: ^1.73.0}
-    prepare: true
     requiresBuild: true
     dependencies:
       '@styled/typescript-styled-plugin': 1.0.0
