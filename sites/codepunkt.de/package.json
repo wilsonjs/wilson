@@ -30,7 +30,7 @@
     "animejs": "^3.2.1",
     "fast-equals": "^5.0.0",
     "gl-matrix": "^3.4.3",
-    "hoofd": "1.7.1",
+    "hoofd": "1.7.3",
     "html-minifier-terser": "^7.1.0",
     "lodash": "^4.17.21",
     "preact": "^10.10.0",
